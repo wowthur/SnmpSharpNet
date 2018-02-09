@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2020
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnmpSharpNet", "SnmpSharpNet\SnmpSharpNet.csproj", "{9230290C-9CCA-49C5-9DFB-35934D89262C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9230290C-9CCA-49C5-9DFB-35934D89262C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9230290C-9CCA-49C5-9DFB-35934D89262C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9230290C-9CCA-49C5-9DFB-35934D89262C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9230290C-9CCA-49C5-9DFB-35934D89262C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {444964FB-9B94-4521-89AB-A90F2471306D}
+	EndGlobalSection
+EndGlobal
