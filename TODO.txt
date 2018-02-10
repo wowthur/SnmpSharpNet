@@ -1,0 +1,20 @@
+﻿- Remove MutableByte where possible as linq already can do most of this inline.
+- Helper function for "byte []" for IsNullOrEmpty() or IsNullOrShorterThan()
+- Consider refactoring to var instead of explicit types during declaration to make changing return types easier
+- Join IAuthenticationDigest.PasswordToKey implementations as they are very redundant
+- 64-bit extension method to Random for AES-64 salt
+- Better buffer endian solutions for 3DES and AES? (initialization vectors)
+- Array deep copy extension methods (AES ExtendShortKey, maybe just use ToArray())
+- Verify key parity for DES in PrivacyDES.Decrypt
+- SNMPV3ReportError.TranslateError switch on equals
+- AgentParameters() : this... what's the this do? base()?
+- Buffer overflow/underflow exception generating template/generic (Ethernet address would benefit)
+- IpAddress.IsIP() use regular expression
+- OctetString.IsHex is questionable in quality
+- OctetString.ToHexString() ... simple Linq solution is better
+- OctetString.GetHashCode() ... maybe... maybe not
+- OctetString.CompareTo and Equals ... lots of duplicate complexity... merge
+- Oid Concat() - good for operator overload
+- Oid Encode() - Probably will throw on null values... add test
+- Oid Parse() - replace with a regex
+- Eliminate extra protected value for properties and make them direct
