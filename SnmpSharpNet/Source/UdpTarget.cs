@@ -37,54 +37,50 @@ namespace SnmpSharpNet
     /// </remarks>
     public class UdpTarget : UdpTransport, IDisposable
     {
-        /// <summary>
-        /// SNMP request target host IP address
-        /// </summary>
+        /// <summary>SNMP request target host IP address</summary>
         protected IPAddress _address;
+
         /// <summary>
         /// Maximum number of retries. Value of 0 (zero) will result in a single request without
         /// retries.
         /// </summary>
         protected int _retry;
-        /// <summary>
-        /// SNMP target UDP port number
-        /// </summary>
+
+        /// <summary>SNMP target UDP port number</summary>
         protected int _port;
-        /// <summary>
-        /// SNMP request timeout value in milliseconds
-        /// </summary>
+
+        /// <summary>SNMP request timeout value in milliseconds</summary>
         protected int _timeout;
-        /// <summary>
-        /// Get/Set Udp agent IP address
-        /// </summary>
+
+        /// <summary>Get/Set Udp agent IP address</summary>
         public System.Net.IPAddress Address
         {
             get { return _address; }
             set
             {
                 _address = value;
+
                 if (_address.AddressFamily == AddressFamily.InterNetworkV6 && !base.IsIPv6)
                     base.InitializeSocket(true);
                 else if (_address.AddressFamily == AddressFamily.InterNetwork && base.IsIPv6)
                     base.InitializeSocket(false);
             }
         }
-        /// <summary>
-        /// Get/Set Udp agent port number
-        /// </summary>
+
+        /// <summary>Get/Set Udp agent port number</summary>
         public int Port
         {
             get { return _port; }
             set { _port = value; }
         }
-        /// <summary>
-        /// Get/Set Udp agent timeout value in milliseconds
-        /// </summary>
+
+        /// <summary>Get/Set Udp agent timeout value in milliseconds</summary>
         public int Timeout
         {
             get { return _timeout; }
             set { _timeout = value; }
         }
+
         /// <summary>
         /// Get/Set Udp agent maximum retry value. Value of 0 (zero) will result in a single request
         /// being sent without further retry attempts.
@@ -94,9 +90,8 @@ namespace SnmpSharpNet
             get { return _retry; }
             set { _retry = value; }
         }
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+
+        /// <summary>Constructor.</summary>
         /// <param name="peer">SNMP peer IP address</param>
         /// <param name="port">SNMP peer UDP port number</param>
         /// <param name="timeout">SNMP peer timeout in milliseconds</param>
@@ -109,9 +104,8 @@ namespace SnmpSharpNet
             _timeout = timeout;
             _retry = retry;
         }
-        /// <summary>
-        /// Constructor
-        /// </summary>
+
+        /// <summary>Constructor</summary>
         /// <remarks>
         /// Initializes the class with defaults for timeout (2000ms = 2 seconds), retry (two) and agent UDP port
         /// number (161).
@@ -158,17 +152,23 @@ namespace SnmpSharpNet
         public SnmpPacket Request(Pdu pdu, IAgentParameters agentParameters)
         {
             byte[] outPacket;
+
             if (agentParameters.Version == ESnmpVersion.Ver3)
             {
                 SecureAgentParameters secparams = (SecureAgentParameters)agentParameters;
+
                 if (secparams.Authentication != AuthenticationDigests.None && secparams.AuthenticationSecret.Length <= 0)
                     throw new SnmpAuthenticationException("Authentication password not specified.");
+
                 if (secparams.Privacy != PrivacyProtocols.None && secparams.PrivacySecret.Length <= 0)
                     throw new SnmpPrivacyException("Privacy password not specified.");
+
                 _noSourceCheck = false; // this option is not valid for SNMP v3 requests
+
                 ScopedPdu outPdu = new ScopedPdu(pdu);
                 SnmpV3Packet packet = new SnmpV3Packet(outPdu);
                 secparams.InitializePacket(packet);
+
                 if (secparams.HasCachedKeys)
                     outPacket = packet.Encode(secparams.AuthenticationKey, secparams.PrivacyKey);
                 else
@@ -177,80 +177,97 @@ namespace SnmpSharpNet
             else if (agentParameters.Version == ESnmpVersion.Ver1)
             {
                 AgentParameters param = (AgentParameters)agentParameters;
+
                 if (!param.Valid())
                     throw new SnmpException(SnmpException.EErrorCode.InvalidIAgentParameters, "Invalid AgentParameters. Unable to process request.");
+
                 SnmpV1Packet packet = new SnmpV1Packet();
                 packet.Pdu.Set(pdu);
                 packet.Community.Set(param.Community);
+
                 outPacket = packet.Encode();
+
                 _noSourceCheck = param.DisableReplySourceCheck;
             }
             else if (agentParameters.Version == ESnmpVersion.Ver2)
             {
                 AgentParameters param = (AgentParameters)agentParameters;
+
                 if (!param.Valid())
                     throw new SnmpException(SnmpException.EErrorCode.InvalidIAgentParameters, "Invalid AgentParameters. Unable to process request.");
+
                 SnmpV2Packet packet = new SnmpV2Packet();
                 packet.Pdu.Set(pdu);
                 packet.Community.Set(param.Community);
                 _noSourceCheck = param.DisableReplySourceCheck;
+
                 outPacket = packet.Encode();
             }
             else
-            {
                 throw new SnmpInvalidVersionException("Unsupported SNMP version.");
-            }
 
-            byte[] inBuffer = base.Request(_address, _port, outPacket, outPacket.Length, _timeout, _retry);
+            byte[] inBuffer = Request(_address, _port, outPacket, outPacket.Length, _timeout, _retry);
 
             if (inBuffer == null || inBuffer.Length <= 0)
-            {
                 throw new SnmpException(SnmpException.EErrorCode.NoDataReceived, "No data received on request.");
-            }
+
             // verify packet
             if (agentParameters.Version == ESnmpVersion.Ver1)
             {
                 SnmpV1Packet packet = new SnmpV1Packet();
                 AgentParameters param = (AgentParameters)agentParameters;
+
                 packet.Decode(inBuffer, inBuffer.Length);
+
                 if (packet.Community != param.Community)
                 {
                     // invalid community name received. Ignore the rest of the packet
                     throw new SnmpAuthenticationException("Invalid community name in reply.");
                 }
+
                 if (packet.Pdu.RequestId != pdu.RequestId)
                 {
                     // invalid request id. unmatched response ignored
                     throw new SnmpException(SnmpException.EErrorCode.InvalidRequestId, "Invalid request id in reply.");
                 }
+
                 return packet;
             }
-            else if (agentParameters.Version == ESnmpVersion.Ver2)
+
+            if (agentParameters.Version == ESnmpVersion.Ver2)
             {
                 SnmpV2Packet packet = new SnmpV2Packet();
                 AgentParameters param = (AgentParameters)agentParameters;
+
                 packet.Decode(inBuffer, inBuffer.Length);
+
                 if (packet.Community != param.Community)
                 {
                     // invalid community name received. Ignore the rest of the packet
                     throw new SnmpAuthenticationException("Invalid community name in reply.");
                 }
+
                 if (packet.Pdu.RequestId != pdu.RequestId)
                 {
                     // invalid request id. unmatched response ignored
                     throw new SnmpException(SnmpException.EErrorCode.InvalidRequestId, "Invalid request id in reply.");
                 }
+
                 return packet;
             }
-            else if (agentParameters.Version == ESnmpVersion.Ver3)
+
+            if (agentParameters.Version == ESnmpVersion.Ver3)
             {
                 SnmpV3Packet packet = new SnmpV3Packet();
+
                 SecureAgentParameters secparams = (SecureAgentParameters)agentParameters;
                 secparams.InitializePacket(packet);
+
                 if (secparams.HasCachedKeys)
                     packet.Decode(inBuffer, inBuffer.Length, secparams.AuthenticationKey, secparams.PrivacyKey);
                 else
                     packet.Decode(inBuffer, inBuffer.Length);
+
                 // first check if packet is a discovery response and process it
                 if (packet.Pdu.Type == EPduType.Report && packet.Pdu.VbCount > 0 && packet.Pdu.VbList[0].Oid.Equals(SnmpConstants.usmStatsUnknownEngineIDs))
                 {
@@ -260,9 +277,7 @@ namespace SnmpSharpNet
                 else
                 {
                     if (!secparams.ValidateIncomingPacket(packet))
-                    {
                         return null;
-                    }
                     else
                     {
                         secparams.UpdateDiscoveryValues(packet); // update time, etc. values
@@ -270,16 +285,14 @@ namespace SnmpSharpNet
                     }
                 }
             }
+
             return null;
         }
 
-        /// <summary>
-        /// Internal event to send result of the async request to.
-        /// </summary>
+        /// <summary>Internal event to send result of the async request to.</summary>
         protected event SnmpAsyncResponse _response;
-        /// <summary>
-        /// Internal storage of the agent parameters information passed to the async request member function.
-        /// </summary>
+
+        /// <summary>Internal storage of the agent parameters information passed to the async request member function.</summary>
         protected IAgentParameters _agentParameters;
 
         /// <summary>
@@ -299,13 +312,14 @@ namespace SnmpSharpNet
         public bool RequestAsync(Pdu pdu, IAgentParameters agentParameters, SnmpAsyncResponse responseCallback)
         {
             if (IsBusy)
-            {
                 return false; // class is busy
-            }
+
             _response = null;
             _response += responseCallback;
             _agentParameters = agentParameters;
+
             byte[] outPacket;
+
             if (agentParameters.Version == ESnmpVersion.Ver3)
             {
                 SecureAgentParameters secparams = (SecureAgentParameters)agentParameters;
@@ -314,17 +328,22 @@ namespace SnmpSharpNet
                     // _response(AsyncRequestResult.AuthenticationError, null);
                     return false;
                 }
+
                 if (secparams.Privacy != PrivacyProtocols.None && secparams.PrivacySecret.Length <= 0)
                 {
                     // _response(AsyncRequestResult.PrivacyError, null);
                     return false;
                 }
+
                 _noSourceCheck = false; // this option is not valid for SNMP v3 requests
+
                 ScopedPdu outPdu = new ScopedPdu(pdu);
                 outPdu.ContextEngineId.Set(secparams.EngineId);
                 outPdu.ContextName.Set(secparams.ContextName);
+
                 SnmpV3Packet packet = new SnmpV3Packet(outPdu);
                 secparams.InitializePacket(packet);
+
                 try
                 {
                     if (secparams.HasCachedKeys)
@@ -336,16 +355,20 @@ namespace SnmpSharpNet
                 {
                     ex.GetType();
                     _response(EAsyncRequestResult.EncodeError, packet);
+
                     return false;
                 }
             }
             else if (agentParameters.Version == (int)ESnmpVersion.Ver1)
             {
                 AgentParameters param = (AgentParameters)agentParameters;
+
                 _noSourceCheck = param.DisableReplySourceCheck;
+
                 SnmpV1Packet packet = new SnmpV1Packet();
                 packet.Pdu.Set(pdu);
                 packet.Community.Set(param.Community);
+
                 try
                 {
                     outPacket = packet.Encode();
@@ -354,16 +377,20 @@ namespace SnmpSharpNet
                 {
                     ex.GetType();
                     _response(EAsyncRequestResult.EncodeError, packet);
+
                     return false;
                 }
             }
             else if (agentParameters.Version == ESnmpVersion.Ver2)
             {
                 AgentParameters param = (AgentParameters)agentParameters;
+
                 _noSourceCheck = param.DisableReplySourceCheck;
+
                 SnmpV2Packet packet = new SnmpV2Packet();
                 packet.Pdu.Set(pdu);
                 packet.Community.Set(param.Community);
+
                 try
                 {
                     outPacket = packet.Encode();
@@ -372,6 +399,7 @@ namespace SnmpSharpNet
                 {
                     ex.GetType();
                     _response(EAsyncRequestResult.EncodeError, packet);
+
                     return false;
                 }
             }
@@ -380,12 +408,9 @@ namespace SnmpSharpNet
                 throw new SnmpInvalidVersionException("Unsupported SNMP version.");
             }
 
-            if (!base.RequestAsync(_address, _port, outPacket, outPacket.Length, _timeout, _retry, new SnmpAsyncCallback(AsyncResponse)))
-            {
-                return false;
-            }
-            return true;
+            return RequestAsync(_address, _port, outPacket, outPacket.Length, _timeout, _retry, new SnmpAsyncCallback(AsyncResponse));
         }
+
         /// <summary>
         /// Perform SNMP version 3 discovery operation. This is the first operation that needs to be
         /// performed on a newly accessed agent to retrieve agentId, agentBoots and agentTime values, critical
@@ -401,8 +426,10 @@ namespace SnmpSharpNet
             param.Reset();
             param.SecurityName.Set("");
             param.Reportable = true;
+
             Pdu pdu = new Pdu(); // just leave everything at default.
             SnmpV3Packet inpkt = (SnmpV3Packet)Request(pdu, param);
+
             if (inpkt != null)
             {
                 if (inpkt.USM.EngineBoots == 0 && inpkt.USM.EngineTime == 0)
@@ -416,34 +443,36 @@ namespace SnmpSharpNet
             }
             return false;
         }
-        /// <summary>
-        /// Make an async discovery request for protocol version 3.
-        /// </summary>
+
+        /// <summary>Make an async discovery request for protocol version 3.</summary>
         /// <param name="param">Agent parameters</param>
         /// <param name="callback">Callback method</param>
         /// <returns>True if operation was correctly initiated, otherwise false.</returns>
         public bool DiscoveryAsync(SecureAgentParameters param, SnmpAsyncResponse callback)
         {
             Pdu p = new Pdu();
+
             return RequestAsync(p, param, callback);
         }
+
         internal void AsyncResponse(EAsyncRequestResult result, IPEndPoint peer, byte[] buffer, int buflen)
         {
             if (result != EAsyncRequestResult.NoError)
-            {
                 _response(result, null);
-            }
             else
             {
                 if (buffer == null || buffer.Length <= 0 || buflen <= 0)
                 {
                     _response(EAsyncRequestResult.NoDataReceived, null);
+
                     return;
                 }
+
                 // verify packet
                 if (_agentParameters.Version == (int)ESnmpVersion.Ver1)
                 {
                     SnmpV1Packet packet = new SnmpV1Packet();
+
                     try
                     {
                         packet.Decode(buffer, buflen);
@@ -455,12 +484,15 @@ namespace SnmpSharpNet
                         _response(EAsyncRequestResult.DecodeError, packet);
                         return;
                     }
+
                     _response(EAsyncRequestResult.NoError, packet);
+
                     return;
                 }
                 else if (_agentParameters.Version == ESnmpVersion.Ver2)
                 {
                     SnmpV2Packet packet = new SnmpV2Packet();
+
                     try
                     {
                         packet.Decode(buffer, buflen);
@@ -483,6 +515,7 @@ namespace SnmpSharpNet
                     SnmpV3Packet packet = new SnmpV3Packet();
                     SecureAgentParameters secparams = (SecureAgentParameters)_agentParameters;
                     secparams.InitializePacket(packet);
+
                     try
                     {
                         if (secparams.HasCachedKeys)
@@ -495,6 +528,7 @@ namespace SnmpSharpNet
                         _response(EAsyncRequestResult.DecodeError, packet);
                         return;
                     }
+
                     if (!secparams.ValidateIncomingPacket(packet))
                     {
                         _response(EAsyncRequestResult.AuthenticationError, packet);
@@ -502,6 +536,7 @@ namespace SnmpSharpNet
                     else
                     {
                         secparams.UpdateDiscoveryValues(packet); // update time, etc. values
+
                         if (packet.USM.EngineId.Length > 0 && packet.USM.EngineBoots == 0 && packet.USM.EngineTime == 0)
                         {
                             Pdu p = new Pdu();
