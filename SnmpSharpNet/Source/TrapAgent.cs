@@ -15,20 +15,17 @@
 // 
 // First introduced: 0.5.2
 //
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net;
-using System.Net.Sockets;
+using SnmpSharpNet.Exception;
 using SnmpSharpNet.Security;
 using SnmpSharpNet.Types;
-using SnmpSharpNet.Exception;
+using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 
 namespace SnmpSharpNet
 {
-    /// <summary>
-    /// Send SNMP Trap notifications
-    /// </summary>
+    /// <summary>Send SNMP Trap notifications</summary>
     /// <remarks>
     /// TrapAgent class is used to hide Socket operations from users and provide an easy method to send
     /// Trap notifications.
@@ -39,13 +36,10 @@ namespace SnmpSharpNet
     /// </remarks>
     public class TrapAgent
     {
-        /// <summary>
-        /// Internal Socket class
-        /// </summary>
+        /// <summary>Internal Socket class</summary>
         protected Socket _sock;
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+
+        /// <summary>Constructor.</summary>
         /// <remarks>
         /// Constructor initializes an internal Socket used to send traps. Socket is initialized by selecting a
         /// random UDP port number.
@@ -55,17 +49,15 @@ namespace SnmpSharpNet
             _sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             _sock.Bind(new IPEndPoint(IPAddress.Any, 0));
         }
-        /// <summary>
-        /// Destructor.
-        /// </summary>
+
+        /// <summary>Destructor.</summary>
         /// <remarks>Destructors only purpose is to close the Socket used by the class.</remarks>
         ~TrapAgent()
         {
             _sock.Close();
         }
-        /// <summary>
-        /// Send SNMP version 1 Trap notification
-        /// </summary>
+
+        /// <summary>Send SNMP version 1 Trap notification</summary>
         /// <param name="packet">SNMP v1 Trap packet class</param>
         /// <param name="peer">Manager (receiver) IP address</param>
         /// <param name="port">Manager (receiver) UDP port number</param>
@@ -74,9 +66,8 @@ namespace SnmpSharpNet
             byte[] outBuffer = packet.Encode();
             _sock.SendTo(outBuffer, new IPEndPoint((IPAddress)peer, port));
         }
-        /// <summary>
-        /// Construct and send SNMP v1 Trap
-        /// </summary>
+
+        /// <summary>Construct and send SNMP v1 Trap</summary>
         /// <param name="receiver">Receiver IP address</param>
         /// <param name="receiverPort">Receiver UDP port number</param>
         /// <param name="community">SNMP community name</param>
@@ -99,9 +90,8 @@ namespace SnmpSharpNet
             packet.Pdu.Enterprise.Set(senderSysObjectID);
             SendV1Trap(packet, receiver, receiverPort);
         }
-        /// <summary>
-        /// Send SNMP version 2 Trap notification
-        /// </summary>
+
+        /// <summary>Send SNMP version 2 Trap notification</summary>
         /// <param name="packet">SNMP v2 Trap packet class</param>
         /// <param name="peer">Manager (receiver) IP address</param>
         /// <param name="port">Manager (receiver) UDP port number</param>
@@ -109,13 +99,12 @@ namespace SnmpSharpNet
         {
             if (packet.Pdu.Type != EPduType.V2Trap)
                 throw new SnmpInvalidPduTypeException("Invalid Pdu type.");
+
             byte[] outBuffer = packet.Encode();
             _sock.SendTo(outBuffer, new IPEndPoint((IPAddress)peer, port));
         }
 
-        /// <summary>
-        /// Construct and send SNMP v2 Trap
-        /// </summary>
+        /// <summary>Construct and send SNMP v2 Trap</summary>
         /// <param name="receiver">Trap receiver IP address</param>
         /// <param name="receiverPort">Trap receiver UDP port number</param>
         /// <param name="community">SNMP community name</param>
@@ -132,9 +121,8 @@ namespace SnmpSharpNet
             packet.Pdu.SetVbList(varList);
             SendV2Trap(packet, receiver, receiverPort);
         }
-        /// <summary>
-        /// Send SNMP version 3 Trap notification
-        /// </summary>
+
+        /// <summary>Send SNMP version 3 Trap notification</summary>
         /// <param name="packet">SNMP v3 Trap packet class</param>
         /// <param name="peer">Manager (receiver) IP address</param>
         /// <param name="port">Manager (receiver) UDP port number</param>
@@ -142,13 +130,12 @@ namespace SnmpSharpNet
         {
             if (packet.Pdu.Type != EPduType.V2Trap)
                 throw new SnmpInvalidPduTypeException("Invalid Pdu type.");
+
             byte[] outBuffer = packet.Encode();
             _sock.SendTo(outBuffer, new IPEndPoint((IPAddress)peer, port));
         }
 
-        /// <summary>
-        /// Construct and send SNMP v3 noAuthNoPriv Trap
-        /// </summary>
+        /// <summary>Construct and send SNMP v3 noAuthNoPriv Trap</summary>
         /// <param name="receiver">Trap receiver IP address</param>
         /// <param name="receiverPort">Trap receiver UDP port number</param>
         /// <param name="engineId">Sender SNMP engineId</param>
@@ -173,9 +160,7 @@ namespace SnmpSharpNet
             SendV3Trap(packet, receiver, receiverPort);
         }
 
-        /// <summary>
-        /// Construct and send SNMP v3 authNoPriv Trap
-        /// </summary>
+        /// <summary>Construct and send SNMP v3 authNoPriv Trap</summary>
         /// <param name="receiver">Trap receiver IP address</param>
         /// <param name="receiverPort">Trap receiver UDP port number</param>
         /// <param name="engineId">Sender SNMP engineId</param>
@@ -185,8 +170,10 @@ namespace SnmpSharpNet
         /// <param name="senderUpTime">Sender upTime</param>
         /// <param name="trapObjectID">Trap object ID</param>
         /// <param name="varList">Variable binding list</param>
-        /// <param name="authDigest">Authentication digest. <see cref="AuthenticationDigests"/> enumeration for
-        /// available digests</param>
+        /// <param name="authDigest">
+        /// Authentication digest. <see cref="AuthenticationDigests"/> enumeration for
+        /// available digests
+        /// </param>
         /// <param name="authSecret">Authentication secret</param>
         public void SendV3Trap(IpAddress receiver, int receiverPort, byte[] engineId, Int32 senderEngineBoots,
             Int32 senderEngineTime, string senderUserName, uint senderUpTime, Oid trapObjectID, VbCollection varList,
@@ -204,9 +191,7 @@ namespace SnmpSharpNet
             SendV3Trap(packet, receiver, receiverPort);
         }
 
-        /// <summary>
-        /// Construct and send SNMP v3 authPriv Trap
-        /// </summary>
+        /// <summary>Construct and send SNMP v3 authPriv Trap</summary>
         /// <param name="receiver">Trap receiver IP address</param>
         /// <param name="receiverPort">Trap receiver UDP port number</param>
         /// <param name="engineId">Sender SNMP engineId</param>
@@ -216,11 +201,15 @@ namespace SnmpSharpNet
         /// <param name="senderUpTime">Sender upTime</param>
         /// <param name="trapObjectID">Trap object ID</param>
         /// <param name="varList">Variable binding list</param>
-        /// <param name="authDigest">Authentication digest. See <see cref="AuthenticationDigests"/> enumeration for
-        /// available digests</param>
+        /// <param name="authDigest">
+        /// Authentication digest. See <see cref="AuthenticationDigests"/> enumeration for
+        /// available digests
+        /// </param>
         /// <param name="authSecret">Authentication secret</param>
-        /// <param name="privProtocol">Privacy protocol. See <see cref="PrivacyProtocols"/> enumeration for
-        /// available privacy protocols.</param>
+        /// <param name="privProtocol">
+        /// Privacy protocol. See <see cref="PrivacyProtocols"/> enumeration for
+        /// available privacy protocols.
+        /// </param>
         /// <param name="privSecret">Privacy secret</param>
         public void SendV3Trap(IpAddress receiver, int receiverPort, byte[] engineId, Int32 senderEngineBoots,
             Int32 senderEngineTime, string senderUserName, uint senderUpTime, Oid trapObjectID, VbCollection varList,
@@ -238,9 +227,7 @@ namespace SnmpSharpNet
             SendV3Trap(packet, receiver, receiverPort);
         }
 
-        /// <summary>
-        /// Send SNMP Trap notification
-        /// </summary>
+        /// <summary>Send SNMP Trap notification</summary>
         /// <remarks>
         /// Helper function to allow for seamless sending of SNMP notifications for all protocol versions.
         /// 
@@ -256,6 +243,7 @@ namespace SnmpSharpNet
         public static void SendTrap(SnmpPacket packet, IpAddress peer, int port)
         {
             TrapAgent agent = new TrapAgent();
+
             if (packet is SnmpV1TrapPacket)
                 agent.SendV1Trap((SnmpV1TrapPacket)packet, peer, port);
             else if (packet is SnmpV2Packet)

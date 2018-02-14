@@ -42,22 +42,18 @@ namespace SnmpSharpNet
 
         #region Variables
 
-        // <summary>
-        // Protocol version. Always == SnmpConstants.SNMPV3
-        // </summary>
+        // <summary>Protocol version. Always == SnmpConstants.</summary>
         // protected Integer32 _version;
-        /// <summary>
-        /// Authoritative engine id
-        /// </summary>
+
+        /// <summary>Authoritative engine </summary>
         protected OctetString _engineId;
-        /// <summary>
-        /// Authoritative engine boots value
-        /// </summary>
+        
+        /// <summaryAuthoritative engine boots value</summary>
         protected Integer32 _engineBoots;
-        /// <summary>
-        /// Authoritative engine time value
-        /// </summary>
+
+        /// <summary>Authoritative engine time value</summary>
         protected Integer32 _engineTime;
+
         /// <summary>
         /// Time stamp when authoritative engine time value was last refreshed with data from the agent.
         /// 
@@ -65,37 +61,37 @@ namespace SnmpSharpNet
         /// repeat discovery process every 150 seconds.
         /// </summary>
         protected DateTime _engineTimeStamp;
-        /// <summary>
-        /// Security name value, or user name.
-        /// </summary>
+        
+        /// <summary>Security name value, or user name.</summary>
         protected OctetString _securityName;
-        /// <summary>
-        /// Privacy protocol to use. For available protocols, see <see cref="PrivacyProtocols"/> enumeration.
-        /// </summary>
+
+        /// <summary>Privacy protocol to use. For available protocols, see <see cref="PrivacyProtocols"/> enumeration.</summary>
         protected PrivacyProtocols _privacyProtocol;
+        
         /// <summary>
         /// Authentication digest to use in authNoPriv and authPriv security combinations. For available
         /// authentication digests, see <see cref="AuthenticationDigests"/> enumeration.
         /// </summary>
         protected AuthenticationDigests _authenticationProtocol;
-        /// <summary>
-        /// Privacy secret (or privacy password)
-        /// </summary>
+        
+        /// <summary>Privacy secret (or privacy password)</summary>
         protected MutableByte _privacySecret;
-        /// <summary>
-        /// Authentication secret (or authentication password)
-        /// </summary>
+
+        /// <summary>Authentication secret (or authentication password)</summary>
         protected MutableByte _authenticationSecret;
+
         /// <summary>
         /// Context engine id. By default, this value is set to authoritative engine id value unless specifically
         /// set to a different value here.
         /// </summary>
         protected OctetString _contextEngineId;
+        
         /// <summary>
         /// Context name. By default this value is a 0 length string (no context name). Set this value if you
         /// require it to be defined in ScopedPdu.
         /// </summary>
         protected OctetString _contextName;
+        
         /// <summary>
         /// Maximum message size. This value is by default set to 64KB and then updated by the maximum message
         /// size value in the response from the agent.
@@ -103,6 +99,7 @@ namespace SnmpSharpNet
         /// This value should be the smallest message size supported by both the agent and manager.
         /// </summary>
         protected Integer32 _maxMessageSize;
+        
         /// <summary>
         /// Reportable option flag. Set to true by default.
         /// 
@@ -111,27 +108,22 @@ namespace SnmpSharpNet
         /// requests are silently dropped by the agent.
         /// </summary>
         protected bool _reportable;
-        /// <summary>
-        /// Cached privacy key
-        /// </summary>
+        
+        /// <summary>Cached privacy key</summary>
         protected byte[] _privacyKey;
-        /// <summary>
-        /// Cached authentication key
-        /// </summary>
+
+        /// <summary>Cached authentication key</summary>
         protected byte[] _authenticationKey;
 
         #endregion /* Variables */
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        /// <summary>Constructor</summary>
         public SecureAgentParameters()
         {
             Reset();
         }
-        /// <summary>
-        /// Copy constructor. Initialize the class with the values of the parameter class values.
-        /// </summary>
+
+        /// <summary>Copy constructor. Initialize the class with the values of the parameter class values.</summary>
         /// <param name="second">Parameter class.</param>
         public SecureAgentParameters(SecureAgentParameters second)
             : this()
@@ -149,125 +141,89 @@ namespace SnmpSharpNet
             _authenticationSecret.Set(second.AuthenticationSecret);
             _reportable = second.Reportable;
             _securityName.Set(second.SecurityName);
+
             if (second.AuthenticationKey != null)
                 _authenticationKey = (byte[])second.AuthenticationKey.Clone();
+
             if (second.PrivacyKey != null)
                 _privacyKey = (byte[])second.PrivacyKey.Clone();
         }
 
         #region Properties
 
-        /// <summary>
-        /// Agent authoritative engine id
-        /// </summary>
+        /// <summary>Agent authoritative engine id</summary>
         public OctetString EngineId
         {
-            get
-            {
-                return _engineId;
-            }
-        }
-        /// <summary>
-        /// SNMP version 3 agent engine boots value
-        /// </summary>
-        public Integer32 EngineBoots
-        {
-            get
-            {
-                return _engineBoots;
-            }
+            get { return _engineId; }
         }
 
-        /// <summary>
-        /// Get engine time stamp value (last time engine boots and time values were retrieved from the SNMP agent).
-        /// </summary>
+        /// <summary>SNMP version 3 agent engine boots value</summary>
+        public Integer32 EngineBoots
+        {
+            get { return _engineBoots; }
+        }
+
+        /// <summary>Get engine time stamp value (last time engine boots and time values were retrieved from the SNMP agent).</summary>
         /// <returns>DateTime stamp of the time timeliness values were last refreshed</returns>
         internal DateTime EngineTimeStamp()
         {
             return _engineTimeStamp;
         }
-        /// <summary>
-        /// SNMP version 3 agent engine time value.
-        /// </summary>
+
+        /// <summary>SNMP version 3 agent engine time value.</summary>
         public Integer32 EngineTime
         {
-            get
-            {
-                return _engineTime;
-            }
+            get { return _engineTime; }
         }
-        /// <summary>
-        /// Security or user name configured on the SNMP version 3 agent.
-        /// </summary>
+
+        /// <summary>Security or user name configured on the SNMP version 3 agent.</summary>
         public OctetString SecurityName
         {
-            get
-            {
-                return _securityName;
-            }
+            get { return _securityName; }
         }
-        /// <summary>
-        /// Privacy protocol used. Acceptable values are members of <see cref="PrivacyProtocols"/> enum.
-        /// </summary>
+
+        /// <summary>Privacy protocol used. Acceptable values are members of <see cref="PrivacyProtocols"/> enum.</summary>
         public PrivacyProtocols Privacy
         {
-            get
-            {
-                return _privacyProtocol;
-            }
+            get { return _privacyProtocol; }
             set
             {
                 if (value != PrivacyProtocols.None && PrivacyProtocol.GetInstance(value) == null)
                     throw new SnmpPrivacyException("Invalid privacy protocol");
+
                 _privacyProtocol = value;
             }
         }
-        /// <summary>
-        /// Privacy secret. Length of the secret is dependent on the selected privacy method.
-        /// </summary>
+
+        /// <summary>Privacy secret. Length of the secret is dependent on the selected privacy method.</summary>
         public MutableByte PrivacySecret
         {
-            get
-            {
-                return _privacySecret;
-            }
+            get { return _privacySecret; }
         }
-        /// <summary>
-        /// Authentication method. Acceptable values are members of <see cref="AuthenticationDigests"/> enum.
-        /// </summary>
+
+        /// <summary>Authentication method. Acceptable values are members of <see cref="AuthenticationDigests"/> enum.</summary>
         public AuthenticationDigests Authentication
         {
-            get
-            {
-                return _authenticationProtocol;
-            }
+            get { return _authenticationProtocol; }
             set
             {
                 if (value != AuthenticationDigests.None && Security.Authentication.GetInstance(value) == null)
                     throw new SnmpAuthenticationException("Invalid authentication protocol.");
+
                 _authenticationProtocol = value;
             }
         }
-        /// <summary>
-        /// Authentication secret. Secret length depends on the hash algorithm selected.
-        /// </summary>
+
+        /// <summary>Authentication secret. Secret length depends on the hash algorithm selected.</summary>
         public MutableByte AuthenticationSecret
         {
-            get
-            {
-                return _authenticationSecret;
-            }
+            get { return _authenticationSecret; }
         }
-        /// <summary>
-        /// SNMP version. Only acceptable version is <see cref="ESnmpVersion.Ver3"/>
-        /// </summary>
+
+        /// <summary>SNMP version. Only acceptable version is <see cref="ESnmpVersion.Ver3"/></summary>
         public ESnmpVersion Version
         {
-            get
-            {
-                // return (SnmpVersion)_version.Value;
-                return ESnmpVersion.Ver3;
-            }
+            get { return ESnmpVersion.Ver3; }
         }
 
         /// <summary>
@@ -281,53 +237,31 @@ namespace SnmpSharpNet
         /// </summary>
         public OctetString ContextEngineId
         {
-            get
-            {
-                return _contextEngineId;
-            }
+            get { return _contextEngineId; }
         }
-        /// <summary>
-        /// Get SNMP version 3 context name
-        /// </summary>
+
+        /// <summary>Get SNMP version 3 context name</summary>
         public OctetString ContextName
         {
-            get
-            {
-                return _contextName;
-            }
+            get { return _contextName; }
         }
 
-        /// <summary>
-        /// Get SNMP version 3 maximum message size object
-        /// </summary>
+        /// <summary>Get SNMP version 3 maximum message size object</summary>
         public Integer32 MaxMessageSize
         {
-            get
-            {
-                return _maxMessageSize;
-            }
+            get { return _maxMessageSize; }
         }
 
-        /// <summary>
-        /// Get/Set reportable flag status in the SNMP version 3 packet.
-        /// </summary>
+        /// <summary>Get/Set reportable flag status in the SNMP version 3 packet.</summary>
         public bool Reportable
         {
-            get
-            {
-                return _reportable;
-            }
-            set
-            {
-                _reportable = value;
-            }
+            get { return _reportable; }
+            set { _reportable = value; }
         }
 
         #endregion /* Properties */
 
-        /// <summary>
-        /// Prepare class for noAuthNoPriv operations. Set authentication and privacy protocols to none.
-        /// </summary>
+        /// <summary>Prepare class for noAuthNoPriv operations. Set authentication and privacy protocols to none.</summary>
         /// <param name="securityName">User security name</param>
         public void NoAuthNoPriv(string securityName)
         {
@@ -337,9 +271,8 @@ namespace SnmpSharpNet
             _privacyProtocol = PrivacyProtocols.None;
             _privacySecret.Clear();
         }
-        /// <summary>
-        /// Prepare class for authNoPriv operations. Set privacy protocol to none
-        /// </summary>
+
+        /// <summary>Prepare class for authNoPriv operations. Set privacy protocol to none</summary>
         /// <param name="securityName">User security name</param>
         /// <param name="authDigest">Authentication protocol</param>
         /// <param name="authSecret">Authentication secret (password)</param>
@@ -351,9 +284,8 @@ namespace SnmpSharpNet
             _privacyProtocol = PrivacyProtocols.None;
             _privacySecret.Clear();
         }
-        /// <summary>
-        /// Prepare class for authPriv operations.
-        /// </summary>
+
+        /// <summary>Prepare class for authPriv operations.</summary>
         /// <param name="securityName">User security name</param>
         /// <param name="authDigest">Authentication protocol</param>
         /// <param name="authSecret">Authentication secret (password)</param>
@@ -367,45 +299,24 @@ namespace SnmpSharpNet
             _privacyProtocol = privProtocol;
             _privacySecret.Set(privSecret);
         }
-        /// <summary>
-        /// Get/Set cached privacy key value
-        /// </summary>
-        /// <remarks>
-        /// Privacy key is set by reference.
-        /// </remarks>
+
+        /// <summary>Get/Set cached privacy key value</summary>
+        /// <remarks>Privacy key is set by reference.</remarks>
         public byte[] PrivacyKey
         {
-            get
-            {
-                return _privacyKey;
-            }
-            set
-            {
-                _privacyKey = value;
-            }
+            get { return _privacyKey; }
+            set { _privacyKey = value; }
         }
 
-        /// <summary>
-        /// Get/Set cached authentication key value
-        /// </summary>
-        /// <remarks>
-        /// Authentication key value is set by reference.
-        /// </remarks>
+        /// <summary>Get/Set cached authentication key value</summary>
+        /// <remarks>Authentication key value is set by reference.</remarks>
         public byte[] AuthenticationKey
         {
-            get
-            {
-                return _authenticationKey;
-            }
-            set
-            {
-                _authenticationKey = value;
-            }
+            get { return _authenticationKey; }
+            set { _authenticationKey = value; }
         }
 
-        /// <summary>
-        /// Check if cached privacy or authentication keys are available
-        /// </summary>
+        /// <summary>Check if cached privacy or authentication keys are available</summary>
         public bool HasCachedKeys
         {
             get
@@ -427,11 +338,12 @@ namespace SnmpSharpNet
                 return false;
             }
         }
-        /// <summary>
-        /// Checks validity of the class. 
-        /// </summary>
-        /// <returns>Returns false if all required values are not initialized, or if invalid
-        /// combination of options is set, otherwise true.</returns>
+
+        /// <summary>Checks validity of the class.</summary>
+        /// <returns>
+        /// Returns false if all required values are not initialized, or if invalid
+        /// combination of options is set, otherwise true.
+        /// </returns>
         public bool Valid()
         {
             if (SecurityName.Length <= 0 && (_authenticationProtocol != AuthenticationDigests.None || _privacyProtocol != PrivacyProtocols.None))
@@ -440,10 +352,13 @@ namespace SnmpSharpNet
                 // in theory you can use blank security name during discovery process so this is not exactly prohibited by it is discouraged
                 return false;
             }
+
             if (_authenticationProtocol == AuthenticationDigests.None && _privacyProtocol != PrivacyProtocols.None)
                 return false; // noAuthPriv mode is not valid in SNMP version 3 
+
             if (_authenticationProtocol != AuthenticationDigests.None && _authenticationSecret.Length <= 0)
                 return false; // Authentication protocol requires authentication secret
+
             if (_privacyProtocol != PrivacyProtocols.None && _privacySecret.Length <= 0)
                 return false; // Privacy protocol requires privacy secret
 
@@ -452,43 +367,39 @@ namespace SnmpSharpNet
                 if (!ValidateEngineTime())
                     return false; // engine time is outside the acceptable timeliness window
             }
+
             // rest of the values can be empty during the discovery process so no point in checking
             return true;
         }
 
-        /// <summary>
-        /// InitializePacket SNMP packet with values from this class. Works only on SNMP version 3 packets.
-        /// </summary>
+        /// <summary>InitializePacket SNMP packet with values from this class. Works only on SNMP version 3 packets.</summary>
         /// <param name="packet">Instance of <see cref="SnmpV3Packet"/></param>
         /// <exception cref="SnmpInvalidVersionException">Thrown when parameter packet is not SnmpV3Packet</exception>
         public void InitializePacket(SnmpPacket packet)
         {
-            if (packet is SnmpV3Packet)
+            if (packet is SnmpV3Packet pkt)
             {
-                SnmpV3Packet pkt = (SnmpV3Packet)packet;
                 bool isAuth = (_authenticationProtocol == AuthenticationDigests.None) ? false : true;
                 bool isPriv = (_privacyProtocol == PrivacyProtocols.None) ? false : true;
+
                 if (isAuth && isPriv)
-                {
                     pkt.AuthPriv(_securityName, _authenticationSecret, _authenticationProtocol, _privacySecret, _privacyProtocol);
-                }
                 else if (isAuth && !isPriv)
-                {
                     pkt.AuthNoPriv(_securityName, _authenticationSecret, _authenticationProtocol);
-                }
                 else
-                {
                     pkt.NoAuthNoPriv(_securityName);
-                }
+
                 pkt.USM.EngineId.Set(_engineId);
                 pkt.USM.EngineBoots = _engineBoots.Value;
                 pkt.USM.EngineTime = GetCurrentEngineTime();
                 pkt.MaxMessageSize = _maxMessageSize.Value;
                 pkt.MsgFlags.Reportable = _reportable;
+
                 if (_contextEngineId.Length > 0)
                     pkt.ScopedPdu.ContextEngineId.Set(_contextEngineId);
                 else
                     pkt.ScopedPdu.ContextEngineId.Set(_engineId);
+
                 if (_contextName.Length > 0)
                     pkt.ScopedPdu.ContextName.Set(_contextName);
                 else
@@ -504,8 +415,7 @@ namespace SnmpSharpNet
         /// and privacy values are updated as well which discovery process doesn't use.
         /// </summary>
         /// <param name="packet"><see cref="SnmpV3Packet"/> cast as <see cref="SnmpPacket"/></param>
-        /// <exception cref="SnmpInvalidVersionException">Thrown when SNMP packet class other then version 3 
-        /// is passed as parameter</exception>
+        /// <exception cref="SnmpInvalidVersionException">Thrown when SNMP packet class other then version 3 is passed as parameter</exception>
         public void UpdateValues(SnmpPacket packet)
         {
             if (packet is SnmpV3Packet pkt)
@@ -530,17 +440,19 @@ namespace SnmpSharpNet
         /// class. Values updated are EngineId, EngineTime and EngineBoots.
         /// </summary>
         /// <param name="packet"><see cref="SnmpV3Packet"/> class cast as <see cref="SnmpPacket"/></param>
-        /// <exception cref="SnmpInvalidVersionException">Thrown when SNMP packet class other then version 3 
-        /// is passed as parameter</exception>
+        /// <exception cref="SnmpInvalidVersionException">
+        /// Thrown when SNMP packet class other then version 3 is passed as parameter
+        /// </exception>
         public void UpdateDiscoveryValues(SnmpPacket packet)
         {
-            if (packet is SnmpV3Packet)
+            if (packet is SnmpV3Packet pkt)
             {
-                SnmpV3Packet pkt = (SnmpV3Packet)packet;
                 _engineId.Set(pkt.USM.EngineId);
                 _engineTime.Value = pkt.USM.EngineTime;
                 _engineBoots.Value = pkt.USM.EngineBoots;
+
                 UpdateTimeStamp();
+
                 _contextEngineId.Set(pkt.ScopedPdu.ContextEngineId);
                 _contextName.Set(pkt.ScopedPdu.ContextName);
             }
@@ -560,6 +472,7 @@ namespace SnmpSharpNet
         {
             _engineTimeStamp = DateTime.UtcNow;
         }
+
         /// <summary>
         /// Validate agents engine time. Valid engine time value is time that has been initialized to
         /// a value other then default (DateTime.MinValue is default set in the constructor) and that
@@ -594,7 +507,9 @@ namespace SnmpSharpNet
         {
             if (!ValidateEngineTime())
                 return 0;
+
             TimeSpan diff = DateTime.UtcNow.Subtract(_engineTimeStamp);
+            
             // increment the value by one to make sure we don't fall behind the agents clock
             return Convert.ToInt32(_engineTime.Value + diff.TotalSeconds + 1);
         }
@@ -623,13 +538,11 @@ namespace SnmpSharpNet
                 {
                     // we do not expect report packets so dump it
                     throw new SnmpException(SnmpException.EErrorCode.ReportOnNoReports, "Unexpected report packet received.");
-                    // return false; 
                 }
                 if (packet.MsgFlags.Authentication == false && packet.MsgFlags.Privacy)
                 {
                     // no authentication and no privacy allowed in report packets
                     throw new SnmpException(SnmpException.EErrorCode.UnsupportedNoAuthPriv, "Authentication and privacy combination is not supported.");
-                    // return false; 
                 }
                 // the rest will not be checked, there is no point
             }
@@ -639,52 +552,47 @@ namespace SnmpSharpNet
                 {
                     // different engine id is not allowed
                     throw new SnmpException(SnmpException.EErrorCode.InvalidAuthoritativeEngineId, "EngineId mismatch.");
-                    // return false; 
                 }
 
                 if (packet.USM.Authentication != _authenticationProtocol || packet.USM.Privacy != _privacyProtocol)
                 {
                     // we have to have the same authentication and privacy protocol - no last minute changes
                     throw new SnmpException("Agent parameters updated after request was made.");
-                    // return false; 
                 }
+
                 if (packet.USM.Authentication != AuthenticationDigests.None)
                 {
                     if (packet.USM.AuthenticationSecret != _authenticationSecret)
                     {
                         // authentication secret has to match
                         throw new SnmpAuthenticationException("Authentication secret in the packet class does not match the IAgentParameter secret.");
-                        // return false; 
                     }
                 }
+
                 if (packet.USM.Privacy != PrivacyProtocols.None)
                 {
                     if (packet.USM.PrivacySecret != _privacySecret)
                     {
                         // privacy secret has to match
                         throw new SnmpPrivacyException("Privacy secret in the packet class does not match the IAgentParameters secret.");
-                        // return false; 
                     }
                 }
+
                 if (packet.USM.SecurityName != _securityName)
-                {
                     throw new SnmpException(SnmpException.EErrorCode.InvalidSecurityName, "Security name mismatch.");
-                    // return false;
-                }
             }
+
             return true;
         }
-        /// <summary>
-        /// Reset privacy and authentication keys to null.
-        /// </summary>
+
+        /// <summary>Reset privacy and authentication keys to null.</summary>
         public void ResetKeys()
         {
             _privacyKey = null;
             _authenticationKey = null;
         }
-        /// <summary>
-        /// Reset the class. Initialize all member values to class defaults.
-        /// </summary>
+
+        /// <summary>Reset the class. Initialize all member values to class defaults.</summary>
         public void Reset()
         {
             _engineId = new OctetString();
@@ -712,17 +620,15 @@ namespace SnmpSharpNet
             _privacyKey = null;
             _authenticationKey = null;
         }
-        /// <summary>
-        /// Clone current object
-        /// </summary>
+
+        /// <summary>Clone current object</summary>
         /// <returns>Duplicate object initialized with values from this class.</returns>
         public object Clone()
         {
-            return (object)new SecureAgentParameters(this);
+            return new SecureAgentParameters(this);
         }
-        /// <summary>
-        /// Build cached authentication and privacy encryption keys if they are appropriate for the selected security mode.
-        /// </summary>
+
+        /// <summary>Build cached authentication and privacy encryption keys if they are appropriate for the selected security mode.</summary>
         /// <remarks>
         /// This method should be called after discovery process has been completed and all security related values
         /// have been set. For noAuthNoPriv, none of the keys are generated. authNoPriv will result in authentication
@@ -736,8 +642,10 @@ namespace SnmpSharpNet
 
             if (_engineId == null || _engineId.Length <= 0)
                 return;
+
             if (_authenticationSecret == null || _authenticationSecret.Length <= 0)
                 return;
+
             if (_authenticationProtocol != AuthenticationDigests.None)
             {
                 IAuthenticationDigest authProto = Security.Authentication.GetInstance(_authenticationProtocol);

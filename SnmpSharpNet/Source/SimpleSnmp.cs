@@ -37,47 +37,39 @@ namespace SnmpSharpNet
     /// </remarks>
     public class SimpleSnmp
     {
-        /// <summary>
-        /// SNMP Agents IP address
-        /// </summary>
+        /// <summary>SNMP Agents IP address</summary>
         protected IPAddress _peerIP;
-        /// <summary>
-        /// SNMP Agents name
-        /// </summary>
+
+        /// <summary>SNMP Agents name</summary>
         protected string _peerName;
-        /// <summary>
-        /// SNMP Agent UDP port number
-        /// </summary>
+
+        /// <summary>SNMP Agent UDP port number</summary>
         protected int _peerPort;
-        /// <summary>
-        /// Target class
-        /// </summary>
+
+        /// <summary>Target class</summary>
         protected UdpTarget _target;
-        /// <summary>
-        /// Timeout value in milliseconds
-        /// </summary>
+
+        /// <summary>Timeout value in milliseconds</summary>
         protected int _timeout;
-        /// <summary>
-        /// Maximum retry count excluding the first request
-        /// </summary>
+
+        /// <summary>Maximum retry count excluding the first request</summary>
         protected int _retry;
-        /// <summary>
-        /// SNMP community name
-        /// </summary>
+
+        /// <summary>SNMP community name</summary>
         protected string _community;
-        /// <summary>
-        /// Non repeaters value used in SNMP GET-BULK requests
-        /// </summary>
+
+        /// <summary>Non repeaters value used in SNMP GET-BULK requests</summary>
         protected int _nonRepeaters = 0;
-        /// <summary>
-        /// Maximum repetitions value used in SNMP GET-BULK requests
-        /// </summary>
+
+        /// <summary>Maximum repetitions value used in SNMP GET-BULK requests</summary>
         protected int _maxRepetitions = 50;
+
         /// <summary>
         /// Flag determines if exceptions are suppressed or thrown. When exceptions are suppressed, methods
         /// return null on errors regardless of what the error is.
         /// </summary>
         protected bool _suppressExceptions = true;
+        
         /// <summary>Constructor.</summary>
         /// <remarks>
         /// Class is initialized to default values. Peer IP address is set to loopback, peer port number
@@ -93,9 +85,8 @@ namespace SnmpSharpNet
             _target = null;
             _peerName = "localhost";
         }
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+
+        /// <summary>Constructor.</summary>
         /// <remarks>
         /// Class is initialized with default values with the agent name set to the supplied DNS name (or 
         /// IP address). If peer name is a DNS name, DNS resolution will take place in the constructor attempting
@@ -108,9 +99,8 @@ namespace SnmpSharpNet
             _peerName = peerName;
             Resolve();
         }
-        /// <summary>
-        /// Constructor
-        /// </summary>
+
+        /// <summary>Constructor</summary>
         /// <param name="peerName">Peer name or IP address</param>
         /// <param name="community">SNMP community name</param>
         public SimpleSnmp(string peerName, string community)
@@ -118,9 +108,8 @@ namespace SnmpSharpNet
         {
             _community = community;
         }
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+
+        /// <summary>Constructor.</summary>
         /// <param name="peerName">Peer name or IP address</param>
         /// <param name="peerPort">Peer UDP port number</param>
         /// <param name="community">SNMP community name</param>
@@ -129,9 +118,8 @@ namespace SnmpSharpNet
         {
             _peerPort = peerPort;
         }
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+
+        /// <summary>Constructor.</summary>
         /// <param name="peerName">Peer name or IP address</param>
         /// <param name="peerPort">Peer UDP port number</param>
         /// <param name="community">SNMP community name</param>
@@ -143,6 +131,7 @@ namespace SnmpSharpNet
             _timeout = timeout;
             _retry = retry;
         }
+
         /// <summary>Class validity flag</summary>
         /// <remarks>
         /// Return class validity status. If class is valid, it is ready to send requests and receive
@@ -153,20 +142,16 @@ namespace SnmpSharpNet
             get
             {
                 if (_peerIP == IPAddress.None || _peerIP == IPAddress.Any)
-                {
                     return false;
-                }
+
                 if (_community.Length < 1 || _community.Length > 50)
-                {
                     return false;
-                }
+
                 return true;
             }
         }
 
-        /// <summary>
-        /// SNMP GET request
-        /// </summary>
+        /// <summary>SNMP GET request</summary>
         /// <example>SNMP GET request:
         /// <code>
         /// String snmpAgent = "10.10.10.1";
@@ -200,20 +185,20 @@ namespace SnmpSharpNet
             if (!Valid)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpException("SimpleSnmp class is not valid.");
-                }
+
                 return null; // class is not fully initialized.
             }
+
             // function only works on SNMP version 1 and SNMP version 2 requests
             if (version != ESnmpVersion.Ver1 && version != ESnmpVersion.Ver2)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpInvalidVersionException("SimpleSnmp support SNMP version 1 and 2 only.");
-                }
+
                 return null;
             }
+
             try
             {
                 _target = new UdpTarget(_peerIP, _peerPort, _timeout, _retry);
@@ -222,18 +207,17 @@ namespace SnmpSharpNet
             {
                 _target = null;
                 if (!_suppressExceptions)
-                {
                     throw ex;
-                }
             }
+
             if (_target == null)
-            {
                 return null;
-            }
+
             try
             {
                 AgentParameters param = new AgentParameters(version, new OctetString(_community));
                 SnmpPacket result = _target.Request(pdu, param);
+
                 if (result != null)
                 {
                     if (result.Pdu.ErrorStatus == 0)
@@ -245,44 +229,31 @@ namespace SnmpSharpNet
                                 v.Value.Type == SnmpConstants.SMI_NOSUCHOBJECT))
                             {
                                 if (!res.ContainsKey(v.Oid))
-                                {
                                     res.Add(v.Oid, new Null());
-                                }
                                 else
-                                {
                                     res.Add(Oid.NullOid(), v.Value);
-                                }
                             }
                             else
                             {
                                 if (!res.ContainsKey(v.Oid))
-                                {
                                     res.Add(v.Oid, v.Value);
-                                }
                                 else
                                 {
                                     if (res[v.Oid].Type == v.Value.Type)
-                                    {
                                         res[v.Oid] = v.Value; // update value of the existing Oid entry
-                                    }
                                     else
-                                    {
                                         throw new SnmpException(SnmpException.EErrorCode.OidValueTypeChanged, String.Format("Value type changed from {0} to {1}", res[v.Oid].Type, v.Value.Type));
-                                    }
                                 }
                             }
                         }
                         _target.Close();
                         _target = null;
+
                         return res;
                     }
-                    else
-                    {
-                        if (!_suppressExceptions)
-                        {
-                            throw new SnmpErrorStatusException("Agent responded with an error", result.Pdu.ErrorStatus, result.Pdu.ErrorIndex);
-                        }
-                    }
+
+                    if (!_suppressExceptions)
+                        throw new SnmpErrorStatusException("Agent responded with an error", result.Pdu.ErrorStatus, result.Pdu.ErrorIndex);
                 }
             }
             catch (System.Exception ex)
@@ -294,14 +265,14 @@ namespace SnmpSharpNet
                     throw ex;
                 }
             }
+
             _target.Close();
             _target = null;
+
             return null;
         }
 
-        /// <summary>
-        /// SNMP GET request
-        /// </summary>
+        /// <summary>SNMP GET request</summary>
         /// <example>SNMP GET request:
         /// <code>
         /// string snmpAgent = "10.10.10.1";
@@ -331,31 +302,28 @@ namespace SnmpSharpNet
             if (!Valid)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpException("SimpleSnmp class is not valid.");
-                }
+
                 return null;
             }
+
             // function only works on SNMP version 1 and SNMP version 2 requests
             if (version != ESnmpVersion.Ver1 && version != ESnmpVersion.Ver2)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpInvalidVersionException("SimpleSnmp support SNMP version 1 and 2 only.");
-                }
+
                 return null;
             }
+
             Pdu pdu = new Pdu(EPduType.Get);
             foreach (string s in oidList)
-            {
                 pdu.VbList.Add(s);
-            }
+
             return Get(version, pdu);
         }
 
-        /// <summary>
-        /// SNMP GET-NEXT request
-        /// </summary>
+        /// <summary>SNMP GET-NEXT request</summary>
         /// <example>SNMP GET-NEXT request:
         /// <code>
         /// string snmpAgent = "10.10.10.1";
@@ -389,20 +357,20 @@ namespace SnmpSharpNet
             if (!Valid)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpException("SimpleSnmp class is not valid.");
-                }
+
                 return null; // class is not fully initialized.
             }
+
             // function only works on SNMP version 1 and SNMP version 2 requests
             if (version != ESnmpVersion.Ver1 && version != ESnmpVersion.Ver2)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpInvalidVersionException("SimpleSnmp support SNMP version 1 and 2 only.");
-                }
+
                 return null;
             }
+
             try
             {
                 _target = new UdpTarget(_peerIP, _peerPort, _timeout, _retry);
@@ -411,14 +379,15 @@ namespace SnmpSharpNet
             {
                 _target = null;
             }
+
             if (_target == null)
-            {
                 return null;
-            }
+
             try
             {
                 AgentParameters param = new AgentParameters(version, new OctetString(_community));
                 SnmpPacket result = _target.Request(pdu, param);
+
                 if (result != null)
                 {
                     if (result.Pdu.ErrorStatus == 0)
@@ -430,36 +399,26 @@ namespace SnmpSharpNet
                                 (v.Value.Type == SnmpConstants.SMI_ENDOFMIBVIEW) ||
                                 (v.Value.Type == SnmpConstants.SMI_NOSUCHINSTANCE) ||
                                 (v.Value.Type == SnmpConstants.SMI_NOSUCHOBJECT))
-                            {
                                 break;
-                            }
+
                             if (res.ContainsKey(v.Oid))
                             {
                                 if (res[v.Oid].Type != v.Value.Type)
-                                {
                                     throw new SnmpException(SnmpException.EErrorCode.OidValueTypeChanged, "OID value type changed for OID: " + v.Oid.ToString());
-                                }
                                 else
-                                {
                                     res[v.Oid] = v.Value;
-                                }
                             }
                             else
-                            {
                                 res.Add(v.Oid, v.Value);
-                            }
                         }
+
                         _target.Close();
                         _target = null;
                         return res;
                     }
-                    else
-                    {
-                        if (!_suppressExceptions)
-                        {
-                            throw new SnmpErrorStatusException("Agent responded with an error", result.Pdu.ErrorStatus, result.Pdu.ErrorIndex);
-                        }
-                    }
+
+                    if (!_suppressExceptions)
+                        throw new SnmpErrorStatusException("Agent responded with an error", result.Pdu.ErrorStatus, result.Pdu.ErrorIndex);
                 }
             }
             catch (System.Exception ex)
@@ -471,14 +430,13 @@ namespace SnmpSharpNet
                     throw ex;
                 }
             }
+
             _target.Close();
             _target = null;
             return null;
         }
 
-        /// <summary>
-        /// SNMP GET-NEXT request
-        /// </summary>
+        /// <summary>SNMP GET-NEXT request</summary>
         /// <example>SNMP GET-NEXT request:
         /// <code>
         /// string snmpAgent = "10.10.10.1";
@@ -508,31 +466,28 @@ namespace SnmpSharpNet
             if (!Valid)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpException("SimpleSnmp class is not valid.");
-                }
+
                 return null;
             }
+
             // function only works on SNMP version 1 and SNMP version 2 requests
             if (version != ESnmpVersion.Ver1 && version != ESnmpVersion.Ver2)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpInvalidVersionException("SimpleSnmp support SNMP version 1 and 2 only.");
-                }
+
                 return null;
             }
+
             Pdu pdu = new Pdu(EPduType.GetNext);
             foreach (string s in oidList)
-            {
                 pdu.VbList.Add(s);
-            }
+
             return GetNext(version, pdu);
         }
 
-        /// <summary>
-        /// SNMP GET-BULK request
-        /// </summary>
+        /// <summary>SNMP GET-BULK request</summary>
         /// <remarks>
         /// GetBulk request type is only available with SNMP v2c agents. SNMP v3 also supports the request itself
         /// but that version of the protocol is not supported by SimpleSnmp.
@@ -582,33 +537,33 @@ namespace SnmpSharpNet
             if (!Valid)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpException("SimpleSnmp class is not valid.");
-                }
+
                 return null; // class is not fully initialized.
             }
+
             try
             {
                 pdu.NonRepeaters = _nonRepeaters;
                 pdu.MaxRepetitions = _maxRepetitions;
+
                 _target = new UdpTarget(_peerIP, _peerPort, _timeout, _retry);
             }
             catch (System.Exception ex)
             {
                 _target = null;
                 if (!_suppressExceptions)
-                {
                     throw ex;
-                }
             }
+
             if (_target == null)
-            {
                 return null;
-            }
+
             try
             {
                 AgentParameters param = new AgentParameters(ESnmpVersion.Ver2, new OctetString(_community));
                 SnmpPacket result = _target.Request(pdu, param);
+
                 if (result != null)
                 {
                     if (result.Pdu.ErrorStatus == 0)
@@ -621,36 +576,27 @@ namespace SnmpSharpNet
                                 (v.Value.Type == SnmpConstants.SMI_NOSUCHINSTANCE) ||
                                 (v.Value.Type == SnmpConstants.SMI_NOSUCHOBJECT)
                                 )
-                            {
                                 break;
-                            }
+
                             if (res.ContainsKey(v.Oid))
                             {
                                 if (res[v.Oid].Type != v.Value.Type)
-                                {
                                     throw new SnmpException(SnmpException.EErrorCode.OidValueTypeChanged, "OID value type changed for OID: " + v.Oid.ToString());
-                                }
                                 else
-                                {
                                     res[v.Oid] = v.Value;
-                                }
                             }
                             else
-                            {
                                 res.Add(v.Oid, v.Value);
-                            }
                         }
+
                         _target.Close();
                         _target = null;
+
                         return res;
                     }
-                    else
-                    {
-                        if (!_suppressExceptions)
-                        {
-                            throw new SnmpErrorStatusException("Agent responded with an error", result.Pdu.ErrorStatus, result.Pdu.ErrorIndex);
-                        }
-                    }
+
+                    if (!_suppressExceptions)
+                        throw new SnmpErrorStatusException("Agent responded with an error", result.Pdu.ErrorStatus, result.Pdu.ErrorIndex);
                 }
             }
             catch (System.Exception ex)
@@ -659,17 +605,18 @@ namespace SnmpSharpNet
                 {
                     _target.Close();
                     _target = null;
+
                     throw ex;
                 }
             }
+
             _target.Close();
             _target = null;
+
             return null;
         }
 
-        /// <summary>
-        /// SNMP GET-BULK request
-        /// </summary>
+        /// <summary>SNMP GET-BULK request</summary>
         /// <remarks>
         /// Performs a GetBulk SNMP v2 operation on a list of OIDs. This is a convenience function that
         /// calls GetBulk(Pdu) method.
@@ -698,26 +645,24 @@ namespace SnmpSharpNet
             if (!Valid)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpException("SimpleSnmp class is not valid.");
-                }
+
                 return null;
             }
+
             Pdu pdu = new Pdu(EPduType.GetBulk)
             {
                 MaxRepetitions = _maxRepetitions,
                 NonRepeaters = _nonRepeaters
             };
+
             foreach (string s in oidList)
-            {
                 pdu.VbList.Add(s);
-            }
+
             return GetBulk(pdu);
         }
 
-        /// <summary>
-        /// SNMP SET request
-        /// </summary>
+        /// <summary>SNMP SET request</summary>
         /// <example>Set operation in SNMP version 1:
         /// <code>
         /// string snmpAgent = "10.10.10.1";
@@ -747,20 +692,20 @@ namespace SnmpSharpNet
             if (!Valid)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpException("SimpleSnmp class is not valid.");
-                }
+
                 return null; // class is not fully initialized.
             }
+
             // function only works on SNMP version 1 and SNMP version 2 requests
             if (version != ESnmpVersion.Ver1 && version != ESnmpVersion.Ver2)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpInvalidVersionException("SimpleSnmp support SNMP version 1 and 2 only.");
-                }
+
                 return null;
             }
+
             try
             {
                 _target = new UdpTarget(_peerIP, _peerPort, _timeout, _retry);
@@ -769,18 +714,17 @@ namespace SnmpSharpNet
             {
                 _target = null;
                 if (!_suppressExceptions)
-                {
                     throw ex;
-                }
             }
+
             if (_target == null)
-            {
                 return null;
-            }
+
             try
             {
                 AgentParameters param = new AgentParameters(version, new OctetString(_community));
                 SnmpPacket result = _target.Request(pdu, param);
+
                 if (result != null)
                 {
                     if (result.Pdu.ErrorStatus == 0)
@@ -791,30 +735,21 @@ namespace SnmpSharpNet
                             if (res.ContainsKey(v.Oid))
                             {
                                 if (res[v.Oid].Type != v.Value.Type)
-                                {
                                     throw new SnmpException(SnmpException.EErrorCode.OidValueTypeChanged, "OID value type changed for OID: " + v.Oid.ToString());
-                                }
                                 else
-                                {
                                     res[v.Oid] = v.Value;
-                                }
                             }
                             else
-                            {
                                 res.Add(v.Oid, v.Value);
-                            }
                         }
+
                         _target.Close();
                         _target = null;
                         return res;
                     }
-                    else
-                    {
-                        if (!_suppressExceptions)
-                        {
-                            throw new SnmpErrorStatusException("Agent responded with an error", result.Pdu.ErrorStatus, result.Pdu.ErrorIndex);
-                        }
-                    }
+
+                    if (!_suppressExceptions)
+                        throw new SnmpErrorStatusException("Agent responded with an error", result.Pdu.ErrorStatus, result.Pdu.ErrorIndex);
                 }
             }
             catch (System.Exception ex)
@@ -823,17 +758,18 @@ namespace SnmpSharpNet
                 {
                     _target.Close();
                     _target = null;
+
                     throw ex;
                 }
             }
+
             _target.Close();
             _target = null;
+
             return null;
         }
 
-        /// <summary>
-        /// SNMP SET request
-        /// </summary>
+        /// <summary>SNMP SET request</summary>
         /// <example>Set operation in SNMP version 1:
         /// <code>
         /// string snmpAgent = "10.10.10.1";
@@ -862,25 +798,24 @@ namespace SnmpSharpNet
             if (!Valid)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpException("SimpleSnmp class is not valid.");
-                }
+
                 return null;
             }
+
             // function only works on SNMP version 1 and SNMP version 2 requests
             if (version != ESnmpVersion.Ver1 && version != ESnmpVersion.Ver2)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpInvalidVersionException("SimpleSnmp support SNMP version 1 and 2 only.");
-                }
+
                 return null;
             }
+
             Pdu pdu = new Pdu(EPduType.Set);
             foreach (Vb vb in vbs)
-            {
                 pdu.VbList.Add(vb);
-            }
+
             return Set(version, pdu);
         }
 
@@ -928,33 +863,33 @@ namespace SnmpSharpNet
             if (!Valid)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpException("SimpleSnmp class is not valid.");
-                }
+
                 return null;
             }
+
             // function only works on SNMP version 1 and SNMP version 2 requests
             if (version != ESnmpVersion.Ver1 && version != ESnmpVersion.Ver2)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpInvalidVersionException("SimpleSnmp support SNMP version 1 and 2 only.");
-                }
+
                 return null;
             }
+
             if (rootOid.Length < 2)
             {
                 if (!_suppressExceptions)
-                {
                     throw new SnmpException(SnmpException.EErrorCode.InvalidOid, "RootOid is not a valid Oid");
-                }
+
                 return null;
             }
+
             Oid root = new Oid(rootOid);
+
             if (root.Length <= 0)
-            {
                 return null; // unable to parse root oid
-            }
+
             Oid lastOid = (Oid)root.Clone();
 
             Dictionary<Oid, AsnType> result = new Dictionary<Oid, AsnType>();
@@ -962,13 +897,10 @@ namespace SnmpSharpNet
             {
                 Dictionary<Oid, AsnType> val = null;
                 if (version == ESnmpVersion.Ver1)
-                {
                     val = GetNext(version, new string[] { lastOid.ToString() });
-                }
                 else
-                {
                     val = GetBulk(new string[] { lastOid.ToString() });
-                }
+
                 // check that we have a result
                 if (val == null || val.Count == 0)
                 {
@@ -982,16 +914,13 @@ namespace SnmpSharpNet
                         if (result.ContainsKey(entry.Key))
                         {
                             if (result[entry.Key].Type != entry.Value.Type)
-                            {
                                 throw new SnmpException(SnmpException.EErrorCode.OidValueTypeChanged, "OID value type changed for OID: " + entry.Key.ToString());
-                            }
                             else
                                 result[entry.Key] = entry.Value;
                         }
                         else
-                        {
                             result.Add(entry.Key, entry.Value);
-                        }
+
                         lastOid = (Oid)entry.Key.Clone();
                     }
                     else
@@ -1007,17 +936,14 @@ namespace SnmpSharpNet
 
         #region Properties
 
-        /// <summary>
-        /// Get/Set peer IP address
-        /// </summary>
+        /// <summary>Get/Set peer IP address</summary>
         public IPAddress PeerIP
         {
             get { return _peerIP; }
             set { _peerIP = value; }
         }
-        /// <summary>
-        /// Get/Set peer name
-        /// </summary>
+
+        /// <summary>Get/Set peer name</summary>
         public string PeerName
         {
             get { return _peerName; }
@@ -1027,54 +953,51 @@ namespace SnmpSharpNet
                 Resolve();
             }
         }
-        /// <summary>
-        /// Get/Set peer port number
-        /// </summary>
+
+        /// <summary>Get/Set peer port number</summary>
         public int PeerPort
         {
             get { return _peerPort; }
             set { _peerPort = value; }
         }
-        /// <summary>
-        /// Get set timeout value in milliseconds
-        /// </summary>
+
+        /// <summary>Get set timeout value in milliseconds</summary>
         public int Timeout
         {
             get { return _timeout; }
             set { _timeout = value; }
         }
-        /// <summary>
-        /// Get/Set maximum retry count
-        /// </summary>
+
+        /// <summary>Get/Set maximum retry count</summary>
         public int Retry
         {
             get { return _retry; }
             set { _retry = value; }
         }
-        /// <summary>
-        /// Get/Set SNMP community name
-        /// </summary>
+
+        /// <summary>Get/Set SNMP community name</summary>
         public string Community
         {
             get { return _community; }
             set { _community = value; }
         }
 
-        /// <summary>
-        /// Get/Set NonRepeaters value
-        /// </summary>
-        /// <remarks>NonRepeaters value will only be used by SNMPv2 GET-BULK requests. Any other
-        /// request type will ignore this value.</remarks>
+        /// <summary>Get/Set NonRepeaters value</summary>
+        /// <remarks>
+        /// NonRepeaters value will only be used by SNMPv2 GET-BULK requests. Any other
+        /// request type will ignore this value.
+        /// </remarks>
         public int NonRepeaters
         {
             get { return _nonRepeaters; }
             set { _nonRepeaters = value; }
         }
-        /// <summary>
-        /// Get/Set MaxRepetitions value
-        /// </summary>
-        /// <remarks>MaxRepetitions value will only be used by SNMPv2 GET-BULK requests. Any other
-        /// request type will ignore this value.</remarks>
+
+        /// <summary>Get/Set MaxRepetitions value</summary>
+        /// <remarks>
+        /// MaxRepetitions value will only be used by SNMPv2 GET-BULK requests. Any other
+        /// request type will ignore this value.
+        /// </remarks>
         public int MaxRepetitions
         {
             get { return _maxRepetitions; }
@@ -1085,9 +1008,7 @@ namespace SnmpSharpNet
 
         #region Utility functions
 
-        /// <summary>
-        /// Resolve peer name to an IP address
-        /// </summary>
+        /// <summary>Resolve peer name to an IP address</summary>
         /// <remarks>
         /// This method will not throw any exceptions, even on failed DNS resolution. Make
         /// sure you call SimpleSnmp.Valid property to verify class state.
@@ -1099,14 +1020,12 @@ namespace SnmpSharpNet
             if (_peerName.Length > 0)
             {
                 if (IPAddress.TryParse(_peerName, out _peerIP))
-                {
                     return true;
-                }
-                else
-                {
-                    _peerIP = IPAddress.None; // just in case
-                }
+
+                _peerIP = IPAddress.None; // just in case
+
                 IPHostEntry he = null;
+
                 try
                 {
                     he = Dns.GetHostEntry(_peerName);
@@ -1114,13 +1033,14 @@ namespace SnmpSharpNet
                 catch (System.Exception ex)
                 {
                     if (!_suppressExceptions)
-                    {
                         throw ex;
-                    }
+
                     he = null;
                 }
+
                 if (he == null)
                     return false; // resolution failed
+
                 foreach (IPAddress tmp in he.AddressList)
                 {
                     if (tmp.AddressFamily == AddressFamily.InterNetwork)
@@ -1129,9 +1049,11 @@ namespace SnmpSharpNet
                         break;
                     }
                 }
+
                 if (_peerIP != IPAddress.None)
                     return true;
             }
+
             return false;
         }
 
@@ -1143,17 +1065,9 @@ namespace SnmpSharpNet
         /// </summary>
         public bool SuppressExceptions
         {
-            get
-            {
-                return _suppressExceptions;
-            }
-            set
-            {
-                _suppressExceptions = value;
-            }
+            get { return _suppressExceptions; }
+            set { _suppressExceptions = value; }
         }
-
-
         #endregion
     }
 }

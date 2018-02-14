@@ -530,10 +530,10 @@ namespace SnmpSharpNet.Types
         /// <returns>New Oid class with the two values added together</returns>
         public static Oid operator +(Oid oid, uint[] ids)
         {
-            if (((Object)oid) == null && ((Object)ids) == null)
+            if (((Object)oid) == null && ids == null)
                 return null;
 
-            if (((Object)ids) == null)
+            if (ids == null)
                 return (Oid)oid.Clone();
 
             Oid newoid = new Oid(oid)
@@ -840,7 +840,7 @@ namespace SnmpSharpNet.Types
                     if ((buffer[offset] & HIGH_BIT) == 0)
                     {
                         // short encoding
-                        result = (uint)buffer[offset];
+                        result = buffer[offset];
                         offset += 1;
                         headerLength--;
                     }

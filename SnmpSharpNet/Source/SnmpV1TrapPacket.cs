@@ -145,7 +145,7 @@ namespace SnmpSharpNet
 
             base.Encode(tmpBuffer);
 
-            return (byte[])tmpBuffer;
+            return tmpBuffer;
         }
     }
 }

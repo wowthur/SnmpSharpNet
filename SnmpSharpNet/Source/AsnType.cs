@@ -22,62 +22,62 @@ namespace SnmpSharpNet
     public abstract class AsnType : ICloneable
     {
         /// <summary>Bool true/false value type</summary>
-        public static readonly byte BOOLEAN = (byte)0x01;
+        public const byte BOOLEAN = 0x01;
 
         /// <summary>Signed 32-bit integer type</summary>
-        public static readonly byte INTEGER = (byte)0x02;
+        public const byte INTEGER = 0x02;
 
         /// <summary>Bit sequence type</summary>
-        public static readonly byte BITSTRING = (byte)0x03;
+        public const byte BITSTRING = 0x03;
 
         /// <summary>Octet (byte) value type</summary>
-        public static readonly byte OCTETSTRING = (byte)0x04;
+        public const byte OCTETSTRING = 0x04;
 
         /// <summary>Null (no value) type</summary>
-        public static readonly byte NULL = (byte)0x05;
+        public const byte NULL = 0x05;
 
         /// <summary>Object id type</summary>
-        public static readonly byte OBJECTID = (byte)0x06;
+        public const byte OBJECTID = 0x06;
 
         /// <summary>Arbitrary data type</summary>
-        public static readonly byte SEQUENCE = (byte)0x10;
+        public const byte SEQUENCE = 0x10;
 
         /// <summary>
         /// Defined by referencing a fixed, unordered list of types,
         /// some of which may be declared optional. Each value is an
         /// unordered list of values, one from each component type.
         /// </summary>
-        public static readonly byte SET = (byte)0x11;
+        public const byte SET = 0x11;
 
         /// <summary>
         /// Generally useful, application-independent types and
         /// construction mechanisms.
         /// </summary>
-        public static readonly byte UNIVERSAL = (byte)0x00;
+        public const byte UNIVERSAL = 0x00;
 
         /// <summary>
         /// Relevant to a particular application. These are defined
         /// in standards other than ASN.1.
         /// </summary>
-        public static readonly byte APPLICATION = (byte)0x40;
+        public const byte APPLICATION = 0x40;
 
         /// <summary>Also relevant to a particular application, but limited by context</summary>
-        public static readonly byte CONTEXT = (byte)0x80;
+        public const byte CONTEXT = 0x80;
 
         /// <summary>These are types not covered by any standard but instead defined by users.</summary>
-        public static readonly byte PRIVATE = (byte)0xC0;
+        public const byte PRIVATE = 0xC0;
 
         /// <summary>A primitive data object.</summary>
-        public static readonly byte PRIMITIVE = (byte)0x00;
+        public const byte PRIMITIVE = 0x00;
 
         /// <summary> A constructed data object such as a set or sequence.</summary>
-        public static readonly byte CONSTRUCTOR = (byte)0x20;
+        public const byte CONSTRUCTOR = 0x20;
 
         /// <summary> Defines the "high bit" that is the sign extension bit for a 8-bit signed value.</summary>
-        protected static readonly byte HIGH_BIT = (byte)0x80;
+        protected const byte HIGH_BIT = 0x80;
 
         /// <summary> Defines the BER extension "value" that is used to mark an extension type.</summary>
-        protected static readonly byte EXTENSION_ID = (byte)0x1F;
+        protected const byte EXTENSION_ID = 0x1F;
 
         /// <summary>Get ASN.1 value type stored in this class.</summary>
         public byte Type { get; set; }

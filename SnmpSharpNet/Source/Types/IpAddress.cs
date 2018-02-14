@@ -155,7 +155,7 @@ namespace SnmpSharpNet.Types
         /// <returns> Cloned IpAddress object.</returns>
         public override System.Object Clone()
         {
-            return (Object)new IpAddress(this);
+            return new IpAddress(this);
         }
 
         /// <summary>Sets the class value to the IP address parsed from the string parameter.</summary>
@@ -241,10 +241,10 @@ namespace SnmpSharpNet.Types
             byte[] data = _data;
 
             System.Text.StringBuilder buf = new System.Text.StringBuilder();
-            buf.Append((int)(data[0] < 0 ? 256 + data[0] : data[0])).Append('.');
-            buf.Append((int)(data[1] < 0 ? 256 + data[1] : data[1])).Append('.');
-            buf.Append((int)(data[2] < 0 ? 256 + data[2] : data[2])).Append('.');
-            buf.Append((int)(data[3] < 0 ? 256 + data[3] : data[3]));
+            buf.Append(data[0] < 0 ? 256 + data[0] : data[0]).Append('.');
+            buf.Append(data[1] < 0 ? 256 + data[1] : data[1]).Append('.');
+            buf.Append(data[2] < 0 ? 256 + data[2] : data[2]).Append('.');
+            buf.Append(data[3] < 0 ? 256 + data[3] : data[3]);
 
             return buf.ToString();
         }
@@ -443,7 +443,7 @@ namespace SnmpSharpNet.Types
             uint ip = (uint)_data[3] << 24;
             ip += (uint)_data[2] << 16;
             ip += (uint)_data[1] << 8;
-            ip += (uint)_data[0];
+            ip += _data[0];
             return ip;
         }
         /// <summary>

@@ -421,7 +421,7 @@ namespace SnmpSharpNet
             get
             {
                 if (index < 0 || index >= Length)
-                    return (byte)0x00; // don't throw an exception here
+                    return 0x00; // don't throw an exception here
 
                 return _buffer[index];
             }

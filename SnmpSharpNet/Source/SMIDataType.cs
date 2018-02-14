@@ -18,9 +18,7 @@ using System;
 
 namespace SnmpSharpNet
 {
-    /// <summary>
-    /// Collection of static helper methods making operations with SMI data types simpler and easier.
-    /// </summary>
+    /// <summary>Collection of static helper methods making operations with SMI data types simpler and easier.</summary>
     public sealed class SMIDataType
     {
 
@@ -28,16 +26,15 @@ namespace SnmpSharpNet
         {
         }
 
-        /// <summary>
-        /// Get class instance for the SMI value type with the specific TLV encoding type code.
-        /// </summary>
+        /// <summary>Get class instance for the SMI value type with the specific TLV encoding type code.</summary>
         /// <param name="asnType">SMI type code</param>
         /// <returns>Correct SMI type class instance for the data type or null if type is not recognized</returns>
         public static AsnType GetSyntaxObject(byte asnType)
         {
-            if (!SMIDataType.IsValidType(asnType))
+            if (!IsValidType(asnType))
                 return null;
-            return SMIDataType.GetSyntaxObject((ESMIDataTypeCode)asnType);
+
+            return GetSyntaxObject((ESMIDataTypeCode)asnType);
         }
 
         /// <summary>Used to create correct variable type object for the specified encoded type</summary>
@@ -46,6 +43,7 @@ namespace SnmpSharpNet
         public static AsnType GetSyntaxObject(ESMIDataTypeCode asnType)
         {
             AsnType obj = null;
+
             if (asnType == ESMIDataTypeCode.Integer)
                 obj = new Integer32();
             else if (asnType == ESMIDataTypeCode.Counter32)
@@ -73,9 +71,7 @@ namespace SnmpSharpNet
             else if (asnType == ESMIDataTypeCode.EndOfMibView)
                 obj = new EndOfMibView();
             else if (asnType == ESMIDataTypeCode.Null)
-            {
                 obj = new Null();
-            }
 
             return obj;
         }
@@ -117,9 +113,7 @@ namespace SnmpSharpNet
             return obj;
         }
 
-        /// <summary>
-        /// Return string representation of the SMI value type.
-        /// </summary>
+        /// <summary>Return string representation of the SMI value type.</summary>
         /// <param name="type">AsnType class Type member function value.</param>
         /// <returns>String formatted name of the SMI type.</returns>
         public static string GetTypeName(ESMIDataTypeCode type)
@@ -127,19 +121,19 @@ namespace SnmpSharpNet
             return Enum.GetName(typeof(ESMIDataTypeCode), type);
         }
 
-        /// <summary>
-        /// Check if byte code is a valid SMI data type code
-        /// </summary>
+        /// <summary>Check if byte code is a valid SMI data type code</summary>
         /// <param name="smiType">SMI data type code to test</param>
         /// <returns>true if valid SMI data type, otherwise false</returns>
         public static bool IsValidType(byte smiType)
         {
             byte[] validSMITypes = (byte[])Enum.GetValues(typeof(ESMIDataTypeCode));
+
             foreach (int type in validSMITypes)
             {
                 if (type == smiType)
                     return true;
             }
+
             return false;
         }
     }

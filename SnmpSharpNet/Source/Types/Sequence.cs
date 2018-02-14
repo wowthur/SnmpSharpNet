@@ -86,7 +86,7 @@ namespace SnmpSharpNet.Types
         /// <returns>Cloned sequence cast as object</returns>
         public override object Clone()
         {
-            return (object)new Sequence(_data);
+            return new Sequence(_data);
         }
     }
 }

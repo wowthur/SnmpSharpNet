@@ -14,12 +14,11 @@
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
 // 
 
+using SnmpSharpNet.Exception;
+using SnmpSharpNet.Security;
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Diagnostics;
-using SnmpSharpNet.Security;
-using SnmpSharpNet.Exception;
 
 namespace SnmpSharpNet
 {

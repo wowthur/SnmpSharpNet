@@ -709,9 +709,8 @@ namespace SnmpSharpNet
             if (obj is Integer32)
                 return (((Integer32)obj) == _requestId);
 
-            if (obj is Pdu)
+            if (obj is Pdu p)
             {
-                Pdu p = (Pdu)obj;
                 if (p.Type != Type)
                     return false;
 
@@ -721,13 +720,13 @@ namespace SnmpSharpNet
                 if (p.VbCount != VbCount)
                     return false;
 
-                foreach (Vb v in VbList)
+                foreach (var v in VbList)
                 {
                     if (!p.VbList.ContainsOid(v.Oid))
                         return false;
                 }
 
-                foreach (Vb v in p.VbList)
+                foreach (var v in p.VbList)
                 {
                     if (!VbList.ContainsOid(v.Oid))
                         return false;

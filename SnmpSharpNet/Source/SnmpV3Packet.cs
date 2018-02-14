@@ -189,7 +189,7 @@ namespace SnmpSharpNet
         {
             get
             {
-                return (Pdu)_scopedPdu;
+                return _scopedPdu;
             }
         }
 

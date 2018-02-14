@@ -18,3 +18,8 @@
 - Oid Encode() - Probably will throw on null values... add test
 - Oid Parse() - replace with a regex
 - Eliminate extra protected value for properties and make them direct
+- SecureAgentParameters.HasCachedKeys - clean a bit
+- SNMPConstant.GetTypeName() - Problems with duplicate type values in select
+- SNMPConstant.DumpHex() - More of a helper right?
+- TrapPDU - Use linq for cloning
+- UdpTransport.ReceiveFromCallback() - Consider stacked case statements for identical behavior

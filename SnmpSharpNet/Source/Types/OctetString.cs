@@ -319,7 +319,7 @@ namespace SnmpSharpNet.Types
             StringBuilder b = new StringBuilder();
             for (int i = 0; i < _data.Length; ++i)
             {
-                int x = (int)_data[i] & 0xff;
+                int x = _data[i] & 0xff;
                 if (x < 16)
                     b.Append('0');
 

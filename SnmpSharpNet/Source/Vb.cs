@@ -35,6 +35,7 @@ namespace SnmpSharpNet
         {
             Type = (byte)(SEQUENCE | CONSTRUCTOR);
         }
+
         /// <summary>Construct Vb with the supplied OID and Null value</summary>
         /// <param name="oid">OID</param>
         public Vb(Oid oid)

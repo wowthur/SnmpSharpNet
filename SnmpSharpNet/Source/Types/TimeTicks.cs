@@ -30,21 +30,21 @@ namespace SnmpSharpNet.Types
         /// <summary>Constructor</summary>
         public TimeTicks() : base()
         {
-            Type = (byte)SnmpConstants.SMI_TIMETICKS;
+            Type = SnmpConstants.SMI_TIMETICKS;
         }
 
         /// <summary>Constructor</summary>
         /// <param name="second">Initialize class with value from this class.</param>
         public TimeTicks(TimeTicks second) : base(second)
         {
-            Type = (byte)SnmpConstants.SMI_TIMETICKS;
+            Type = SnmpConstants.SMI_TIMETICKS;
         }
 
         /// <summary>Constructor</summary>
         /// <param name="uint32">The UInteger32 value to initialize the class with.</param>
         public TimeTicks(UInteger32 uint32) : base(uint32)
         {
-            Type = (byte)SnmpConstants.SMI_TIMETICKS;
+            Type = SnmpConstants.SMI_TIMETICKS;
         }
 
         /// <summary>Constructor.</summary>
@@ -52,14 +52,14 @@ namespace SnmpSharpNet.Types
         public TimeTicks(uint value)
             : base(value)
         {
-            Type = (byte)SnmpConstants.SMI_TIMETICKS;
+            Type = SnmpConstants.SMI_TIMETICKS;
         }
 
         /// <summary>Constructor</summary>
         /// <param name="val">String holding 32-bit unsigned integer value to initialize the class with</param>
         public TimeTicks(string val) : base(val)
         {
-            Type = (byte)SnmpConstants.SMI_TIMETICKS;
+            Type = SnmpConstants.SMI_TIMETICKS;
         }
 
         /// <summary>Duplicate object</summary>
