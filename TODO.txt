@@ -23,3 +23,4 @@
 - SNMPConstant.DumpHex() - More of a helper right?
 - TrapPDU - Use linq for cloning
 - UdpTransport.ReceiveFromCallback() - Consider stacked case statements for identical behavior
+- IPAddress - Fix the helpers... they're ugly

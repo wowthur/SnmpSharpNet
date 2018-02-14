@@ -15,6 +15,7 @@
 // 
 using System;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace SnmpSharpNet.Types
 {
@@ -73,7 +74,8 @@ namespace SnmpSharpNet.Types
     [Serializable]
     public class IpAddress : OctetString, IComparable, ICloneable
     {
-        /// <summary> Constructs a default object with a 
+        /// <summary>
+        /// Constructs a default object with a 
         /// length of zero. See the super class
         /// constructor for more details.
         /// </summary>
@@ -83,21 +85,24 @@ namespace SnmpSharpNet.Types
             _data = new byte[] { 0, 0, 0, 0 };
         }
 
-        /// <summary> Constructs an Application String with the
+        /// <summary>
+        /// Constructs an Application String with the
         /// passed data. The data is managed by the 
         /// base class.
         /// </summary>
-        /// <param name="data">The application string to manage (UTF-8)
-        /// </param>
+        /// <param name="data">The application string to manage (UTF-8)</param>
         public IpAddress(byte[] data) : this()
         {
             Type = SnmpConstants.SMI_IPADDRESS;
+
             if (data.Length != 4)
                 throw new OverflowException("Too much data passed to constructor: " + data.Length.ToString());
+
             Set(data);
         }
 
-        /// <summary> Copy constructor. Constructs a duplicate object 
+        /// <summary>
+        /// Copy constructor. Constructs a duplicate object 
         /// based on the passed application string object.
         /// </summary>
         /// <param name="second">The object to copy.</param>
@@ -108,13 +113,9 @@ namespace SnmpSharpNet.Types
                 throw new ArgumentException("Constructor argument cannot be null.");
 
             if (!second.Valid)
-            {
                 _data = new byte[] { 0, 0, 0, 0 };
-            }
             else
-            {
                 Set(second.GetData());
-            }
         }
 
         /// <summary>Copy constructor.</summary>
@@ -159,7 +160,8 @@ namespace SnmpSharpNet.Types
         }
 
         /// <summary>Sets the class value to the IP address parsed from the string parameter.</summary>
-        /// <remarks>Class value will be set with the parsed dotted decimal IP address in the parameter or
+        /// <remarks>
+        /// Class value will be set with the parsed dotted decimal IP address in the parameter or
         /// if string parameter does not represent an IP address, DNS resolution
         /// will be performed.
         /// 
@@ -193,9 +195,7 @@ namespace SnmpSharpNet.Types
                 }
             }
             else
-            {
                 _data = ipa.GetAddressBytes();
-            }
         }
 
         /// <summary>
@@ -211,9 +211,7 @@ namespace SnmpSharpNet.Types
             _data[3] = (byte)(ipvalue >> 24);
         }
 
-        /// <summary>
-        /// Set class value from the IPAddress argument
-        /// </summary>
+        /// <summary>Set class value from the IPAddress argument</summary>
         /// <param name="ipaddr">Type: <see cref="System.Net.IPAddress"/> class instance</param>
         public void Set(IPAddress ipaddr)
         {
@@ -226,9 +224,8 @@ namespace SnmpSharpNet.Types
         public static explicit operator IPAddress(IpAddress ipaddr)
         {
             if (ipaddr.Length != 4)
-            {
                 return IPAddress.Any;
-            }
+
             return new IPAddress(ipaddr.GetData());
         }
 
@@ -238,6 +235,7 @@ namespace SnmpSharpNet.Types
         {
             if (_data == null)
                 return "";
+
             byte[] data = _data;
 
             System.Text.StringBuilder buf = new System.Text.StringBuilder();
@@ -249,9 +247,7 @@ namespace SnmpSharpNet.Types
             return buf.ToString();
         }
 
-        /// <summary>
-        /// Compare value against IPAddress, byte array, uint, IpAddress of OctetString class value.
-        /// </summary>
+        /// <summary>Compare value against IPAddress, byte array, uint, IpAddress of OctetString class value.</summary>
         /// <param name="obj">Type: <see cref="System.Net.IPAddress"/> or byte <see cref="Array"/> or <see cref="uint"/> or <see cref="IpAddress"/> or <see cref="OctetString"/></param>
         /// <returns>0 if class values are the same, -1 if current class value is less then or 1 if greater then the class value
         /// we are comparing against.</returns>
@@ -260,30 +256,27 @@ namespace SnmpSharpNet.Types
             byte[] b = null;
             if (obj == null)
                 return -1;
+
             if (obj is IPAddress)
             {
                 IPAddress ipa = (IPAddress)obj;
                 b = ipa.GetAddressBytes();
             }
             else if (obj is byte[])
-            {
                 b = (byte[])obj;
-            }
             else if (obj is uint)
             {
                 IpAddress ipa = new IpAddress((uint)obj);
                 b = ipa.ToArray();
             }
             else if (obj is IpAddress)
-            {
                 b = ((IpAddress)obj).ToArray();
-            }
             else if (obj is OctetString)
-            {
                 b = ((OctetString)obj).ToArray();
-            }
+
             if (_data == null)
                 return -1;
+
             if (b.Length != _data.Length)
             {
                 if (_data.Length < b.Length)
@@ -296,42 +289,38 @@ namespace SnmpSharpNet.Types
                 for (int i = 0; i < _data.Length; i++)
                 {
                     if (_data[i] < b[i])
-                    {
                         return -1;
-                    }
-                    else if (_data[i] > b[i])
-                    {
+
+                    if (_data[i] > b[i])
                         return 1;
-                    }
                 }
+
                 return 0;
             }
         }
-        /// <summary>
-        /// Compare 2 IpAddress objects.
-        /// </summary>
+
+        /// <summary>Compare 2 IpAddress objects.</summary>
         /// <param name="obj"><see cref="IpAddress"/> object to compare against</param>
         /// <returns>True if objects are the same, otherwise false.</returns>
         public override bool Equals(object obj)
         {
             if (obj == null)
                 return false;
+
             return ((CompareTo(obj) == 0) ? true : false);
         }
-        /// <summary>
-        /// Return hash representing the value of this object
-        /// </summary>
+
+        /// <summary>Return hash representing the value of this object</summary>
         /// <returns>Integer hash representing the object</returns>
         public override int GetHashCode()
         {
             if (_data == null || _data.Length != 4)
                 return 0;
-            int hash = Convert.ToInt32(_data[0]) + Convert.ToInt32(_data[1]) + Convert.ToInt32(_data[2]) + Convert.ToInt32(_data[3]);
-            return hash;
+
+            return Convert.ToInt32(_data[0]) + Convert.ToInt32(_data[1]) + Convert.ToInt32(_data[2]) + Convert.ToInt32(_data[3]);
         }
-        /// <summary>
-        /// Returns true if object contains a valid IP address value.
-        /// </summary>
+
+        /// <summary>Returns true if object contains a valid IP address value.</summary>
         public bool Valid
         {
             get
@@ -357,78 +346,64 @@ namespace SnmpSharpNet.Types
         public override int Decode(byte[] buffer, int offset)
         {
             offset = base.Decode(buffer, offset);
+
             if (_data.Length != 4)
             {
                 _data = null;
                 throw new OverflowException("ASN.1 decoding error. Invalid data length.");
             }
+
             return offset;
         }
 
         #region Helper functions
 
-        /// <summary>
-        /// Class A IP address
-        /// </summary>
-        public static int ClassA = 1;
-        /// <summary>
-        /// Class B IP address
-        /// </summary>
-        public static int ClassB = 2;
-        /// <summary>
-        /// Class C IP address
-        /// </summary>
-        public static int ClassC = 3;
-        /// <summary>
-        /// Class D IP address
-        /// </summary>
-        public static int ClassD = 4;
-        /// <summary>
-        /// Class E IP address
-        /// </summary>
-        public static int ClassE = 5;
-        /// <summary>
-        /// Invalid IP address class
-        /// </summary>
-        public static int InvalidClass = 0;
+        public enum Class
+        {
+            /// <summary>Class A IP address</summary>
+            A = 1,
 
-        /// <summary>
-        /// Return network class of the IP address
-        /// </summary>
+            /// <summary>Class B IP address</summary>
+            B = 2,
+
+            /// <summary>Class C IP address</summary>
+            C = 3,
+
+            /// <summary>Class D IP address</summary>
+            D = 4,
+
+            /// <summary>Class E IP address</summary>
+            E = 5,
+
+            /// <summary>Invalid IP address class</summary>
+            Invalid = 0
+        };
+
+        /// <summary>Return network class of the IP address</summary>
         /// <returns>Integer network class. Return values are <see cref="ClassA"/>, <see cref="ClassB"/>, <see cref="ClassC"/>,
         /// <see cref="ClassD"/>, <see cref="ClassE"/>, or <see cref="InvalidClass"/> on error.</returns>
-        public int GetClass()
+        public Class GetClass()
         {
             byte octet = _data[0];
             if ((octet & 0x80) == 0)
-            {
-                return ClassA; // Class A
-            }
-            else if ((octet & 0x80) != 0 && (octet & 0x40) == 0)
-            {
-                return ClassB; // Class B
-            }
-            else if ((octet & 0x80) != 0 && (octet & 0x40) != 0 && (octet & 0x20) == 0)
-            {
-                return ClassC; // Class C
-            }
-            else if ((octet & 0x80) != 0 && (octet & 0x40) != 0 && (octet & 0x20) != 0 && (octet & 0x10) == 0)
-            {
-                return ClassD;
-            }
-            else if ((octet & 0x80) != 0 && (octet & 0x40) != 0 && (octet & 0x20) != 0 && (octet & 0x10) != 0)
-            {
-                return ClassE;
-            }
-            else
-            {
-                return InvalidClass; // Other class
-            }
+                return Class.A; // Class A
+
+            if((octet & 0xC0) == 0x80)
+                return Class.B; // Class B
+
+            if((octet & 0xE0) == 0xC0)
+                return Class.C; // Class C
+
+            if((octet & 0xF0) == 0xE0)
+                return Class.D;
+
+            if((octet & 0xF8) == 0xF0)
+                return Class.E;
+
+            return Class.Invalid; // Other class
         }
 
-        /// <summary>
-        /// Network byte order IP address
-        /// </summary>
+        /// <summary>Network byte order IP address</summary>
         /// <remarks>
         /// Convert internal byte array representation of the IP address into a network byte order 
         /// (most significant byte first) unsigned integer value.
@@ -444,11 +419,23 @@ namespace SnmpSharpNet.Types
             ip += (uint)_data[2] << 16;
             ip += (uint)_data[1] << 8;
             ip += _data[0];
+
             return ip;
         }
-        /// <summary>
-        /// Return subnet address of the IP address in this object and supplied subnet mask
-        /// </summary>
+
+        /// <summary>Host order IP address</summary>
+        /// <returns>Unsigned integer value representing the IP address in host byte order</returns>
+        public uint ToUInt32Host()
+        {
+            uint ip = (uint)_data[0] << 24;
+            ip += (uint)_data[1] << 16;
+            ip += (uint)_data[2] << 8;
+            ip += _data[3];
+
+            return ip;
+        }
+
+        /// <summary>Return subnet address of the IP address in this object and supplied subnet mask</summary>
         /// <param name="mask">Subnet mask</param>
         /// <returns>New IpAddress object containing subnet address</returns>
         public IpAddress GetSubnetAddress(IpAddress mask)
@@ -456,15 +443,14 @@ namespace SnmpSharpNet.Types
             byte[] ip = _data;
             byte[] m = mask.ToArray();
             byte[] res = new byte[4];
+
             for (int i = 0; i < 4; i++)
-            {
                 res[i] = (byte)(ip[i] & m[i]);
-            }
+
             return new IpAddress(res);
         }
-        /// <summary>
-        /// Inverts IP address value. All 0s are converted to 1s and 1s to 0s
-        /// </summary>
+
+        /// <summary>Inverts IP address value. All 0s are converted to 1s and 1s to 0s</summary>
         /// <example>
         /// <code lang="cs">
         /// IpAddress testMask = new IpAddress("255.255.0.0");
@@ -478,23 +464,17 @@ namespace SnmpSharpNet.Types
         /// <returns>Inverted value of the IP address</returns>
         public IpAddress Invert()
         {
-            byte[] bitmask = new byte[] { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
-            byte[] ip = _data;
-            byte[] iip = new byte[4] { 0, 0, 0, 0 };
-            // Walk through each byte
-            for (int b = 0; b < 4; b++)
-            {
-                // Check each bit
-                for (int i = 0; i < bitmask.Length; i++)
+            return new IpAddress(
+                new byte []
                 {
-                    if ((ip[b] & bitmask[i]) == 0)
-                    {
-                        iip[b] |= bitmask[i];
-                    }
+                    (byte)~(_data[0] & 0xFF),
+                    (byte)~(_data[1] & 0xFF),
+                    (byte)~(_data[2] & 0xFF),
+                    (byte)~(_data[3] & 0xFF)
                 }
-            }
-            return new IpAddress(iip);
+            );
         }
+
         /// <summary>
         /// Returns broadcast address for the objects IP and supplied subnet mask.
         /// 
@@ -514,14 +494,12 @@ namespace SnmpSharpNet.Types
             byte[] m = im.GetData();
             byte[] res = new byte[4];
             for (int i = 0; i < 4; i++)
-            {
                 res[i] = (byte)(ip[i] | m[i]);
-            }
+
             return new IpAddress(res);
         }
-        /// <summary>
-        /// Returns network mask for the class value
-        /// </summary>
+
+        /// <summary>Returns network mask for the class value</summary>
         /// <remarks>Each IpAddress belongs to one of the 5 classes, A, B, C, D or E. D network class are multicast
         /// addresses and E is experimental class. Because D and E are not "real" network classes and as such don't
         /// have a network mask, only classes A, B and C will return a valid subnet mask. Classes D and E will return
@@ -529,19 +507,21 @@ namespace SnmpSharpNet.Types
         /// <returns>Network mask or null if address doesn't belong to classes A, B or C</returns>
         public IpAddress NetworkMask()
         {
-            int cl = GetClass();
-            switch (cl)
+            var ipClass = GetClass();
+
+            switch (ipClass)
             {
-                case 1:
+                case Class.A:
                     return new IpAddress(new byte[] { 255, 0, 0, 0 });
-                case 2:
+                case Class.B:
                     return new IpAddress(new byte[] { 255, 255, 0, 0 });
-                case 3:
+                case Class.C:
                     return new IpAddress(new byte[] { 255, 255, 255, 0 });
                 default:
                     return null;
             }
         }
+
         /// <summary>
         /// Checks if the value of the object is a valid subnet mask.
         /// 
@@ -552,28 +532,14 @@ namespace SnmpSharpNet.Types
         /// <returns>true if valid subnet mask, otherwise false</returns>
         public bool IsValidMask()
         {
-            byte[] bitmask = new byte[] { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
-            byte[] ip = _data;
-            bool endMask = false;
-            for (int i = 0; i < 4; i++)
-            {
-                for (int b = 0; b < bitmask.Length; b++)
-                {
-                    if ((ip[i] & bitmask[b]) == 0)
-                    {
-                        if (!endMask)
-                        {
-                            endMask = true;
-                        }
-                    }
-                    if ((ip[i] & bitmask[b]) != 0 && endMask)
-                    {
-                        return false; // Invalid mask. bit set to 1 after 0s were found
-                    }
-                }
-            }
-            return true; // Mask is ok
+            var x = ToUInt32Host();
+
+            while ((x & 0x80000000) != 0)
+                x <<= 1;
+
+            return x == 0;
         }
+
         /// <summary>
         /// Returns number of subnet bits in the mask.
         /// 
@@ -590,25 +556,20 @@ namespace SnmpSharpNet.Types
         /// <returns>Set bits in the subnet mask or 0 if invalid subnet mask</returns>
         public int GetMaskBits()
         {
-            if (!IsValidMask())
+            var x = ToUInt32Host();
+            var result = 0;
+            while ((x & 0x80000000) != 0)
             {
-                return 0; // Invalid mask
+                x <<= 1;
+                result++;
             }
-            byte[] bitmask = new byte[] { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
-            byte[] ip = _data;
-            int bitcount = 0;
-            for (int i = 0; i < 4; i++)
-            {
-                for (int b = 0; b < bitmask.Length; b++)
-                {
-                    if ((ip[i] & bitmask[b]) != 0)
-                    {
-                        bitcount += 1;
-                    }
-                }
-            }
-            return bitcount;
+
+            if (x == 0)
+                return result;
+
+            return 0;
         }
+
         /// <summary>
         /// Build a subnet mask from bit count value
         /// </summary>
@@ -627,22 +588,18 @@ namespace SnmpSharpNet.Types
         /// <returns>New IPAddress class containing the subnet mask</returns>
         public static IpAddress BuildMaskFromBits(int bits)
         {
-            byte[] bitmask = new byte[] { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
-            byte[] res = new byte[] { 0, 0, 0, 0 };
-            int bcount = 0;
-            for (int i = 0; i <= 3; i++)
-            {
-                for (int b = 0; b < bitmask.Length; b++)
+            var x = 0xFFFFFFFF << 32 - bits;
+            return new IpAddress(
+                new byte[]
                 {
-                    if (bcount < bits)
-                    {
-                        res[i] |= bitmask[b];
-                        ++bcount;
-                    }
+                    (byte)(x >> 24),
+                    (byte)((x >> 16) & 0xFF),
+                    (byte)((x >> 8) & 0xFF),
+                    (byte)(x & 0xFF)
                 }
-            }
-            return new IpAddress(res);
+            );
         }
+
         /// <summary>
         /// Reverse int value byte order. Static function in IPAddress class doesn't work 
         /// the way I expected it (didn't troubleshoot) so here is another implementation.
@@ -698,9 +655,13 @@ namespace SnmpSharpNet.Types
         {
             uint ip = ToUInt32();
             uint revip = ReverseByteOrder(ip);
+
             revip += count;
+
             return new IpAddress(ReverseByteOrder(revip));
         }
+
+        private static Regex expValidateIp = new Regex(@"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", RegexOptions.Compiled);
 
         /// <summary>
         /// Check if supplied string contains a valid IP address.
@@ -714,40 +675,7 @@ namespace SnmpSharpNet.Types
         /// <returns>true if string contains an IP address in dotted decimal format, otherwise false</returns>
         public static bool IsIP(string val)
         {
-            if (val.Length == 0 || val.Length < 7 || val.Length > 15)
-                return false;
-
-            bool validChar = true;
-            int dotCount = 0;
-            foreach (char c in val)
-            {
-                if (!Char.IsDigit(c) && c != '.')
-                {
-                    validChar = false;
-                    break;
-                }
-                else if (c == '.')
-                    dotCount += 1;
-            }
-
-            if (!validChar)
-                return false;
-
-            if (dotCount != 3)
-                return false;
-
-            string[] ar = val.Split('.');
-            if (ar.Length != 4)
-                return false;
-
-            for (int i = 0; i < 4; i++)
-            {
-                int v = Convert.ToInt32(ar[i]);
-                if (v < 0 || v > 255)
-                    return false;
-            }
-
-            return true;
+            return expValidateIp.IsMatch(val);
         }
 
         #endregion Helper functions

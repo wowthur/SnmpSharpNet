@@ -17,8 +17,4 @@
     <ProjectReference Include="..\SnmpSharpNet\SnmpSharpNet.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Types\" />
-  </ItemGroup>
-
 </Project>
