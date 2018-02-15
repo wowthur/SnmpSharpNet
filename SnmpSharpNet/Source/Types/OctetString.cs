@@ -1,55 +1,57 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using System;
-using System.Text;
-using System.Globalization;
-using System.Collections.Generic;
-using System.Linq;
-using SnmpSharpNet.Exception;
-
+//
 namespace SnmpSharpNet.Types
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Text;
+    using SnmpSharpNet.Exception;
+
     /// <summary>ASN.1 OctetString type implementation</summary>
     [Serializable]
-    public class OctetString : 
-        AsnType, 
-        ICloneable, 
-        IComparable<byte[]>, 
-        IComparable<OctetString>, 
+    public class OctetString :
+        AsnType,
+        ICloneable,
+        IComparable<byte[]>,
+        IComparable<OctetString>,
         IEnumerable<byte>
     {
         /// <summary>Data buffer</summary>
-        protected byte[] _data;
+        protected byte[] data { get; set; }
 
         /// <summary>Constructor</summary>
         public OctetString()
         {
-            Type = SnmpConstants.SMI_STRING;
+            Type = SnmpConstants.SmiString;
         }
 
         /// <summary> Constructs an Octet String with the contents of the supplied string.</summary>
         /// <param name="data">String data to convert into OctetString class value.</param>
-        public OctetString(string data) : this()
+        public OctetString(string data)
+            : this()
         {
             Set(data);
         }
 
         /// <summary>Constructs the object and sets the data buffer to the byte array values</summary>
         /// <param name="data">Byte array to copy into the data buffer</param>
-        public OctetString(byte[] data) : this()
+        public OctetString(byte[] data)
+            : this()
         {
             Set(data);
         }
@@ -60,7 +62,8 @@ namespace SnmpSharpNet.Types
         /// </summary>
         /// <param name="data">Byte array to set class value to</param>
         /// <param name="useReference">If true, set class value to reference byte array parameter, otherwise copy data into new internal byte array</param>
-        public OctetString(byte[] data, bool useReference) : this()
+        public OctetString(byte[] data, bool useReference)
+            : this()
         {
             if (useReference)
                 SetRef(data);
@@ -70,48 +73,50 @@ namespace SnmpSharpNet.Types
 
         /// <summary>Constructor creating class from values in the supplied class.</summary>
         /// <param name="second">OctetString object to copy data from.</param>
-        public OctetString(OctetString second) : this()
+        public OctetString(OctetString second)
+            : this()
         {
             Set(second);
         }
 
         /// <summary>Constructor. Initialize the class value to a 1 byte array with the supplied value</summary>
         /// <param name="data">Value to initialize the class data to.</param>
-        public OctetString(byte data) : this()
+        public OctetString(byte data)
+            : this()
         {
             Set(data);
         }
 
         /// <summary>Get length of the internal byte array. 0 if byte array is undefined or zero length.</summary>
-        virtual public int Length
+        public virtual int Length
         {
-            get { return _data == null ? 0 : _data.Length; }
+            get { return data == null ? 0 : data.Length; }
         }
 
         /// <summary>
         /// Internal method to return OctetString byte array. Used for copy operations, comparisons and similar within the
         /// library. Not available for users of the library
         /// </summary>
-        /// <returns></returns>
+        /// <returns>the byte array of the string</returns>
         internal byte[] GetData()
         {
-            return _data;
+            return data;
         }
 
         /// <summary>Empty data buffer</summary>
         public void Clear()
         {
-            _data = null;
+            data = null;
         }
 
         /// <summary>Convert the OctetString class to a byte array. Internal class data buffer is *copied* and not passed to the caller.</summary>
         /// <returns>Byte array representing the OctetString class data</returns>
         public byte[] ToArray()
         {
-            if (_data == null)
+            if (data == null)
                 return null;
 
-            return _data.ToArray();
+            return data.ToArray();
         }
 
         /// <summary>
@@ -122,9 +127,9 @@ namespace SnmpSharpNet.Types
         public virtual void Set(string value)
         {
             if (value == null || value.Length == 0)
-                _data = null;
+                data = null;
             else
-                _data = Encoding.UTF8.GetBytes(value);
+                data = Encoding.UTF8.GetBytes(value);
         }
 
         /// <summary>
@@ -135,17 +140,17 @@ namespace SnmpSharpNet.Types
         public virtual void Set(byte[] data)
         {
             if (data == null || data.Length <= 0)
-                _data = null;
+                this.data = null;
             else
-                _data = data.ToArray();
+                this.data = data.ToArray();
         }
 
         /// <summary>Set class value to an array 1 byte long and set the value to the supplied argument.</summary>
         /// <param name="data">Byte value to initialize the class value with</param>
         public virtual void Set(byte data)
         {
-            _data = new byte[1];
-            _data[0] = data;
+            this.data = new byte[1];
+            this.data[0] = data;
         }
 
         /// <summary>Set value at specified position to the supplied value</summary>
@@ -156,26 +161,26 @@ namespace SnmpSharpNet.Types
             if (position < 0 || position >= Length)
                 return; // Don't throw exceptions here
 
-            _data[position] = value;
+            data[position] = value;
         }
 
         /// <summary>Set class value to reference of parameter byte array</summary>
         /// <param name="data">Data buffer parameter</param>
         public virtual void SetRef(byte[] data)
         {
-            _data = data;
+            this.data = data;
         }
 
         /// <summary>
         /// Append string value to the OctetString class. If current class content is length 0, new
         /// string value is set as the value of this class.
-        /// 
+        ///
         /// Class assumes that string value is UTF8 encoded.
         /// </summary>
         /// <param name="value">UTF8 encoded string value</param>
         public void Append(string value)
         {
-            if (_data == null)
+            if (data == null)
                 Set(value);
             else
             {
@@ -198,10 +203,10 @@ namespace SnmpSharpNet.Types
             if (value == null || value.Length == 0)
                 throw new ArgumentNullException("value");
 
-            if (_data == null)
+            if (data == null)
                 Set(value);
             else
-                _data = _data.Concat(value).ToArray();
+                data = data.Concat(value).ToArray();
         }
 
         /// <summary>Indexed access to the OctetString class data members.</summary>
@@ -220,20 +225,21 @@ namespace SnmpSharpNet.Types
                 if (index < 0 || index >= Length)
                     return 0; // Don't throw exceptions here
 
-                return _data[index];
+                return data[index];
             }
+
             set
             {
                 if (index < 0 || index >= Length)
                     return; // Don't throw exceptions here
 
-                _data[index] = value;
+                data[index] = value;
             }
         }
 
         /// <summary>Creates a duplicate copy of the object and returns it to the caller.</summary>
         /// <returns> A newly constructed copy of self</returns>
-        public override Object Clone()
+        public override object Clone()
         {
             return new OctetString(this);
         }
@@ -251,21 +257,22 @@ namespace SnmpSharpNet.Types
         {
             get
             {
-                if (_data == null || _data.Length <= 0)
+                if (data == null || data.Length <= 0)
                     return false; // empty string can't be hex :)
 
                 bool isHex = false;
-                for (int i = 0; i < _data.Length; i++)
+                for (int i = 0; i < data.Length; i++)
                 {
-                    byte b = _data[i];
+                    byte b = data[i];
                     if (b < 32)
                     {
-                        if (b != 10 && b != 13 && !(b == 0x00 && (_data.Length - 1) == i))
+                        if (b != 10 && b != 13 && !(b == 0x00 && (data.Length - 1) == i))
                             isHex = true;
                     }
                     else if (b > 127)
                         isHex = true;
                 }
+
                 return isHex;
             }
         }
@@ -280,15 +287,15 @@ namespace SnmpSharpNet.Types
                 return string.Format(
                     CultureInfo.CurrentCulture,
                     "{0:x2}{1:x2}.{2:x2}{3:x2}.{4:x2}{5:x2}",
-                    _data[0],
-                    _data[1],
-                    _data[2],
-                    _data[3],
-                    _data[4],
-                    _data[5]
-                );
+                    data[0],
+                    data[1],
+                    data[2],
+                    data[3],
+                    data[4],
+                    data[5]);
             }
-            return "";
+
+            return string.Empty;
         }
 
         /// <summary>
@@ -298,8 +305,8 @@ namespace SnmpSharpNet.Types
         /// <returns>String representation of the object.</returns>
         public override string ToString()
         {
-            if (_data == null || _data.Length <= 0)
-                return "";
+            if (data == null || data.Length <= 0)
+                return string.Empty;
 
             bool asHex = IsHex;
 
@@ -307,7 +314,7 @@ namespace SnmpSharpNet.Types
             if (asHex)
                 rs = ToHexString();
             else
-                rs = Encoding.UTF8.GetString(_data);
+                rs = Encoding.UTF8.GetString(data);
 
             return rs;
         }
@@ -317,17 +324,18 @@ namespace SnmpSharpNet.Types
         public string ToHexString()
         {
             StringBuilder b = new StringBuilder();
-            for (int i = 0; i < _data.Length; ++i)
+            for (int i = 0; i < data.Length; ++i)
             {
-                int x = _data[i] & 0xff;
+                int x = data[i] & 0xff;
                 if (x < 16)
                     b.Append('0');
 
                 b.Append(Convert.ToString(x, 16).ToUpper());
 
-                if (i < _data.Length - 1)
+                if (i < data.Length - 1)
                     b.Append(' ');
             }
+
             return b.ToString();
         }
 
@@ -352,22 +360,23 @@ namespace SnmpSharpNet.Types
                 return false; // Incompatible object type
 
             // check for null value in comparison
-            if (d == null || _data == null)
+            if (d == null || data == null)
             {
-                if (d == null && _data == null)
+                if (d == null && data == null)
                     return true; // both values are null
 
                 return false; // one value is not null
             }
 
-            if (d.Length != _data.Length)
+            if (d.Length != data.Length)
                 return false; // Objects have different length
 
             for (int cnt = 0; cnt < d.Length; cnt++)
             {
-                if (d[cnt] != _data[cnt])
+                if (d[cnt] != data[cnt])
                     return false;
             }
+
             return true;
         }
 
@@ -384,10 +393,10 @@ namespace SnmpSharpNet.Types
         /// <returns>True if equal, otherwise false</returns>
         public static bool operator ==(OctetString str1, OctetString str2)
         {
-            if (((Object)str1) == null && ((Object)str2) == null)
+            if (((object)str1) == null && ((object)str2) == null)
                 return true;
 
-            if (((Object)str1) == null || ((Object)str2) == null)
+            if (((object)str1) == null || ((object)str2) == null)
                 return false;
 
             return str1.Equals(str2);
@@ -407,28 +416,30 @@ namespace SnmpSharpNet.Types
         /// <returns>-1 if class value is greater (longer or higher value), 1 if byte array is greater or 0 if the same</returns>
         public int CompareTo(byte[] other)
         {
-            if (_data == null && (other != null && other.Length > 0))
+            if (data == null && (other != null && other.Length > 0))
                 return 1;
 
-            if ((other == null || other.Length == 0) && _data.Length > 0)
+            if ((other == null || other.Length == 0) && data.Length > 0)
                 return -1;
 
-            if (_data == null && other == null)
+            if (data == null && other == null)
                 return 0;
 
-            if (_data.Length > other.Length)
+            if (data.Length > other.Length)
                 return -1;
-            else if (_data.Length < other.Length)
+            else if (data.Length < other.Length)
                 return 1;
             else
             {
-                for (int i = 0; i < _data.Length; i++)
+                for (int i = 0; i < data.Length; i++)
                 {
-                    if (_data[i] > other[i])
+                    if (data[i] > other[i])
                         return -1;
-                    else if (_data[i] < other[i])
+
+                    if (data[i] < other[i])
                         return 1;
                 }
+
                 return 0;
             }
         }
@@ -444,7 +455,7 @@ namespace SnmpSharpNet.Types
         /// <summary>Implicit operator allowing cast of OctetString objects to byte[] array</summary>
         /// <param name="oStr">OctetString to cast as byte array</param>
         /// <returns>Byte array value of the supplied OctetString</returns>
-        public static implicit operator byte[] (OctetString oStr)
+        public static implicit operator byte[](OctetString oStr)
         {
             if (oStr == null)
                 return null;
@@ -455,21 +466,19 @@ namespace SnmpSharpNet.Types
         /// <summary>Reset internal buffer to null.</summary>
         public void Reset()
         {
-            _data = null;
+            data = null;
         }
-
-        #region Encode and decode methods
 
         /// <summary>BER encode OctetString variable.</summary>
         /// <param name="buffer"><see cref="MutableByte"/> encoding destination.</param>
         public override void Encode(MutableByte buffer)
         {
-            if (_data == null || _data.Length == 0)
+            if (data == null || data.Length == 0)
                 BuildHeader(buffer, Type, 0);
             else
             {
-                BuildHeader(buffer, Type, _data.Length);
-                buffer.Append(_data);
+                BuildHeader(buffer, Type, data.Length);
+                buffer.Append(data);
             }
         }
 
@@ -492,28 +501,25 @@ namespace SnmpSharpNet.Types
             if (headerLength == 0)
             {
                 // Packet contains string length == 0
-                _data = null;
+                data = null;
             }
             else
             {
-                //
                 // copy the data
-                //
-                _data = new byte[headerLength];
-                Buffer.BlockCopy(buffer, offset, _data, 0, headerLength);
+                data = new byte[headerLength];
+                Buffer.BlockCopy(buffer, offset, data, 0, headerLength);
                 offset += headerLength;
             }
+
             return offset;
         }
-
-        #endregion Encode and decode methods
 
         /// <summary>Returns an enumerator that iterates through the OctetString byte collection</summary>
         /// <returns>An IEnumerator  object that can be used to iterate through the collection.</returns>
         public IEnumerator<byte> GetEnumerator()
         {
-            if (_data != null)
-                return ((IEnumerable<byte>)_data).GetEnumerator();
+            if (data != null)
+                return ((IEnumerable<byte>)data).GetEnumerator();
 
             return null;
         }
@@ -522,8 +528,8 @@ namespace SnmpSharpNet.Types
         /// <returns>An IEnumerator  object that can be used to iterate through the collection.</returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            if (_data != null)
-                return _data.GetEnumerator();
+            if (data != null)
+                return data.GetEnumerator();
 
             return null;
         }

@@ -1,56 +1,59 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Exception;
-using System;
-using System.Globalization;
-
+//
 namespace SnmpSharpNet.Types
 {
+    using System;
+    using System.Globalization;
+    using SnmpSharpNet.Exception;
+
     /// <summary>SMI unsigned 32-bit integer value class.</summary>
     [Serializable]
-    public class UInteger32 : 
+    public class UInteger32 :
         AsnType,
         IComparable<UInteger32>,
         IComparable<uint>
     {
         /// <summary>Internal unsigned integer 32-bit value</summary>
-        protected uint _value;
+        protected uint value;
 
         /// <summary>Constructor. Class value is set to 0.</summary>
         public UInteger32()
         {
-            Type = SnmpConstants.SMI_UNSIGNED32;
+            Type = SnmpConstants.SmiUnsigned32;
         }
 
         /// <summary>Constructor. SET the class value to the supplied 32-bit value.</summary>
         /// <param name="val">Value to initialize the class with.</param>
-        public UInteger32(uint val) : this()
+        public UInteger32(uint val)
+            : this()
         {
-            _value = val;
+            value = val;
         }
 
         /// <summary>Constructor. Initializes the class to the same value as the argument.</summary>
         /// <param name="second">Object whose value is used to initialize this class.</param>
-        public UInteger32(UInteger32 second) : this(second.Value)
+        public UInteger32(UInteger32 second)
+            : this(second.Value)
         {
         }
 
         /// <summary>Constructor. Initialize the class with the unsigned integer 32-bit value stored as a string value in the argument.</summary>
         /// <param name="val">Unsigned integer value encoded as a string</param>
-        public UInteger32(string val) : this()
+        public UInteger32(string val)
+            : this()
         {
             Set(val);
         }
@@ -63,7 +66,7 @@ namespace SnmpSharpNet.Types
             if (value.Length == 0)
                 throw new ArgumentException("value", "String has to be length greater then 0");
 
-            _value = uint.Parse(value);
+            this.value = uint.Parse(value);
         }
 
         /// <summary>SET class value from another UInteger32 or Integer32 class cast as <seealso cref="AsnType"/>.</summary>
@@ -75,28 +78,28 @@ namespace SnmpSharpNet.Types
                 throw new ArgumentNullException("value", "Parameter is null");
 
             if (value is UInteger32)
-                _value = ((UInteger32)value).Value;
+                this.value = ((UInteger32)value).Value;
             else if (value is Integer32)
-                _value = (uint)((Integer32)value).Value;
+                this.value = (uint)((Integer32)value).Value;
         }
 
         /// <summary>Value of the object. Returns 32 bit unsigned integer</summary>
         public uint Value
         {
-            get { return _value; }
-            set { _value = value; }
+            get { return value; }
+            set { this.value = value; }
         }
 
         /// <summary>Returns the string representation of the object.</summary>
         /// <returns>String representation of the of the class value.</returns>
         public override string ToString()
         {
-            return Convert.ToString(_value, CultureInfo.CurrentCulture);
+            return Convert.ToString(value, CultureInfo.CurrentCulture);
         }
 
         /// <summary>Returns a duplicate of the current object</summary>
         /// <returns>A duplicate copy of the current object</returns>
-        public override Object Clone()
+        public override object Clone()
         {
             return new UInteger32(this);
         }
@@ -104,7 +107,7 @@ namespace SnmpSharpNet.Types
         /// <summary>Implicit casting of the object value as uint value</summary>
         /// <param name="value">UInteger32 class</param>
         /// <returns>uint value stored by the UInteger32 class</returns>
-        public static implicit operator UInt32(UInteger32 value)
+        public static implicit operator uint(UInteger32 value)
         {
             if (value == null)
                 return 0;
@@ -112,15 +115,13 @@ namespace SnmpSharpNet.Types
             return value.Value;
         }
 
-        #region Encode and decode methods
-
         /// <summary>BER encode class value.</summary>
         /// <param name="buffer">Target buffer. Value is appended to the end of it.</param>
         public override void Encode(MutableByte buffer)
         {
             MutableByte tmp = new MutableByte();
 
-            byte[] b = BitConverter.GetBytes(_value);
+            byte[] b = BitConverter.GetBytes(value);
 
             for (int i = 3; i >= 0; i--)
             {
@@ -165,24 +166,22 @@ namespace SnmpSharpNet.Types
             if (headerLength > 5)
                 throw new OverflowException("Integer too large: cannot decode");
 
-            _value = 0;
+            value = 0;
             for (int i = 0; i < headerLength; i++)
             {
-                _value <<= 8;
-                _value = _value | buffer[offset++];
+                value <<= 8;
+                value = value | buffer[offset++];
             }
 
             return offset;
         }
-
-        #endregion Encode and decode methods
 
         /// <summary>Compare implementation that will compare this class value with the value of another <see cref="UInteger32"/> class.</summary>
         /// <param name="other">UInteger32 value to compare class value with.</param>
         /// <returns>True if values are the same, otherwise false</returns>
         public int CompareTo(UInteger32 other)
         {
-            return _value.CompareTo(other.Value);
+            return value.CompareTo(other.Value);
         }
 
         /// <summary>Compare implementation that will compare this class value with argument uint value.</summary>
@@ -190,7 +189,7 @@ namespace SnmpSharpNet.Types
         /// <returns>True if values are the same, otherwise false</returns>
         public int CompareTo(uint other)
         {
-            return _value.CompareTo(other);
+            return value.CompareTo(other);
         }
 
         /// <summary>Compare class value against the object argument. Supported argument types are <see cref="UInteger32"/> and Int32.</summary>
@@ -204,13 +203,13 @@ namespace SnmpSharpNet.Types
             if (obj is UInteger32)
             {
                 UInteger32 u32 = (UInteger32)obj;
-                return _value.Equals(u32.Value);
+                return value.Equals(u32.Value);
             }
 
             if (obj is uint)
             {
                 uint u32 = (uint)obj;
-                return _value.Equals(u32);
+                return value.Equals(u32);
             }
 
             return false; // last resort
@@ -256,7 +255,7 @@ namespace SnmpSharpNet.Types
             if ((object)second == null)
                 return true;
 
-            return (first.Value > second.Value);
+            return first.Value > second.Value;
         }
 
         /// <summary>Less then operator</summary>
@@ -275,14 +274,14 @@ namespace SnmpSharpNet.Types
             if ((object)second == null)
                 return false;
 
-            return (first.Value < second.Value);
+            return first.Value < second.Value;
         }
 
         /// <summary>Returns hashed class value.</summary>
         /// <returns>Int32 hash value</returns>
         public override int GetHashCode()
         {
-            return _value.GetHashCode();
+            return value.GetHashCode();
         }
 
         /// <summary>Addition operator.</summary>
@@ -314,8 +313,8 @@ namespace SnmpSharpNet.Types
 
         /// <summary>Subtraction operator</summary>
         /// <remarks>
-        /// Subtract the value of the second UInteger32 class value from the first UInteger32 class value. 
-        /// Values of the two objects are subtracted and a new class is instantiated with the result. 
+        /// Subtract the value of the second UInteger32 class value from the first UInteger32 class value.
+        /// Values of the two objects are subtracted and a new class is instantiated with the result.
         /// Original values of the two parameter classes are preserved.
         /// </remarks>
         /// <param name="first">First UInteger32 object</param>

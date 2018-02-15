@@ -1,218 +1,174 @@
 ﻿// This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 /* Changes:
  *  Dec/05, 2008
  *   Added user name comparison in decode method
  */
-using SnmpSharpNet.Exception;
-using SnmpSharpNet.Types;
-using System;
-
 namespace SnmpSharpNet.Security
 {
+    using System;
+    using SnmpSharpNet.Exception;
+    using SnmpSharpNet.Types;
+
     /// <summary>
     /// User security model implementation class.
     /// </summary>
     public class UserSecurityModel : AsnType, ICloneable
     {
-        /// <summary>
-        /// Authoritative engine id
-        /// </summary>
-        protected OctetString _engineId;
+        /// <summary>Authoritative engine id</summary>
+        protected OctetString engineId;
 
-        /// <summary>
-        /// Authoritative engine boots value
-        /// </summary>
-        protected Integer32 _engineBoots;
+        /// <summary>Authoritative engine boots value</summary>
+        protected Integer32 engineBoots;
 
-        /// <summary>
-        /// Authoritative engine time value
-        /// </summary>
-        protected Integer32 _engineTime;
+        /// <summary>Authoritative engine time value</summary>
+        protected Integer32 engineTime;
 
-        /// <summary>
-        /// SNMP version 3 security name (or user name)
-        /// </summary>
-        protected OctetString _securityName;
+        /// <summary>SNMP version 3 security name (or user name)</summary>
+        protected OctetString securityName;
 
-        /// <summary>
-        /// Authentication digest enumeration value. For acceptable values see <see cref="AuthenticationDigests"/>
-        /// </summary>
-        protected AuthenticationDigests _authentication;
+        /// <summary>Authentication digest enumeration value. For acceptable values see <see cref="AuthenticationDigests"/></summary>
+        protected AuthenticationDigests authentication;
 
-        /// <summary>
-        /// Authentication secret
-        /// </summary>
-        protected MutableByte _authenticationSecret;
+        /// <summary>Authentication secret</summary>
+        protected MutableByte authenticationSecret;
 
-        /// <summary>
-        /// Authentication parameters in authNoPriv and authPriv requests
-        /// </summary>
-        private OctetString _authenticationParameters;
+        /// <summary>Authentication parameters in authNoPriv and authPriv requests</summary>
+        private OctetString authenticationParameters;
 
-        /// <summary>
-        /// Privacy protocol. For valid values see <see cref="PrivacyProtocols"/>
-        /// </summary>
-        protected PrivacyProtocols _privacy;
+        /// <summary>Privacy protocol. For valid values see <see cref="EPrivacyProtocols"/></summary>
+        protected EPrivacyProtocols privacy;
 
-        /// <summary>
-        /// Privacy secret
-        /// </summary>
-        protected MutableByte _privacySecret;
+        /// <summary>Privacy secret</summary>
+        protected MutableByte privacySecret;
 
-        /// <summary>
-        /// Privacy parameters in authPriv requests
-        /// </summary>
-        protected OctetString _privacyParameters;
+        /// <summary>Privacy parameters in authPriv requests</summary>
+        protected OctetString privacyParameters;
 
-        /// <summary>
-        /// Get SNMP version 3 agent authoritative engine id object
-        /// </summary>
+        /// <summary>Get SNMP version 3 agent authoritative engine id object</summary>
         public OctetString EngineId
         {
-            get { return _engineId; }
+            get { return engineId; }
         }
 
-        /// <summary>
-        /// Get SNMP version 3 agent authoritative engine boots object
-        /// </summary>
-        public Int32 EngineBoots
+        /// <summary>Get SNMP version 3 agent authoritative engine boots object</summary>
+        public int EngineBoots
         {
-            get { return _engineBoots.Value; }
-            set { _engineBoots.Value = value; }
+            get { return engineBoots.Value; }
+            set { engineBoots.Value = value; }
         }
 
-        /// <summary>
-        /// Get SNMP version 3 agent authoritative engine time object
-        /// </summary>
-        public Int32 EngineTime
+        /// <summary>Get SNMP version 3 agent authoritative engine time object</summary>
+        public int EngineTime
         {
-            get { return _engineTime.Value; }
-            set { _engineTime.Value = value; }
+            get { return engineTime.Value; }
+            set { engineTime.Value = value; }
         }
 
-        /// <summary>
-        /// Get SNMP version 3 authentication parameter field object
-        /// </summary>
+        /// <summary>Get SNMP version 3 authentication parameter field object</summary>
         public OctetString AuthenticationParameters
         {
-            get { return _authenticationParameters; }
+            get { return authenticationParameters; }
         }
 
-        /// <summary>
-        /// Set SNMP version 3 agent engine time related values.
-        /// </summary>
+        /// <summary>Set SNMP version 3 agent engine time related values.</summary>
         /// <param name="engineTime">SNMP version 3 agent engine time value</param>
         /// <param name="engineBoots">SNMP version 3 agent engine boot value</param>
-        public void SetEngineTime(Int32 engineTime, Int32 engineBoots)
+        public void SetEngineTime(int engineTime, int engineBoots)
         {
-            _engineTime.Value = engineTime;
-            _engineBoots.Value = engineBoots;
+            this.engineTime.Value = engineTime;
+            this.engineBoots.Value = engineBoots;
         }
 
-        /// <summary>
-        /// Get/Set hash to use for SNMP version 3 authentication. For available values see <see cref="AuthenticationDigests"/>
-        /// </summary>
+        /// <summary>Get/Set hash to use for SNMP version 3 authentication. For available values see <see cref="AuthenticationDigests"/></summary>
         public AuthenticationDigests Authentication
         {
-            get { return _authentication; }
-            set { _authentication = value; }
+            get { return authentication; }
+            set { authentication = value; }
         }
 
-        /// <summary>
-        /// Security name (or user name)
-        /// </summary>
+        /// <summary>Security name (or user name)</summary>
         public OctetString SecurityName
         {
-            get { return _securityName; }
+            get { return securityName; }
         }
 
-        /// <summary>
-        /// Authentication secret (or password).
-        /// </summary>
+        /// <summary>Authentication secret (or password).</summary>
         public MutableByte AuthenticationSecret
         {
-            get { return _authenticationSecret; }
+            get { return authenticationSecret; }
         }
 
-        /// <summary>
-        /// Privacy secret (or password)
-        /// </summary>
+        /// <summary>Privacy secret (or password)</summary>
         public MutableByte PrivacySecret
         {
-            get { return _privacySecret; }
+            get { return privacySecret; }
         }
 
         /// <summary>
-        /// Get/set privacy protocol value. For available privacy protocols, see <see cref="PrivacyProtocols"/>
+        /// Get/set privacy protocol value. For available privacy protocols, see <see cref="EPrivacyProtocols"/>
         /// enumeration.
         /// </summary>
-        public PrivacyProtocols Privacy
+        public EPrivacyProtocols Privacy
         {
-            get { return _privacy; }
-            set { _privacy = value; }
+            get { return privacy; }
+            set { privacy = value; }
         }
 
-        /// <summary>
-        /// Get privacy parameters object.
-        /// </summary>
+        /// <summary>Get privacy parameters object.</summary>
         public OctetString PrivacyParameters
         {
-            get { return _privacyParameters; }
+            get { return privacyParameters; }
         }
 
-        /// <summary>
-        /// Standard constructor.
-        /// </summary>
+        /// <summary>Standard constructor.</summary>
         public UserSecurityModel()
         {
             Type = 3;
-            _engineId = new OctetString();
-            _engineBoots = new Integer32();
-            _engineTime = new Integer32();
-            _authentication = AuthenticationDigests.None;
+            engineId = new OctetString();
+            engineBoots = new Integer32();
+            engineTime = new Integer32();
+            authentication = AuthenticationDigests.None;
 
-            _securityName = new OctetString();
-            _authenticationSecret = new MutableByte();
-            _authenticationParameters = new OctetString();
-            _privacySecret = new MutableByte();
-            _privacy = PrivacyProtocols.None;
-            _privacyParameters = new OctetString();
+            securityName = new OctetString();
+            authenticationSecret = new MutableByte();
+            authenticationParameters = new OctetString();
+            privacySecret = new MutableByte();
+            privacy = EPrivacyProtocols.None;
+            privacyParameters = new OctetString();
         }
 
-        /// <summary>
-        /// Copy constructor.
-        /// </summary>
+        /// <summary>Copy constructor.</summary>
         /// <param name="value">Class to copy values from</param>
         public UserSecurityModel(UserSecurityModel value)
             : this()
         {
-            _engineId.Set(value.EngineId);
-            _engineBoots.Value = value.EngineBoots;
-            _engineTime.Value = value.EngineTime;
-            _securityName.Set(value.SecurityName);
-            _authenticationParameters = new OctetString();
-            _privacySecret = new MutableByte();
-            _privacy = PrivacyProtocols.None;
-            _privacyParameters = new OctetString();
+            engineId.Set(value.EngineId);
+            engineBoots.Value = value.EngineBoots;
+            engineTime.Value = value.EngineTime;
+            securityName.Set(value.SecurityName);
+            authenticationParameters = new OctetString();
+            privacySecret = new MutableByte();
+            privacy = EPrivacyProtocols.None;
+            privacyParameters = new OctetString();
         }
 
         /// <summary>
         /// Authenticate SNMP version 3 message.
-        /// 
+        ///
         /// Before calling this member, entire SNMP version 3 packet needs to be encoded. After authentication
         /// process is completed, authenticationParameters value in the USM header is updated and SNMPv3 packet
         /// needs to be re-encoded to include it in the BER encoded stream prior to transmission.
@@ -220,17 +176,17 @@ namespace SnmpSharpNet.Security
         /// <param name="wholePacket">SNMP version 3 BER encoded packet.</param>
         public void Authenticate(ref MutableByte wholePacket)
         {
-            if (_authentication != AuthenticationDigests.None)
+            if (authentication != AuthenticationDigests.None)
             {
-                IAuthenticationDigest authProto = Security.Authentication.GetInstance(_authentication);
+                IAuthenticationDigest authProto = Security.Authentication.GetInstance(authentication);
                 byte[] authParam = authProto.Authenticate(AuthenticationSecret, EngineId.ToArray(), wholePacket);
-                _authenticationParameters = new OctetString(authParam);
+                authenticationParameters = new OctetString(authParam);
             }
         }
 
         /// <summary>
         /// Authenticate SNMP version 3 message.
-        /// 
+        ///
         /// Before calling this member, entire SNMP version 3 packet needs to be encoded. After authentication
         /// process is completed, authenticationParameters value in the USM header is updated and SNMPv3 packet
         /// needs to be re-encoded to include it in the BER encoded stream prior to transmission.
@@ -239,40 +195,37 @@ namespace SnmpSharpNet.Security
         /// <param name="wholePacket">SNMP version 3 BER encoded packet.</param>
         public void Authenticate(byte[] authKey, ref MutableByte wholePacket)
         {
-            IAuthenticationDigest authProto = Security.Authentication.GetInstance(_authentication);
+            IAuthenticationDigest authProto = Security.Authentication.GetInstance(authentication);
             byte[] authParam = authProto.Authenticate(authKey, wholePacket);
-            _authenticationParameters = new OctetString(authParam);
+            authenticationParameters = new OctetString(authParam);
         }
 
-        /// <summary>
-        /// Authenticate incoming packet
-        /// </summary>
+        /// <summary>Authenticate incoming packet</summary>
         /// <param name="wholePacket">Received BER encoded SNMP version 3 packet</param>
         /// <returns>True if packet is successfully authenticated, otherwise false.</returns>
         public bool IsAuthentic(MutableByte wholePacket)
         {
-            if (_authentication != AuthenticationDigests.None)
+            if (authentication != AuthenticationDigests.None)
             {
-                IAuthenticationDigest authProto = Security.Authentication.GetInstance(_authentication);
+                IAuthenticationDigest authProto = Security.Authentication.GetInstance(authentication);
                 if (authProto != null)
-                    return authProto.AuthenticateIncomingMessage(AuthenticationSecret, _engineId, _authenticationParameters, wholePacket);
+                    return authProto.AuthenticateIncomingMessage(AuthenticationSecret, engineId, authenticationParameters, wholePacket);
             }
+
             return false; // Nothing to authenticate
         }
 
-        /// <summary>
-        /// Authenticate incoming packet
-        /// </summary>
+        /// <summary>Authenticate incoming packet</summary>
         /// <param name="authKey">Authentication key (not password)</param>
         /// <param name="wholePacket">Received BER encoded SNMP version 3 packet</param>
         /// <returns>True if packet is successfully authenticated, otherwise false.</returns>
         public bool IsAuthentic(byte[] authKey, MutableByte wholePacket)
         {
-            if (_authentication != AuthenticationDigests.None)
+            if (authentication != AuthenticationDigests.None)
             {
-                IAuthenticationDigest authProto = Security.Authentication.GetInstance(_authentication);
+                IAuthenticationDigest authProto = Security.Authentication.GetInstance(authentication);
                 if (authProto != null)
-                    return authProto.AuthenticateIncomingMsg(authKey, _authenticationParameters, wholePacket);
+                    return authProto.AuthenticateIncomingMsg(authKey, authenticationParameters, wholePacket);
             }
 
             return false; // Nothing to authenticate
@@ -287,61 +240,61 @@ namespace SnmpSharpNet.Security
         public override void Encode(MutableByte buffer)
         {
             MutableByte tmp = new MutableByte();
-            
-            // First encode all the values that will form the sequence
-            _engineId.Encode(tmp);
-            // Encode engine boots
-            _engineBoots.Encode(tmp);
-            // encode engine time
-            _engineTime.Encode(tmp);
-            _securityName.Encode(tmp);
 
-            if (_authentication != AuthenticationDigests.None)
+            // First encode all the values that will form the sequence
+            engineId.Encode(tmp);
+
+            // Encode engine boots
+            engineBoots.Encode(tmp);
+
+            // encode engine time
+            engineTime.Encode(tmp);
+            securityName.Encode(tmp);
+
+            if (authentication != AuthenticationDigests.None)
             {
-                if (_authenticationParameters.Length <= 0)
+                if (authenticationParameters.Length <= 0)
                 {
                     // If authentication is used, set authentication parameters field to 12 bytes set to 0x00
-                    _authenticationParameters.Set(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
+                    authenticationParameters.Set(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 });
                 }
             }
             else
-                _authenticationParameters.Reset();
+                authenticationParameters.Reset();
 
-            _authenticationParameters.Encode(tmp);
-            if (_privacy != PrivacyProtocols.None)
+            authenticationParameters.Encode(tmp);
+            if (privacy != EPrivacyProtocols.None)
             {
-                if (_privacyParameters.Length <= 0)
+                if (privacyParameters.Length <= 0)
                 {
-                    IPrivacyProtocol privProto = PrivacyProtocol.GetInstance(_privacy);
+                    IPrivacyProtocol privProto = PrivacyProtocol.GetInstance(privacy);
                     if (privProto != null)
                     {
                         byte[] parameter = new byte[privProto.PrivacyParametersLength];
                         for (int i = 0; i < privProto.PrivacyParametersLength; i++)
                             parameter[i] = 0x00; // This is not necessary since all array members are, by default, initialized to 0
 
-                        _privacyParameters.Set(parameter);
+                        privacyParameters.Set(parameter);
                     }
                     else
                         throw new SnmpException(SnmpException.EErrorCode.UnsupportedPrivacyProtocol, "Unrecognized privacy protocol specified.");
                 }
             }
             else
-                _privacyParameters.Reset();
+                privacyParameters.Reset();
 
-            _privacyParameters.Encode(tmp);
+            privacyParameters.Encode(tmp);
             MutableByte tmp1 = new MutableByte();
 
-            BuildHeader(tmp1, SnmpConstants.SMI_SEQUENCE, tmp.Length);
+            BuildHeader(tmp1, SnmpConstants.SmiSequence, tmp.Length);
             tmp1.Append(tmp);
 
-            BuildHeader(buffer, OCTETSTRING, tmp1.Length);
+            BuildHeader(buffer, (byte)EAsnType.OctetString, tmp1.Length);
 
             buffer.Append(tmp1);
         }
 
-        /// <summary>
-        /// Decode USM portion of the SNMP version 3 packet.
-        /// </summary>
+        /// <summary>Decode USM portion of the SNMP version 3 packet.</summary>
         /// <param name="buffer">Received SNMP packet BER encoded</param>
         /// <param name="offset">Offset within the buffer to start decoding USM information</param>
         /// <returns>Buffer position after the decoded value</returns>
@@ -350,49 +303,46 @@ namespace SnmpSharpNet.Security
         public override int Decode(byte[] buffer, int offset)
         {
             // Grab the octet string header
-
             byte type = ParseHeader(buffer, ref offset, out int len);
 
-            if (type != OCTETSTRING)
+            if (type != (byte)EAsnType.OctetString)
                 throw new SnmpDecodingException("Invalid value type found while looking for USM header.");
 
             if (len > (buffer.Length - offset))
                 throw new OverflowException("Packet too small");
-            
+
             // Now grab the sequence header
             type = ParseHeader(buffer, ref offset, out len);
 
-            if (type != SnmpConstants.SMI_SEQUENCE)
+            if (type != SnmpConstants.SmiSequence)
                 throw new SnmpDecodingException("Sequence missing from USM header.");
 
             if (len > (buffer.Length - offset))
                 throw new OverflowException("Packet too small");
 
             // now grab values one at the time
-            offset = _engineId.Decode(buffer, offset);
-            offset = _engineBoots.Decode(buffer, offset);
-            offset = _engineTime.Decode(buffer, offset);
-            offset = _securityName.Decode(buffer, offset);
+            offset = engineId.Decode(buffer, offset);
+            offset = engineBoots.Decode(buffer, offset);
+            offset = engineTime.Decode(buffer, offset);
+            offset = securityName.Decode(buffer, offset);
 
             int saveOffset = offset;
-            offset = _authenticationParameters.Decode(buffer, offset);
+            offset = authenticationParameters.Decode(buffer, offset);
 
-            if (_authenticationParameters.Length > 0)
+            if (authenticationParameters.Length > 0)
             {
                 // walk through and set the authentication parameters to 0x00 in the packet
-
                 saveOffset += 2; // Skip BER encoded variable type and length
-                for (int i = 0; i < _authenticationParameters.Length; i++)
+
+                for (int i = 0; i < authenticationParameters.Length; i++)
                     buffer[saveOffset + i] = 0x00;
             }
 
-            offset = _privacyParameters.Decode(buffer, offset);
+            offset = privacyParameters.Decode(buffer, offset);
             return offset;
         }
 
-        /// <summary>
-        /// Clone object
-        /// </summary>
+        /// <summary>Clone object</summary>
         /// <returns>Duplicate copy of the object</returns>
         public override object Clone()
         {
@@ -406,19 +356,17 @@ namespace SnmpSharpNet.Security
         /// <returns>True if information is valid and complete enough for a successful request, otherwise false</returns>
         public bool Valid()
         {
-            if ((_authentication != AuthenticationDigests.None || _privacy != PrivacyProtocols.None) && _securityName.Length <= 0)
+            if ((authentication != AuthenticationDigests.None || privacy != EPrivacyProtocols.None) && securityName.Length <= 0)
                 return false; // Have to provide a user name when using authentication or privacy
 
-            if (_authentication == AuthenticationDigests.None && _privacy != PrivacyProtocols.None)
-                return false; // noAuthPriv is not supported by SNMP version 3
-                              // check that secrets are properly configured
+            if (authentication == AuthenticationDigests.None && privacy != EPrivacyProtocols.None)
+                return false; // noAuthPriv is not supported by SNMP version 3, check that secrets are properly configured
 
-            if (_authentication != AuthenticationDigests.None && _authenticationSecret.Length <= 0)
+            if (authentication != AuthenticationDigests.None && authenticationSecret.Length <= 0)
                 return false; // authentication configured without a secret
 
-            if (_privacy != PrivacyProtocols.None && _privacySecret.Length <= 0)
-                return false; // privacy configured without a secret
-                              // no point in checking the rest since discovery process is done with all other values being null or 0
+            if (privacy != EPrivacyProtocols.None && privacySecret.Length <= 0)
+                return false; // privacy configured without a secret, no point in checking the rest since discovery process is done with all other values being null or 0
 
             return true;
         }
@@ -430,17 +378,17 @@ namespace SnmpSharpNet.Security
         public void Reset()
         {
             Type = 3;
-            _engineId = new OctetString();
-            _engineBoots = new Integer32();
-            _engineTime = new Integer32();
-            _authentication = AuthenticationDigests.None;
+            engineId = new OctetString();
+            engineBoots = new Integer32();
+            engineTime = new Integer32();
+            authentication = AuthenticationDigests.None;
 
-            _securityName = new OctetString();
-            _authenticationSecret = new MutableByte();
-            _authenticationParameters = new OctetString();
-            _privacySecret = new MutableByte();
-            _privacy = PrivacyProtocols.None;
-            _privacyParameters = new OctetString();
+            securityName = new OctetString();
+            authenticationSecret = new MutableByte();
+            authenticationParameters = new OctetString();
+            privacySecret = new MutableByte();
+            privacy = EPrivacyProtocols.None;
+            privacyParameters = new OctetString();
         }
     }
 }

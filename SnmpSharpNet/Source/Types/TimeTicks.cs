@@ -1,50 +1,53 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using System;
-
+//
 namespace SnmpSharpNet.Types
 {
+    using System;
+
     /// <summary>SMI TimeTicks class</summary>
     /// <remarks>
     /// TimeTicks value is stored as an unsigned
     /// 32-bit integer representing device uptime in 1/100s of a second time periods.
     /// </remarks>
     [Serializable]
-    public class TimeTicks : 
+    public class TimeTicks :
         UInteger32,
         ICloneable
     {
         /// <summary>Constructor</summary>
-        public TimeTicks() : base()
+        public TimeTicks()
+            : base()
         {
-            Type = SnmpConstants.SMI_TIMETICKS;
+            Type = SnmpConstants.SmiTimeTicks;
         }
 
         /// <summary>Constructor</summary>
         /// <param name="second">Initialize class with value from this class.</param>
-        public TimeTicks(TimeTicks second) : base(second)
+        public TimeTicks(TimeTicks second)
+            : base(second)
         {
-            Type = SnmpConstants.SMI_TIMETICKS;
+            Type = SnmpConstants.SmiTimeTicks;
         }
 
         /// <summary>Constructor</summary>
         /// <param name="uint32">The UInteger32 value to initialize the class with.</param>
-        public TimeTicks(UInteger32 uint32) : base(uint32)
+        public TimeTicks(UInteger32 uint32)
+            : base(uint32)
         {
-            Type = SnmpConstants.SMI_TIMETICKS;
+            Type = SnmpConstants.SmiTimeTicks;
         }
 
         /// <summary>Constructor.</summary>
@@ -52,19 +55,20 @@ namespace SnmpSharpNet.Types
         public TimeTicks(uint value)
             : base(value)
         {
-            Type = SnmpConstants.SMI_TIMETICKS;
+            Type = SnmpConstants.SmiTimeTicks;
         }
 
         /// <summary>Constructor</summary>
         /// <param name="val">String holding 32-bit unsigned integer value to initialize the class with</param>
-        public TimeTicks(string val) : base(val)
+        public TimeTicks(string val)
+            : base(val)
         {
-            Type = SnmpConstants.SMI_TIMETICKS;
+            Type = SnmpConstants.SmiTimeTicks;
         }
 
         /// <summary>Duplicate object</summary>
         /// <returns>Object cloned copy cast to Object</returns>
-        public override System.Object Clone()
+        public override object Clone()
         {
             return new TimeTicks(this);
         }
@@ -80,12 +84,12 @@ namespace SnmpSharpNet.Types
         }
 
         /// <summary>Get TimeTicks value as milliseconds value.</summary>
-        public Int64 Milliseconds
+        public long Milliseconds
         {
             get
             {
-                Int64 ttval = Convert.ToInt64(_value);
-                Int64 res = ttval * 10L;
+                long ttval = Convert.ToInt64(value);
+                long res = ttval * 10L;
 
                 return res;
             }
@@ -98,7 +102,7 @@ namespace SnmpSharpNet.Types
             System.Text.StringBuilder buf = new System.Text.StringBuilder();
             long time = Value;
             long tmp = 0;
-            if ((tmp = (time / (24 * 3600 * 100))) > 0)
+            if ((tmp = time / (24 * 3600 * 100)) > 0)
             {
                 buf.Append(tmp).Append("d ");
                 time = time % (24 * 3600 * 100);
@@ -139,7 +143,7 @@ namespace SnmpSharpNet.Types
         /// <returns>Hash code is the hash code of the class value.</returns>
         public override int GetHashCode()
         {
-            return _value.GetHashCode();
+            return value.GetHashCode();
         }
     }
 }

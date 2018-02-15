@@ -1,29 +1,29 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Exception;
-using System;
-
+//
 namespace SnmpSharpNet.Types
 {
+    using System;
+    using SnmpSharpNet.Exception;
+
     /// <summary>SNMPv2 NoSuchObject error</summary>
     /// <remarks>
-    /// NoSuchObject is returned by the agent in response to a SNMP version 2 request 
+    /// NoSuchObject is returned by the agent in response to a SNMP version 2 request
     /// when requested object does not exist in its MIB.
     /// This value is returned as a <seealso cref="Vb.Value"/> with data of length 0
-    /// 
+    ///
     /// For example:
     /// <code lang="cs">
     /// // [... prepare for a get operation ...]
@@ -38,26 +38,27 @@ namespace SnmpSharpNet.Types
     [Serializable]
     public class NoSuchObject : V2Error, ICloneable
     {
-
         /// <summary>Constructor.</summary>
-        public NoSuchObject() : base()
+        public NoSuchObject()
+            : base()
         {
-            Type = SnmpConstants.SMI_NOSUCHOBJECT;
+            Type = SnmpConstants.SmiNoSuchObject;
         }
 
         /// <summary>Constructor</summary>
         /// <param name="second">
         /// Source for data to initialize this instance with.
-        /// 
+        ///
         /// Irrelevant for this type since no data is stored in the class.
         /// </param>
-        public NoSuchObject(NoSuchObject second) : base(second)
+        public NoSuchObject(NoSuchObject second)
+            : base(second)
         {
         }
 
         /// <summary> Returns a duplicate object of self.</summary>
         /// <returns> A duplicate of self</returns>
-        public override Object Clone()
+        public override object Clone()
         {
             // just create a new object. it doesn't hold any data anyway
             return new NoSuchObject();

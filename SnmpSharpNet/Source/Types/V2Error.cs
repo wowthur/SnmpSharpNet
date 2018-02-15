@@ -1,26 +1,26 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Exception;
-using System;
-
+//
 namespace SnmpSharpNet.Types
 {
+    using System;
+    using SnmpSharpNet.Exception;
+
     /// <summary>Base class for SNMP version 2 error types.</summary>
     /// <remarks>For details see <see cref="NoSuchInstance"/>, <see cref="NoSuchObject"/> and <see cref="EndOfMibView"/>.</remarks>
-    public class V2Error : 
+    public class V2Error :
         AsnType,
         ICloneable
     {
@@ -69,7 +69,7 @@ namespace SnmpSharpNet.Types
 
         /// <summary>Returns a duplicate of the object.</summary>
         /// <returns>A new copy of the current object cast as System.Object.</returns>
-        public override Object Clone()
+        public override object Clone()
         {
             return new V2Error(this);
         }

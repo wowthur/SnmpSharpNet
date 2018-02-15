@@ -1,22 +1,22 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using System;
-
+//
 namespace SnmpSharpNet.Types
 {
+    using System;
+
     /// <summary>Defines an SNMPv2 Party Clock.</summary>
     /// <remarks>
     /// The Party Clock is currently
@@ -27,28 +27,31 @@ namespace SnmpSharpNet.Types
         ICloneable
     {
         /// <summary>Constructor</summary>
-        public V2PartyClock() : base()
+        public V2PartyClock()
+            : base()
         {
-            Type = SnmpConstants.SMI_PARTY_CLOCK;
+            Type = SnmpConstants.SmiPartyClock;
         }
 
         /// <summary>Constructor</summary>
         /// <param name="second">Class to duplicate</param>
-        public V2PartyClock(V2PartyClock second) : base(second)
+        public V2PartyClock(V2PartyClock second)
+            : base(second)
         {
-            Type = SnmpConstants.SMI_PARTY_CLOCK;
+            Type = SnmpConstants.SmiPartyClock;
         }
 
         /// <summary>Constructor</summary>
         /// <param name="uint32">Value to initialize the class with.</param>
-        public V2PartyClock(UInteger32 uint32) : base(uint32)
+        public V2PartyClock(UInteger32 uint32)
+            : base(uint32)
         {
-            Type = SnmpConstants.SMI_PARTY_CLOCK;
+            Type = SnmpConstants.SmiPartyClock;
         }
 
         /// <summary>Clone class</summary>
         /// <returns>Cloned class cast as object</returns>
-        public override System.Object Clone()
+        public override object Clone()
         {
             return new V2PartyClock(this);
         }
@@ -62,7 +65,7 @@ namespace SnmpSharpNet.Types
             long time = Value;
             long tmp = 0;
 
-            if ((tmp = (time / (24 * 3600 * 100))) > 0)
+            if ((tmp = time / (24 * 3600 * 100)) > 0)
             {
                 buf.Append(tmp).Append("d ");
                 time = time % (24 * 3600 * 100);

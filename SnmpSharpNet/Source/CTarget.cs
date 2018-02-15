@@ -1,46 +1,42 @@
-﻿using SnmpSharpNet.Exception;
-using SnmpSharpNet.Types;
-using System;
-using System.Net;
-
-namespace SnmpSharpNet
+﻿namespace SnmpSharpNet
 {
+    using System;
+    using System.Net;
+    using SnmpSharpNet.Exception;
+    using SnmpSharpNet.Types;
+
     /// <summary>
     /// Community based SNMP target. Used for SNMP version 1 and version 2c.
     /// </summary>
     public class CTarget : ITarget
     {
-        #region Private variables
         /// <summary>Target IP address</summary>
-        protected IpAddress _address;
+        protected IpAddress address;
 
         /// <summary>Target port number</summary>
-        protected int _port;
-        
+        protected int port;
+
         /// <summary>Target SNMP version number</summary>
-        protected ESnmpVersion _version;
+        protected ESnmpVersion version;
 
         /// <summary>Target request timeout period in milliseconds</summary>
-        protected int _timeout;
-        
+        private int timeout1;
+
         /// <summary>Target maximum retry count</summary>
-        protected int _retry;
+        protected int retry;
 
         /// <summary>SNMP community name</summary>
-        protected string _community;
-        #endregion
-
-        #region Constructors
+        protected string community;
 
         /// <summary>Constructor</summary>
         public CTarget()
         {
-            _address = new IpAddress(IPAddress.Loopback);
-            _port = 161;
-            _version = ESnmpVersion.Ver2;
-            _timeout = 2000;
-            _retry = 1;
-            _community = "public";
+            address = new IpAddress(IPAddress.Loopback);
+            port = 161;
+            version = ESnmpVersion.Ver2;
+            Timeout1 = 2000;
+            retry = 1;
+            community = "public";
         }
 
         /// <summary>Constructor</summary>
@@ -48,7 +44,7 @@ namespace SnmpSharpNet
         public CTarget(IPAddress addr)
             : this()
         {
-            _address.Set(addr);
+            address.Set(addr);
         }
 
         /// <summary>Constructor</summary>
@@ -57,7 +53,7 @@ namespace SnmpSharpNet
         public CTarget(IPAddress address, string community)
             : this(address)
         {
-            _community = community;
+            this.community = community;
         }
 
         /// <summary>Constructor</summary>
@@ -67,43 +63,35 @@ namespace SnmpSharpNet
         public CTarget(IPAddress addr, int port, string community)
             : this(addr, community)
         {
-            _port = port;
+            this.port = port;
         }
-
-        #endregion Constructors
-
-        #region Properties
 
         /// <summary>SNMP community name for the target</summary>
         public string Community
         {
-            get { return _community; }
-            set { _community = value; }
+            get { return community; }
+            set { community = value; }
         }
-
-        #endregion Properties
-
-        #region ITarget Members
 
         /// <summary>Prepare packet for transmission by filling target specific information in the packet.</summary>
         /// <param name="packet">SNMP packet class for the required version</param>
         /// <returns>True if packet values are correctly set, otherwise false.</returns>
         public bool PreparePacketForTransmission(SnmpPacket packet)
         {
-            if (packet.Version != _version)
+            if (packet.Version != version)
                 return false;
 
-            if (_version == ESnmpVersion.Ver1)
+            if (version == ESnmpVersion.Ver1)
             {
                 SnmpV1Packet pkt = packet as SnmpV1Packet;
-                pkt.Community.Set(_community);
+                pkt.Community.Set(community);
                 return true;
             }
 
-            if (_version == ESnmpVersion.Ver2)
+            if (version == ESnmpVersion.Ver2)
             {
                 SnmpV2Packet pkt = packet as SnmpV2Packet;
-                pkt.Community.Set(_community);
+                pkt.Community.Set(community);
                 return true;
             }
 
@@ -115,20 +103,20 @@ namespace SnmpSharpNet
         /// <returns>True if packet is validated, otherwise false</returns>
         public bool ValidateReceivedPacket(SnmpPacket packet)
         {
-            if (packet.Version != _version)
+            if (packet.Version != version)
                 return false;
 
-            if (_version == ESnmpVersion.Ver1)
+            if (version == ESnmpVersion.Ver1)
             {
                 SnmpV1Packet pkt = packet as SnmpV1Packet;
-                if (pkt.Community.Equals(_community))
+                if (pkt.Community.Equals(community))
                     return true;
             }
 
-            if (_version == ESnmpVersion.Ver2)
+            if (version == ESnmpVersion.Ver2)
             {
                 SnmpV2Packet pkt = packet as SnmpV2Packet;
-                if (pkt.Community.Equals(_community))
+                if (pkt.Community.Equals(community))
                     return true;
             }
 
@@ -139,66 +127,70 @@ namespace SnmpSharpNet
         /// <exception cref="SnmpInvalidVersionException">Thrown when SNMP version other then 1 or 2c is set</exception>
         public ESnmpVersion Version
         {
-            get { return _version; }
+            get { return version; }
+
             set
             {
                 if (value != ESnmpVersion.Ver1 && value != ESnmpVersion.Ver2)
                     throw new SnmpInvalidVersionException("CTarget is only suitable for use with SNMP v1 and v2c protocol versions.");
 
-                _version = value;
+                version = value;
             }
         }
 
         /// <summary>Timeout in milliseconds for the target. Valid timeout values are between 100 and 10000 milliseconds.</summary>
         public int Timeout
         {
-            get { return _timeout; }
+            get { return Timeout1; }
+
             set
             {
                 if (value < 100 || value > 10000)
                     throw new OverflowException("Valid timeout value is between 100 milliseconds and 10000 milliseconds");
 
-                _timeout = value;
+                Timeout1 = value;
             }
         }
 
         /// <summary>Number of retries for the target. Valid values are 0-5.</summary>
         public int Retry
         {
-            get { return _retry; }
+            get { return retry; }
+
             set
             {
                 if (value < 0 || value > 5)
                     throw new OverflowException("Valid retry value is between 0 and 5");
-                _retry = value;
+                retry = value;
             }
         }
 
         /// <summary>Target IP address</summary>
         public IpAddress Address
         {
-            get { return _address; }
+            get { return address; }
         }
 
         /// <summary>Target port number</summary>
         public int Port
         {
-            get { return _port; }
-            set { _port = value; }
+            get { return port; }
+            set { port = value; }
         }
+
+        protected int Timeout1 { get => timeout1; set => timeout1 = value; }
 
         /// <summary>Check validity of the target information.</summary>
         /// <returns>True if valid, otherwise false.</returns>
         public bool Valid()
         {
-            if (_community == null || _community.Length == 0)
+            if (community == null || community.Length == 0)
                 return false;
 
-            if (_address == null || !_address.Valid)
+            if (address == null || !address.Valid)
                 return false;
 
-            return (_port != 0);
+            return port != 0;
         }
-        #endregion
     }
 }

@@ -1,83 +1,86 @@
 ﻿// This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Exception;
-using System;
-
+//
 namespace SnmpSharpNet
 {
-    /// <summary>Base class for all ASN.1 value classes</summary>
-    public abstract class AsnType : ICloneable
+    using System;
+    using SnmpSharpNet.Exception;
+
+    public enum EAsnType
     {
         /// <summary>Bool true/false value type</summary>
-        public const byte BOOLEAN = 0x01;
+        Boolean = 0x01,
 
         /// <summary>Signed 32-bit integer type</summary>
-        public const byte INTEGER = 0x02;
+        Integer = 0x02,
 
         /// <summary>Bit sequence type</summary>
-        public const byte BITSTRING = 0x03;
+        BitString = 0x03,
 
         /// <summary>Octet (byte) value type</summary>
-        public const byte OCTETSTRING = 0x04;
+        OctetString = 0x04,
 
         /// <summary>Null (no value) type</summary>
-        public const byte NULL = 0x05;
+        Null = 0x05,
 
         /// <summary>Object id type</summary>
-        public const byte OBJECTID = 0x06;
+        ObjectId = 0x06,
 
         /// <summary>Arbitrary data type</summary>
-        public const byte SEQUENCE = 0x10;
+        Sequence = 0x10,
 
         /// <summary>
         /// Defined by referencing a fixed, unordered list of types,
         /// some of which may be declared optional. Each value is an
         /// unordered list of values, one from each component type.
         /// </summary>
-        public const byte SET = 0x11;
+        Set = 0x11,
 
         /// <summary>
         /// Generally useful, application-independent types and
         /// construction mechanisms.
         /// </summary>
-        public const byte UNIVERSAL = 0x00;
+        Universal = 0x00,
 
         /// <summary>
         /// Relevant to a particular application. These are defined
         /// in standards other than ASN.1.
         /// </summary>
-        public const byte APPLICATION = 0x40;
+        Application = 0x40,
 
         /// <summary>Also relevant to a particular application, but limited by context</summary>
-        public const byte CONTEXT = 0x80;
+        Context = 0x80,
 
         /// <summary>These are types not covered by any standard but instead defined by users.</summary>
-        public const byte PRIVATE = 0xC0;
+        Private = 0xC0,
 
         /// <summary>A primitive data object.</summary>
-        public const byte PRIMITIVE = 0x00;
+        Primitive = 0x00,
 
         /// <summary> A constructed data object such as a set or sequence.</summary>
-        public const byte CONSTRUCTOR = 0x20;
+        Cosntructor = 0x20,
+    }
 
+    /// <summary>Base class for all ASN.1 value classes</summary>
+    public abstract class AsnType : ICloneable
+    {
         /// <summary> Defines the "high bit" that is the sign extension bit for a 8-bit signed value.</summary>
-        protected const byte HIGH_BIT = 0x80;
+        protected const byte HighBit = 0x80;
 
         /// <summary> Defines the BER extension "value" that is used to mark an extension type.</summary>
-        protected const byte EXTENSION_ID = 0x1F;
+        protected const byte ExtensionId = 0x1F;
 
         /// <summary>Get ASN.1 value type stored in this class.</summary>
         public byte Type { get; set; }
@@ -100,7 +103,9 @@ namespace SnmpSharpNet
         internal static void BuildLength(MutableByte mb, int asnLength)
         {
             if (asnLength < 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(asnLength), "Length cannot be less then 0.");
+            }
 
             byte[] len = BitConverter.GetBytes(asnLength);
             MutableByte buf = new MutableByte();
@@ -118,13 +123,13 @@ namespace SnmpSharpNet
             }
 
             // check for short form encoding
-            if (buf.Length == 1 && (buf[0] & HIGH_BIT) == 0)
+            if (buf.Length == 1 && (buf[0] & HighBit) == 0)
                 mb.Append(buf); // done
             else
             {
                 // long form encoding
                 byte encHeader = (byte)buf.Length;
-                encHeader = (byte)(encHeader | HIGH_BIT);
+                encHeader = (byte)(encHeader | HighBit);
                 mb.Append(encHeader);
                 mb.Append(buf);
             }
@@ -141,14 +146,14 @@ namespace SnmpSharpNet
                 throw new OverflowException("Buffer is too short.");
 
             int dataLen = 0;
-            if ((mb[offset] & HIGH_BIT) == 0)
+            if ((mb[offset] & HighBit) == 0)
             {
                 // short form encoding
                 dataLen = mb[offset++];
                 return dataLen; // we are done
             }
 
-            dataLen = mb[offset++] & ~HIGH_BIT; // store byte length of the encoded length value
+            dataLen = mb[offset++] & ~HighBit; // store byte length of the encoded length value
 
             int value = 0;
             for (int i = 0; i < dataLen; i++)
@@ -161,10 +166,11 @@ namespace SnmpSharpNet
 
             return value;
         }
+
         /// <summary>Build ASN.1 header in the MutableByte array.</summary>
         /// <remarks>
         /// Header is the TL part of the TLV (type, length, value) BER encoded data representation.
-        /// 
+        ///
         /// Each value is encoded as a Type byte, length of the data field and the actual, encoded
         /// data. This method will encode the type and length fields.
         /// </remarks>
@@ -191,13 +197,14 @@ namespace SnmpSharpNet
 
             // ASN.1 type
             byte asnType = mb[offset++];
-            if ((asnType & EXTENSION_ID) == EXTENSION_ID)
+            if ((asnType & ExtensionId) == ExtensionId)
                 throw new SnmpException("Invalid SNMP header type");
 
             // length
             length = ParseLength(mb, ref offset);
             return asnType;
         }
+
         /// <summary>Abstract Clone() member function</summary>
         /// <returns>Duplicated current object cast as Object</returns>
         public abstract object Clone();

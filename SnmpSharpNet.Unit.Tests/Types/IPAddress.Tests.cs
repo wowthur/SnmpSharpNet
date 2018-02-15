@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
-
-namespace SnmpSharpNet.Unit.Tests.Types
+﻿namespace SnmpSharpNet.Unit.Tests.Types
 {
+    using Xunit;
+
     public class IPAddressTests
     {
         [Fact]
@@ -33,14 +30,14 @@ namespace SnmpSharpNet.Unit.Tests.Types
         public void ToUInt32()
         {
             var addr = new SnmpSharpNet.Types.IpAddress(System.Net.IPAddress.Parse("10.100.1.1").GetAddressBytes());
-            Assert.Equal((uint)0x0101640A, addr.ToUInt32());
+            Assert.Equal(0x0101640AU, addr.ToUInt32());
         }
 
         [Fact]
         public void ToUInt32Host()
         {
             var addr = new SnmpSharpNet.Types.IpAddress(System.Net.IPAddress.Parse("10.100.1.1").GetAddressBytes());
-            Assert.Equal((uint)0x0A640101, addr.ToUInt32Host());
+            Assert.Equal(0x0A640101U, addr.ToUInt32Host());
         }
 
         [Fact]

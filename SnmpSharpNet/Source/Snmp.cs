@@ -3,18 +3,15 @@
     public class Snmp : UdpTransport
     {
         /// <summary>Internal event to send result of the async request to.</summary>
-        protected event SnmpAsyncResponse _response;
+        protected event SnmpAsyncResponse OnAsyncResponse;
 
         /// <summary>Internal storage for request target information.</summary>
-        protected ITarget _target = null;
-
-        #region Constructor(s)
+        protected ITarget target = null;
 
         /// <summary>Constructor</summary>
-        public Snmp() : base(false)
+        public Snmp()
+            : base(false)
         {
         }
-
-        #endregion Constructor(s)
     }
 }

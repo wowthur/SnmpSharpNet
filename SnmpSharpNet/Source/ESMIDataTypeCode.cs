@@ -1,22 +1,22 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using System;
-
+//
 namespace SnmpSharpNet
 {
+    using System;
+
     /// <summary>
     /// Enumeration of SMI type codes used in TLV (Type Length Value) BER encoding of SNMP packets.
     /// </summary>
@@ -96,14 +96,14 @@ namespace SnmpSharpNet
         /// <summary> The SNMPv2 error representing that there is No-Such-Instance
         /// for a particular object identifier. This error is the result
         /// of a requested object identifier instance does not exist in the
-        /// agent's tables. 
+        /// agent's tables.
         /// </summary>
         NoSuchInstance = 0xc1,
 
         /// <summary> The SNMPv2 error representing the End-Of-Mib-View.
         /// This error variable will be returned by a SNMPv2 agent
-        /// if the requested object identifier has reached the 
-        /// end of the agent's mib table and there is no lexicographic 
+        /// if the requested object identifier has reached the
+        /// end of the agent's mib table and there is no lexicographic
         /// successor.
         /// </summary>
         EndOfMibView = 0xc2,
@@ -116,6 +116,6 @@ namespace SnmpSharpNet
         /// <summary> Defines an SNMPv2 Party Clock. The Party Clock is currently
         /// Obsolete, but included for backwards compatibility. Obsoleted in RFC 1902.
         /// </summary>
-        PartyClock = 0x47
+        PartyClock = 0x47,
     }
 }

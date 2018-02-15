@@ -1,29 +1,29 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Exception;
-using SnmpSharpNet.Types;
-using System;
-using System.Text;
-
+//
 namespace SnmpSharpNet
 {
+    using System;
+    using System.Text;
+    using SnmpSharpNet.Exception;
+    using SnmpSharpNet.Types;
+
     /// <summary>SNMP version 1 packet class.</summary>
     /// <remarks>
     /// Supported request types are SNMP-GET, SNMP-GETNEXT, SNMP-SET and SNMP-RESPONSE.
-    /// 
+    ///
     /// Available packet classes are:
     /// <ul>
     /// <li><see cref="SnmpV1Packet"/></li>
@@ -31,28 +31,28 @@ namespace SnmpSharpNet
     /// <li><see cref="SnmpV2Packet"/></li>
     /// <li><see cref="SnmpV3Packet"/></li>
     /// </ul>
-    /// 
+    ///
     /// This class is provided to simplify encoding and decoding of packets and to provide consistent interface
-    /// for users who wish to handle transport part of protocol on their own without using the <see cref="UdpTarget"/> 
+    /// for users who wish to handle transport part of protocol on their own without using the <see cref="UdpTarget"/>
     /// class.
-    /// 
-    /// <see cref="SnmpPacket"/> and derived classes have been developed to implement SNMP version 1, 2 and 3 packet 
-    /// support. 
-    /// 
-    /// For SNMP version 1 and 2 packet, <see cref="SnmpV1Packet"/> and <see cref="SnmpV2Packet"/> classes 
-    /// provides  sufficient support for encoding and decoding data to/from BER buffers to satisfy requirements 
-    /// of most applications. 
-    /// 
-    /// SNMP version 3 on the other hand requires a lot more information to be passed to the encoder method and 
+    ///
+    /// <see cref="SnmpPacket"/> and derived classes have been developed to implement SNMP version 1, 2 and 3 packet
+    /// support.
+    ///
+    /// For SNMP version 1 and 2 packet, <see cref="SnmpV1Packet"/> and <see cref="SnmpV2Packet"/> classes
+    /// provides  sufficient support for encoding and decoding data to/from BER buffers to satisfy requirements
+    /// of most applications.
+    ///
+    /// SNMP version 3 on the other hand requires a lot more information to be passed to the encoder method and
     /// returned by the decode method. While using SnmpV3Packet class for full packet handling is possible, transport
     /// specific class <see cref="UdpTarget"/> uses <see cref="SecureAgentParameters"/> class to store protocol
     /// version 3 specific information that carries over from request to request when used on the same SNMP agent
     /// and therefore simplifies both initial definition of agents configuration (mostly security) as well as
     /// removes the need for repeated initialization of the packet class for subsequent requests.
-    /// 
+    ///
     /// If you decide not to use transport helper class(es) like <see cref="UdpTarget"/>, BER encoding and
     /// decoding and packets is easily done with SnmpPacket derived classes.
-    /// 
+    ///
     /// Example, SNMP version 1 packet encoding:
     /// <code>
     /// SnmpV1Packet packetv1 = new SnmpV1Packet();
@@ -60,7 +60,7 @@ namespace SnmpSharpNet
     /// packetv1.Pdu.Set(mypdu);
     /// byte[] berpacket = packetv1.encode();
     /// </code>
-    /// 
+    ///
     /// Example, SNMP version 1 packet decoding:
     /// <code>
     /// SnmpV1Packet packetv1 = new SnmpV1Packet();
@@ -74,7 +74,7 @@ namespace SnmpSharpNet
             : base(ESnmpVersion.Ver1)
         {
             Community = new OctetString();
-            _pdu = new Pdu();
+            pdu = new Pdu();
         }
 
         /// <summary>Standard constructor.</summary>
@@ -89,12 +89,12 @@ namespace SnmpSharpNet
         public OctetString Community { get; private set; }
 
         /// <summary>SNMP Protocol Data Unit</summary>
-        public Pdu _pdu;
+        private Pdu pdu;
 
         /// <summary>Access to the packet <see cref="Pdu"/>.</summary>
         public override Pdu Pdu
         {
-            get { return _pdu; }
+            get { return pdu; }
         }
 
         /// <summary>Decode received SNMP packet.</summary>
@@ -113,7 +113,7 @@ namespace SnmpSharpNet
 
             offset = base.Decode(buffer, buffer.Length);
 
-            if (_protocolVersion.Value != (int)ESnmpVersion.Ver1)
+            if (protocolVersion.Value != (int)ESnmpVersion.Ver1)
                 throw new SnmpInvalidVersionException("Invalid protocol version");
 
             offset = Community.Decode(buf, offset);
@@ -143,29 +143,28 @@ namespace SnmpSharpNet
         /// <summary>Encode SNMP packet for sending.</summary>
         /// <returns>BER encoded SNMP packet.</returns>
         /// <exception cref="SnmpInvalidPduTypeException">
-        /// Thrown when PDU being encoded is not a valid SNMP version 1 PDU. Acceptable 
+        /// Thrown when PDU being encoded is not a valid SNMP version 1 PDU. Acceptable
         /// protocol version 1 operations are GET, GET-NEXT, SET and RESPONSE.
         /// </exception>
         public override byte[] Encode()
         {
             if (
-                Pdu.Type != EPduType.Get && 
+                Pdu.Type != EPduType.Get &&
                 Pdu.Type != EPduType.GetNext &&
-                Pdu.Type != EPduType.Set && 
-                Pdu.Type != EPduType.Response
-                )
+                Pdu.Type != EPduType.Set &&
+                Pdu.Type != EPduType.Response)
                 throw new SnmpInvalidVersionException("Invalid SNMP PDU type while attempting to encode PDU: " + string.Format("0x{0:x2}", Pdu.Type));
 
             if (Pdu.RequestId == 0)
             {
-                Random rand = new Random((System.Int32)DateTime.Now.Ticks);
+                Random rand = new Random((int)DateTime.Now.Ticks);
                 Pdu.RequestId = rand.Next();
             }
 
             MutableByte tmpBuffer = new MutableByte();
 
             // snmp version
-            _protocolVersion.Encode(tmpBuffer);
+            protocolVersion.Encode(tmpBuffer);
 
             // community string
             Community.Encode(tmpBuffer);
@@ -176,7 +175,7 @@ namespace SnmpSharpNet
             MutableByte buf = new MutableByte();
 
             // wrap the packet into a sequence
-            AsnType.BuildHeader(buf, SnmpConstants.SMI_SEQUENCE, tmpBuffer.Length);
+            AsnType.BuildHeader(buf, SnmpConstants.SmiSequence, tmpBuffer.Length);
 
             buf.Append(tmpBuffer);
 

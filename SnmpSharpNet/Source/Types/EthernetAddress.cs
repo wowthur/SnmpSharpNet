@@ -1,23 +1,22 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using System;
-using System.Globalization;
-
+//
 namespace SnmpSharpNet.Types
 {
+    using System;
+    using System.Globalization;
 
     /// <summary>EthernetAddress class encapsulates a 6 byte OctetString
     /// representing an Ethernet MAC address.
@@ -46,7 +45,7 @@ namespace SnmpSharpNet.Types
             else if (data.Length > 6)
                 throw new ArgumentException("Buffer overflow error converting IP address");
 
-            base.Set(data);
+            Set(data);
         }
 
         /// <summary>
@@ -57,7 +56,7 @@ namespace SnmpSharpNet.Types
         public EthernetAddress(EthernetAddress second)
             : base()
         {
-            base.Set(second.ToArray());
+            Set(second.ToArray());
         }
 
         /// <summary>Constructor. Initialize the class with the value from the <see cref="OctetString"/> argument.
@@ -72,7 +71,7 @@ namespace SnmpSharpNet.Types
             else if (Length > 6)
                 throw new ArgumentException("Buffer overflow error converting IP address");
 
-            base.Set(second);
+            Set(second);
         }
 
         /// <summary> Create a new object that is a duplicate of the
@@ -80,7 +79,7 @@ namespace SnmpSharpNet.Types
         /// </summary>
         /// <returns> A newly created duplicate object.
         /// </returns>
-        public override System.Object Clone()
+        public override object Clone()
         {
             return new EthernetAddress(this);
         }
@@ -99,10 +98,10 @@ namespace SnmpSharpNet.Types
             string workString = (string)value.Clone();
             for (int cnt = 0; cnt < value.Length; cnt++)
             {
-                if (!Char.IsNumber(workString[cnt]) && Char.ToUpper(workString[cnt]) != 'A' &&
-                    Char.ToUpper(workString[cnt]) != 'B' && Char.ToUpper(workString[cnt]) != 'C' &&
-                    Char.ToUpper(workString[cnt]) != 'D' && Char.ToUpper(workString[cnt]) != 'E' &&
-                    Char.ToUpper(workString[cnt]) != 'F')
+                if (!char.IsNumber(workString[cnt]) && char.ToUpper(workString[cnt]) != 'A' &&
+                    char.ToUpper(workString[cnt]) != 'B' && char.ToUpper(workString[cnt]) != 'C' &&
+                    char.ToUpper(workString[cnt]) != 'D' && char.ToUpper(workString[cnt]) != 'E' &&
+                    char.ToUpper(workString[cnt]) != 'F')
                 {
                     workString.Remove(cnt, 1);
                     cnt -= 1;
@@ -117,8 +116,8 @@ namespace SnmpSharpNet.Types
             while (pos + 2 < workString.Length)
             {
                 string val = workString.Substring(pos, 2);
-                byte v = Byte.Parse(val, NumberStyles.HexNumber);
-                _data[bufpos++] = v;
+                byte v = byte.Parse(val, NumberStyles.HexNumber);
+                data[bufpos++] = v;
                 pos += 2;
             }
         }
@@ -129,7 +128,7 @@ namespace SnmpSharpNet.Types
         /// <returns>String representation of the object value.</returns>
         public override string ToString()
         {
-            return string.Format(CultureInfo.CurrentCulture, "{0:x2}{1:x2}.{2:x2}{3:x2}.{4:x2}{5:x2}", _data[0], _data[1], _data[2], _data[3], _data[4], _data[5]);
+            return string.Format(CultureInfo.CurrentCulture, "{0:x2}{1:x2}.{2:x2}{3:x2}.{4:x2}{5:x2}", data[0], data[1], data[2], data[3], data[4], data[5]);
         }
     }
 }

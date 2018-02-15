@@ -1,174 +1,169 @@
-﻿using SnmpSharpNet.Exception;
-using SnmpSharpNet.Security;
-using SnmpSharpNet.Types;
-using System;
-
-namespace SnmpSharpNet
+﻿namespace SnmpSharpNet
 {
+    using System;
+    using SnmpSharpNet.Exception;
+    using SnmpSharpNet.Security;
+    using SnmpSharpNet.Types;
+
     /// <summary>
     /// USM security SNMP version 3 target class.
     /// </summary>
     public class UTarget : ITarget
     {
-        #region Private variables
         /// <summary>Target IP address</summary>
-        protected IpAddress _address;
+        protected IpAddress targetAddress;
 
         /// <summary>Target port number</summary>
-        protected int _port;
+        protected int targetPort;
 
         /// <summary>Target SNMP version number</summary>
-        protected ESnmpVersion _version;
+        protected ESnmpVersion targetVersion;
 
         /// <summary>Target request timeout period in milliseconds</summary>
-        protected int _timeout;
+        protected int timeOut;
 
         /// <summary>Target maximum retry count</summary>
-        protected int _retry;
+        protected int retry;
 
         /// <summary>Authoritative engine id</summary>
-        protected OctetString _engineId;
+        protected OctetString engineId;
 
         /// <summary>Authoritative engine boots value</summary>
-        protected Integer32 _engineBoots;
+        protected Integer32 engineBoots;
 
         /// <summary>Authoritative engine time value</summary>
-        protected Integer32 _engineTime;
+        protected Integer32 engineTime;
 
         /// <summary>
         /// Time stamp when authoritative engine time value was last refreshed with data from the agent.
-        /// 
+        ///
         /// This value is used to calculate up to date authoritative agent time value without having to
         /// repeat discovery process every 150 seconds.
         /// </summary>
-        protected DateTime _engineTimeStamp;
-        
-        /// <summary>Security name value, or user name.</summary>
-        protected OctetString _securityName;
+        protected DateTime engineTimeStamp;
 
-        /// <summary>Privacy protocol to use. For available protocols, see <see cref="PrivacyProtocols"/> enumeration.</summary>
-        protected PrivacyProtocols _privacyProtocol;
+        /// <summary>Security name value, or user name.</summary>
+        protected OctetString securityName;
+
+        /// <summary>Privacy protocol to use. For available protocols, see <see cref="EPrivacyProtocols"/> enumeration.</summary>
+        protected EPrivacyProtocols privacyProtocol;
 
         /// <summary>
         /// Authentication digest to use in authNoPriv and authPriv security combinations. For available
         /// authentication digests, see <see cref="AuthenticationDigests"/> enumeration.
         /// </summary>
-        protected AuthenticationDigests _authenticationProtocol;
-        
+        protected AuthenticationDigests authenticationProtocol;
+
         /// <summary>Privacy secret (or privacy password)</summary>
-        protected MutableByte _privacySecret;
+        protected MutableByte privacySecret;
 
         /// <summary>Authentication secret (or authentication password)</summary>
-        protected MutableByte _authenticationSecret;
+        protected MutableByte authenticationSecret;
 
         /// <summary>
         /// Context engine id. By default, this value is set to authoritative engine id value unless specifically
         /// set to a different value here.
         /// </summary>
-        protected OctetString _contextEngineId;
-        
+        protected OctetString contextEngineId;
+
         /// <summary>
         /// Context name. By default this value is a 0 length string (no context name). Set this value if you
         /// require it to be defined in ScopedPdu.
         /// </summary>
-        protected OctetString _contextName;
-        
+        protected OctetString contextName;
+
         /// <summary>
         /// Maximum message size. This value is by default set to 64KB and then updated by the maximum message
         /// size value in the response from the agent.
-        /// 
+        ///
         /// This value should be the smallest message size supported by both the agent and manager.
         /// </summary>
-        protected Integer32 _maxMessageSize;
-        
+        protected Integer32 maximumMessageSize;
+
         /// <summary>
         /// Reportable option flag. Set to true by default.
-        /// 
+        ///
         /// This flag controls if reportable flag will be set in the packet. When this flag is set in the packet,
         /// agent will respond to invalid requests with Report packets. Without this flag being set, all invalid
         /// requests are silently dropped by the agent.
         /// </summary>
-        protected bool _reportable;
+        protected bool reportable;
 
-        #endregion Private variables
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        /// <summary>Constructor</summary>
         public UTarget()
         {
             Reset();
         }
 
-        #region Properties
-
         /// <summary>Agent authoritative engine id</summary>
         public OctetString EngineId
         {
-            get { return _engineId; }
+            get { return engineId; }
         }
 
         /// <summary>SNMP version 3 agent engine boots value</summary>
         public Integer32 EngineBoots
         {
-            get { return _engineBoots; }
+            get { return engineBoots; }
         }
 
         /// <summary>Get engine time stamp value (last time engine boots and time values were retrieved from the SNMP agent).</summary>
         /// <returns>DateTime stamp of the time timeliness values were last refreshed</returns>
         internal DateTime EngineTimeStamp()
         {
-            return _engineTimeStamp;
+            return engineTimeStamp;
         }
 
         /// <summary>SNMP version 3 agent engine time value.</summary>
         public Integer32 EngineTime
         {
-            get { return _engineTime; }
+            get { return engineTime; }
         }
 
         /// <summary>Security or user name configured on the SNMP version 3 agent.</summary>
         public OctetString SecurityName
         {
-            get { return _securityName; }
+            get { return securityName; }
         }
 
-        /// <summary>Privacy protocol used. Acceptable values are members of <see cref="PrivacyProtocols"/> enum.</summary>
-        public PrivacyProtocols Privacy
+        /// <summary>Privacy protocol used. Acceptable values are members of <see cref="EPrivacyProtocols"/> enum.</summary>
+        public EPrivacyProtocols Privacy
         {
-            get { return _privacyProtocol; }
+            get { return privacyProtocol; }
+
             set
             {
-                if (value != PrivacyProtocols.None && PrivacyProtocol.GetInstance(value) == null)
+                if (value != EPrivacyProtocols.None && PrivacyProtocol.GetInstance(value) == null)
                     throw new SnmpPrivacyException("Invalid privacy protocol");
 
-                _privacyProtocol = value;
+                privacyProtocol = value;
             }
         }
 
         /// <summary>Privacy secret. Length of the secret is dependent on the selected privacy method.</summary>
         public MutableByte PrivacySecret
         {
-            get { return _privacySecret; }
+            get { return privacySecret; }
         }
 
         /// <summary>Authentication method. Acceptable values are members of <see cref="AuthenticationDigests"/> enum.</summary>
         public AuthenticationDigests Authentication
         {
-            get { return _authenticationProtocol; }
+            get { return authenticationProtocol; }
+
             set
             {
                 if (value != AuthenticationDigests.None && Security.Authentication.GetInstance(value) == null)
                     throw new SnmpAuthenticationException("Invalid authentication protocol.");
 
-                _authenticationProtocol = value;
+                authenticationProtocol = value;
             }
         }
 
         /// <summary>Authentication secret. Secret length depends on the hash algorithm selected.</summary>
         public MutableByte AuthenticationSecret
         {
-            get { return _authenticationSecret; }
+            get { return authenticationSecret; }
         }
 
         /// <summary>
@@ -176,68 +171,64 @@ namespace SnmpSharpNet
         /// to the same engine id as authoritative engine id (EngineId). I haven't see a
         /// scenario where this value needs to be different by a manager but now there
         /// is an option to do it.
-        /// 
+        ///
         /// To use the default operation, do not set this value or, if you've already set it,
         /// reset it to null (object.ContextEngineId.Reset()).
         /// </summary>
         public OctetString ContextEngineId
         {
-            get { return _contextEngineId; }
+            get { return contextEngineId; }
         }
 
         /// <summary>Get SNMP version 3 context name</summary>
         public OctetString ContextName
         {
-            get { return _contextName; }
+            get { return contextName; }
         }
 
         /// <summary>Get SNMP version 3 maximum message size object</summary>
         public Integer32 MaxMessageSize
         {
-            get { return _maxMessageSize; }
+            get { return maximumMessageSize; }
         }
 
         /// <summary>Get/Set reportable flag status in the SNMP version 3 packet.</summary>
         public bool Reportable
         {
-            get { return _reportable; }
-            set { _reportable = value; }
+            get { return reportable; }
+            set { reportable = value; }
         }
-
-        #endregion Properties
-
-        #region Target specific methods
 
         /// <summary>Reset the class. Initialize all member values to class defaults.</summary>
         public void Reset()
         {
-            _address = new IpAddress(System.Net.IPAddress.Loopback);
-            _port = 161;
-            _version = ESnmpVersion.Ver3;
-            _timeout = 2000;
-            _retry = 1;
+            targetAddress = new IpAddress(System.Net.IPAddress.Loopback);
+            targetPort = 161;
+            targetVersion = ESnmpVersion.Ver3;
+            timeOut = 2000;
+            retry = 1;
 
-            _engineId = new OctetString();
-            _engineBoots = new Integer32();
-            _engineTime = new Integer32();
+            engineId = new OctetString();
+            engineBoots = new Integer32();
+            engineTime = new Integer32();
 
-            _engineTimeStamp = DateTime.MinValue;
+            engineTimeStamp = DateTime.MinValue;
 
-            _privacyProtocol = PrivacyProtocols.None;
-            _authenticationProtocol = AuthenticationDigests.None;
+            privacyProtocol = EPrivacyProtocols.None;
+            authenticationProtocol = AuthenticationDigests.None;
 
-            _privacySecret = new MutableByte();
-            _authenticationSecret = new MutableByte();
+            privacySecret = new MutableByte();
+            authenticationSecret = new MutableByte();
 
-            _contextEngineId = new OctetString();
-            _contextName = new OctetString();
-            _securityName = new OctetString();
+            contextEngineId = new OctetString();
+            contextName = new OctetString();
+            securityName = new OctetString();
 
             // max message size is initialized to 64KB by default. It will be
             // to the smaller of the two values after discovery process
-            _maxMessageSize = new Integer32(64 * 1024);
+            maximumMessageSize = new Integer32(64 * 1024);
 
-            _reportable = true;
+            reportable = true;
         }
 
         /// <summary>
@@ -252,14 +243,14 @@ namespace SnmpSharpNet
         {
             if (packet is SnmpV3Packet pkt)
             {
-                _engineId.Set(pkt.USM.EngineId);
-                _engineTime.Value = pkt.USM.EngineTime;
-                _engineBoots.Value = pkt.USM.EngineBoots;
+                engineId.Set(pkt.USM.EngineId);
+                engineTime.Value = pkt.USM.EngineTime;
+                engineBoots.Value = pkt.USM.EngineBoots;
 
                 UpdateTimeStamp();
 
-                _contextEngineId.Set(pkt.ScopedPdu.ContextEngineId);
-                _contextName.Set(pkt.ScopedPdu.ContextName);
+                contextEngineId.Set(pkt.ScopedPdu.ContextEngineId);
+                contextName.Set(pkt.ScopedPdu.ContextName);
             }
             else
                 throw new SnmpInvalidVersionException("Invalid SNMP version.");
@@ -268,14 +259,14 @@ namespace SnmpSharpNet
         /// <summary>
         /// Updates engine time timestamp. This value is used to determine if agents engine time stored
         /// in this class is valid.
-        /// 
+        ///
         /// Timestamp is saved as DateTime class by default initialized to DateTime.MinValue. Timestamp value
         /// is stored in GMT to make it portable (if it is saved on one computer and loaded on another that uses
         /// a different time zone).
         /// </summary>
         public void UpdateTimeStamp()
         {
-            _engineTimeStamp = DateTime.UtcNow;
+            engineTimeStamp = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -287,10 +278,10 @@ namespace SnmpSharpNet
         /// <returns>True if engine time value is valid, otherwise false.</returns>
         public bool ValidateEngineTime()
         {
-            if (_engineTimeStamp == DateTime.MinValue)
+            if (engineTimeStamp == DateTime.MinValue)
                 return false; // timestamp is at its initial value. not valid
 
-            TimeSpan diff = DateTime.UtcNow.Subtract(_engineTimeStamp);
+            TimeSpan diff = DateTime.UtcNow.Subtract(engineTimeStamp);
 
             // if EngineTime value has not been updated in 10 * max acceptable period (150 seconds) then
             // time is no longer valid
@@ -303,7 +294,7 @@ namespace SnmpSharpNet
         /// <summary>
         /// Calculates and returns current agents engine time. <see cref="ValidateEngineTime"/> is called
         /// prior to calculation to make sure current engine time is timely enough to use.
-        /// 
+        ///
         /// EngineTime is calculated as last received engine time + difference in seconds between the time
         /// stamp saved when last time value was received and current time (using the internal GMT clock).
         /// </summary>
@@ -313,15 +304,11 @@ namespace SnmpSharpNet
             if (!ValidateEngineTime())
                 return 0;
 
-            TimeSpan diff = DateTime.UtcNow.Subtract(_engineTimeStamp);
+            TimeSpan diff = DateTime.UtcNow.Subtract(engineTimeStamp);
 
             // increment the value by one to make sure we don't fall behind the agents clock
-            return Convert.ToInt32(_engineTime.Value + diff.TotalSeconds + 1);
+            return Convert.ToInt32(engineTime.Value + diff.TotalSeconds + 1);
         }
-
-        #endregion Target specific methods
-
-        #region ITarget Members
 
         /// <summary>Prepare packet for transmission by filling target specific information in the packet.</summary>
         /// <param name="packet">SNMP packet class for the required version</param>
@@ -330,30 +317,29 @@ namespace SnmpSharpNet
         {
             if (packet is SnmpV3Packet pkt)
             {
-                bool isAuth = (_authenticationProtocol == AuthenticationDigests.None) ? false : true;
-                bool isPriv = (_privacyProtocol == PrivacyProtocols.None) ? false : true;
-
+                bool isAuth = (authenticationProtocol == AuthenticationDigests.None) ? false : true;
+                bool isPriv = (privacyProtocol == EPrivacyProtocols.None) ? false : true;
 
                 if (isAuth && isPriv)
-                    pkt.AuthPriv(_securityName, _authenticationSecret, _authenticationProtocol, _privacySecret, _privacyProtocol);
+                    pkt.AuthPriv(securityName, authenticationSecret, authenticationProtocol, privacySecret, privacyProtocol);
                 else if (isAuth && !isPriv)
-                    pkt.AuthNoPriv(_securityName, _authenticationSecret, _authenticationProtocol);
+                    pkt.AuthNoPriv(securityName, authenticationSecret, authenticationProtocol);
                 else
-                    pkt.NoAuthNoPriv(_securityName);
+                    pkt.NoAuthNoPriv(securityName);
 
-                pkt.USM.EngineId.Set(_engineId);
-                pkt.USM.EngineBoots = _engineBoots.Value;
+                pkt.USM.EngineId.Set(engineId);
+                pkt.USM.EngineBoots = engineBoots.Value;
                 pkt.USM.EngineTime = GetCurrentEngineTime();
-                pkt.MaxMessageSize = _maxMessageSize.Value;
-                pkt.MsgFlags.Reportable = _reportable;
+                pkt.MaxMessageSize = maximumMessageSize.Value;
+                pkt.MessageFlags.Reportable = reportable;
 
-                if (_contextEngineId.Length > 0)
-                    pkt.ScopedPdu.ContextEngineId.Set(_contextEngineId);
+                if (contextEngineId.Length > 0)
+                    pkt.ScopedPdu.ContextEngineId.Set(contextEngineId);
                 else
-                    pkt.ScopedPdu.ContextEngineId.Set(_engineId);
+                    pkt.ScopedPdu.ContextEngineId.Set(engineId);
 
-                if (_contextName.Length > 0)
-                    pkt.ScopedPdu.ContextName.Set(_contextName);
+                if (contextName.Length > 0)
+                    pkt.ScopedPdu.ContextName.Set(contextName);
                 else
                     pkt.ScopedPdu.ContextName.Reset();
             }
@@ -383,63 +369,54 @@ namespace SnmpSharpNet
             // First check if this is a report packet.
             if (pkt.Pdu.Type == EPduType.Response)
             {
-                if (!_reportable)
+                if (!reportable)
                 {
                     // we do not expect report packets so dump it
                     throw new SnmpException(SnmpException.EErrorCode.ReportOnNoReports, "Unexpected report packet received.");
-                    // return false; 
                 }
 
-                if (pkt.MsgFlags.Authentication == false && pkt.MsgFlags.Privacy)
+                if (pkt.MessageFlags.Authentication == false && pkt.MessageFlags.Privacy)
                 {
                     // no authentication and no privacy allowed in report packets
                     throw new SnmpException(SnmpException.EErrorCode.UnsupportedNoAuthPriv, "Authentication and privacy combination is not supported.");
-                    // return false; 
                 }
 
                 // the rest will not be checked, there is no point
             }
             else
             {
-                if (pkt.USM.EngineId != _engineId)
+                if (pkt.USM.EngineId != engineId)
                 {
                     // different engine id is not allowed
                     throw new SnmpException(SnmpException.EErrorCode.InvalidAuthoritativeEngineId, "EngineId mismatch.");
-                    // return false; 
                 }
 
-                if (pkt.USM.Authentication != _authenticationProtocol || pkt.USM.Privacy != _privacyProtocol)
+                if (pkt.USM.Authentication != authenticationProtocol || pkt.USM.Privacy != privacyProtocol)
                 {
                     // we have to have the same authentication and privacy protocol - no last minute changes
                     throw new SnmpException("Agent parameters updated after request was made.");
-                    // return false; 
                 }
 
                 if (pkt.USM.Authentication != AuthenticationDigests.None)
                 {
-                    if (pkt.USM.AuthenticationSecret != _authenticationSecret)
+                    if (pkt.USM.AuthenticationSecret != authenticationSecret)
                     {
                         // authentication secret has to match
                         throw new SnmpAuthenticationException("Authentication secret in the packet class does not match the IAgentParameter secret.");
-                        // return false; 
                     }
                 }
 
-                if (pkt.USM.Privacy != PrivacyProtocols.None)
+                if (pkt.USM.Privacy != EPrivacyProtocols.None)
                 {
-                    if (pkt.USM.PrivacySecret != _privacySecret)
+                    if (pkt.USM.PrivacySecret != privacySecret)
                     {
                         // privacy secret has to match
                         throw new SnmpPrivacyException("Privacy secret in the packet class does not match the IAgentParameters secret.");
-                        // return false; 
                     }
                 }
 
-                if (pkt.USM.SecurityName != _securityName)
-                {
+                if (pkt.USM.SecurityName != securityName)
                     throw new SnmpException(SnmpException.EErrorCode.InvalidSecurityName, "Security name mismatch.");
-                    // return false;
-                }
             }
 
             return true;
@@ -449,53 +426,56 @@ namespace SnmpSharpNet
         /// <exception cref="SnmpInvalidVersionException">Thrown when SNMP version other then 3 is set</exception>
         public ESnmpVersion Version
         {
-            get { return _version; }
+            get { return targetVersion; }
+
             set
             {
                 if (value != ESnmpVersion.Ver3)
                     throw new SnmpInvalidVersionException("UTarget is only suitable for use with SNMP v2 protocol version.");
 
-                _version = value;
+                targetVersion = value;
             }
         }
 
         /// <summary>Timeout in milliseconds for the target. Valid timeout values are between 100 and 10000 milliseconds.</summary>
         public int Timeout
         {
-            get { return _timeout; }
+            get { return timeOut; }
+
             set
             {
                 if (value < 100 || value > 10000)
                     throw new OverflowException("Valid timeout value is between 100 milliseconds and 10000 milliseconds");
 
-                _timeout = value;
+                timeOut = value;
             }
         }
 
         /// <summary>Number of retries for the target. Valid values are 0-5.</summary>
         public int Retry
         {
-            get { return _retry; }
+            get { return retry; }
+
             set
             {
                 if (value < 0 || value > 5)
                     throw new OverflowException("Valid retry value is between 0 and 5");
 
-                _retry = value;
+                retry = value;
             }
         }
 
         /// <summary>Target IP address</summary>
         public IpAddress Address
         {
-            get { return _address; }
+            get { return targetAddress; }
         }
 
         /// <summary>Target port number</summary>
         public int Port
         {
-            get { return _port; }
-            set { _port = value; }
+            get { return targetPort; }
+            set { targetPort = value; }
         }
 
         /// <summary>Checks validity of the class. </summary>
@@ -503,38 +483,36 @@ namespace SnmpSharpNet
         /// combination of options is set, otherwise true.</returns>
         public bool Valid()
         {
-            if (_address == null || !_address.Valid)
+            if (targetAddress == null || !targetAddress.Valid)
                 return false;
 
-            if (_port == 0)
+            if (targetPort == 0)
                 return false;
 
-            if (SecurityName.Length <= 0 && (_authenticationProtocol != AuthenticationDigests.None || _privacyProtocol != PrivacyProtocols.None))
+            if (SecurityName.Length <= 0 && (authenticationProtocol != AuthenticationDigests.None || privacyProtocol != EPrivacyProtocols.None))
             {
                 // You have to supply security name when using security or privacy.
                 // in theory you can use blank security name during discovery process so this is not exactly prohibited by it is discouraged
                 return false;
             }
 
-            if (_authenticationProtocol == AuthenticationDigests.None && _privacyProtocol != PrivacyProtocols.None)
-                return false; // noAuthPriv mode is not valid in SNMP version 3 
+            if (authenticationProtocol == AuthenticationDigests.None && privacyProtocol != EPrivacyProtocols.None)
+                return false; // noAuthPriv mode is not valid in SNMP version 3
 
-            if (_authenticationProtocol != AuthenticationDigests.None && _authenticationSecret.Length <= 0)
+            if (authenticationProtocol != AuthenticationDigests.None && authenticationSecret.Length <= 0)
                 return false; // Authentication protocol requires authentication secret
 
-            if (_privacyProtocol != PrivacyProtocols.None && _privacySecret.Length <= 0)
+            if (privacyProtocol != EPrivacyProtocols.None && privacySecret.Length <= 0)
                 return false; // Privacy protocol requires privacy secret
 
-            if (_engineTimeStamp != DateTime.MinValue)
+            if (engineTimeStamp != DateTime.MinValue)
             {
                 if (!ValidateEngineTime())
                     return false; // engine time is outside the acceptable timeliness window
             }
-            
+
             // rest of the values can be empty during the discovery process so no point in checking
             return true;
         }
-
-        #endregion
     }
 }

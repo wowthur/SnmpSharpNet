@@ -1,41 +1,41 @@
 ﻿// This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Exception;
-using System;
-using System.Security.Cryptography;
-
+//
 namespace SnmpSharpNet.Security
 {
+    using System;
+    using System.Security.Cryptography;
+    using SnmpSharpNet.Exception;
+
     /// <summary>TripleDES privacy protocol implementation class.</summary>
     /// <remarks>
     /// TripleDES privacy implementation is based on the Internet Draft proposal to the
-    /// SNMPv3 Working Group titled: Extension to the User-Based Security Model (USM) to Support 
+    /// SNMPv3 Working Group titled: Extension to the User-Based Security Model (USM) to Support
     /// Triple-DES EDE in "Outside" CBC Mode
-    /// 
+    ///
     /// High level, TripleDES privacy in SNMPv3 uses DES-EDE. What this means is that a key is generated
     /// that is 24 bytes long. This key is split into 3 * 8 byte keys suitable for use with DES. Keys
     /// are then used to perform ecryption, decryption and another encryption using DES. Additionally, each
     /// block is XORed with the previous block of encrypted data, or if working on the first block, IV value.
-    /// 
+    ///
     /// For details see draft-reeder-snmpv3-usm-3desede-00.txt.
-    /// 
+    ///
     /// Important: TripleDES privacy protocol is not based on a standard. This extension to the USM standard has
     /// been proposed and has expired without approval or move to the standards track. Some vendors have implemented
     /// this privacy protocol and for the completeness of the library, it has been included in SnmpSharpNet.
-    /// 
+    ///
     /// Troubleshooting of TripleDES encryption is difficult because of the low availability so if you find problems
     /// with the SnmpSharpNet implementation, please try to provide me with as much detail, both about your code and
     /// the type/version/mode of the agent you are working with.
@@ -45,31 +45,26 @@ namespace SnmpSharpNet.Security
         /// <summary>
         /// Internal salt value
         /// </summary>
-        protected Int32 _salt = (new Random()).Next();
+        protected int salt = new Random().Next();
 
-        /// <summary>
-        /// Standard constructor.
-        /// </summary>
+        /// <summary>Standard constructor.</summary>
         public Privacy3DES()
         {
         }
 
-        /// <summary>
-        /// Returns next salt value.
-        /// </summary>
+        /// <summary>Returns next salt value.</summary>
         /// <returns>32-bit integer salt value in network byte order (big endian)</returns>
         public int NextSalt()
         {
-            if (_salt == Int32.MaxValue)
-                _salt = 1;
+            if (salt == int.MaxValue)
+                salt = 1;
             else
-                _salt += 1;
-            return _salt;
+                salt += 1;
+
+            return salt;
         }
 
-        /// <summary>
-        /// Encrypt ScopedPdu using TripleDES encryption protocol
-        /// </summary>
+        /// <summary>Encrypt ScopedPdu using TripleDES encryption protocol</summary>
         /// <param name="unencryptedData">Unencrypted ScopedPdu byte array</param>
         /// <param name="offset">Offset to start encryption</param>
         /// <param name="length">Length of data to encrypt</param>
@@ -96,7 +91,7 @@ namespace SnmpSharpNet.Security
                 TripleDES tdes = new TripleDESCryptoServiceProvider
                 {
                     Mode = CipherMode.CBC,
-                    Padding = PaddingMode.None
+                    Padding = PaddingMode.None,
                 };
 
                 // normalize key - generated key is 32 bytes long, we need 24 bytes to encrypt
@@ -113,7 +108,7 @@ namespace SnmpSharpNet.Security
                     encryptedData = transform.TransformFinalBlock(tmpbuffer, 0, tmpbuffer.Length);
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw new SnmpPrivacyException(ex, "Exception was thrown while TripleDES privacy protocol was encrypting data\r\n" + ex.ToString());
             }
@@ -159,7 +154,7 @@ namespace SnmpSharpNet.Security
                 TripleDES tdes = new TripleDESCryptoServiceProvider
                 {
                     Mode = CipherMode.CBC,
-                    Padding = PaddingMode.None
+                    Padding = PaddingMode.None,
                 };
 
                 // normalize key - generated key is 32 bytes long, we need 24 bytes to encrypt
@@ -167,19 +162,17 @@ namespace SnmpSharpNet.Security
                 Buffer.BlockCopy(key, 0, normKey, 0, normKey.Length);
 
                 ICryptoTransform transform = tdes.CreateDecryptor(normKey, iv);
-                byte [] decryptedData = transform.TransformFinalBlock(encryptedData, offset, length);
+                byte[] decryptedData = transform.TransformFinalBlock(encryptedData, offset, length);
 
                 return decryptedData;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw new SnmpPrivacyException(ex, "Exception was thrown while TripleDES privacy protocol was decrypting data.");
             }
         }
 
-        /// <summary>
-        /// Returns minimum encryption/decryption key length. For TripleDES, returned value is 32.
-        /// </summary>
+        /// <summary>Returns minimum encryption/decryption key length. For TripleDES, returned value is 32.</summary>
         /// <remarks>
         /// TripleDES protocol requires a 24 byte encryption key and additional 8 bytes are used for generating the
         /// encryption IV.
@@ -189,9 +182,7 @@ namespace SnmpSharpNet.Security
             get { return 32; }
         }
 
-        /// <summary>
-        /// Return maximum encryption/decryption key length. For TripleDES, returned value is 32
-        /// </summary>
+        /// <summary>Return maximum encryption/decryption key length. For TripleDES, returned value is 32</summary>
         /// <remarks>
         /// TripleDES protocol requires a 24 byte encryption key and additional 8 bytes are used for generating the
         /// encryption IV.
@@ -201,17 +192,13 @@ namespace SnmpSharpNet.Security
             get { return 32; }
         }
 
-        /// <summary>
-        /// Returns the length of privacyParameters USM header field. For TripleDES, field length is 8.
-        /// </summary>
+        /// <summary>Returns the length of privacyParameters USM header field. For TripleDES, field length is 8.</summary>
         public int PrivacyParametersLength
         {
             get { return 8; }
         }
 
-        /// <summary>
-        /// Get final encrypted length
-        /// </summary>
+        /// <summary>Get final encrypted length</summary>
         /// <remarks>
         /// TripleDES performs encryption on 8 byte blocks so the final encrypted size will be a
         /// mulitiple of 8 with padding added to the end of the ScopedPdu if required.
@@ -226,9 +213,7 @@ namespace SnmpSharpNet.Security
             return 8 * ((scopedPduLength / 8) + 1);
         }
 
-        /// <summary>
-        /// Get TripleDES encryption salt value.
-        /// </summary>
+        /// <summary>Get TripleDES encryption salt value.</summary>
         /// <remarks>
         /// Salt value is generated by concatenating engineBoots value with
         /// the random integer value.
@@ -241,6 +226,7 @@ namespace SnmpSharpNet.Security
             int s = NextSalt();
 
             byte[] eb = BitConverter.GetBytes(engineBoots);
+
             // C# is little endian so reverse the values
             salt[3] = eb[0];
             salt[2] = eb[1];
@@ -255,9 +241,7 @@ namespace SnmpSharpNet.Security
             return salt;
         }
 
-        /// <summary>
-        /// Generate IV from the privacy key and salt value returned by GetSalt method.
-        /// </summary>
+        /// <summary>Generate IV from the privacy key and salt value returned by GetSalt method.</summary>
         /// <param name="privacyKey">16 byte privacy key</param>
         /// <param name="salt">Salt value returned by GetSalt method</param>
         /// <returns>IV value used in the encryption process</returns>
@@ -274,9 +258,7 @@ namespace SnmpSharpNet.Security
             return iv;
         }
 
-        /// <summary>
-        /// Privacy protocol name
-        /// </summary>
+        /// <summary>Privacy protocol name</summary>
         public string Name
         {
             get { return "TripleDES"; }
@@ -313,17 +295,13 @@ namespace SnmpSharpNet.Security
             return extendedKey;
         }
 
-        /// <summary>
-        /// TripleDES implementation supports extending of a short encryption key. Always returns true.
-        /// </summary>
+        /// <summary>TripleDES implementation supports extending of a short encryption key. Always returns true.</summary>
         public bool CanExtendShortKey
         {
             get { return true; }
         }
 
-        /// <summary>
-        /// Convert privacy password into encryption key using packet authentication hash.
-        /// </summary>
+        /// <summary>Convert privacy password into encryption key using packet authentication hash.</summary>
         /// <param name="secret">Privacy user secret/password</param>
         /// <param name="engineId">Authoritative engine id of the SNMP agent</param>
         /// <param name="authProtocol">Authentication protocol</param>

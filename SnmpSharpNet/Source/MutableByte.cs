@@ -1,29 +1,29 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using System;
-using System.Linq;
-using System.Text;
-
+//
 namespace SnmpSharpNet
 {
+    using System;
+    using System.Linq;
+    using System.Text;
+
     /// <summary>Mutable byte implementation class</summary>
     /// <remarks>
     /// Mutable byte class allows for manipulation of a byte array with
     /// operations like append, prepend.
-    /// 
+    ///
     /// Functionality is implemented through temporary buffer creation
     /// and data duplication.
     ///
@@ -42,10 +42,10 @@ namespace SnmpSharpNet
     /// buffer.Reset(); // Erase all the data from the buffer
     /// </code>
     /// </remarks>
-    public class MutableByte : Object, ICloneable, IComparable<MutableByte>, IComparable<byte[]>
+    public class MutableByte : object, ICloneable, IComparable<MutableByte>, IComparable<byte[]>
     {
         /// <summary>Internal byte buffer</summary>
-        byte[] _buffer;
+        private byte[] buffer;
 
         /// <summary>Standard constructor. Initializes the internal buffer to null.</summary>
         public MutableByte()
@@ -57,7 +57,7 @@ namespace SnmpSharpNet
         public MutableByte(byte[] buf)
         {
             if (buf != null)
-                _buffer = buf.ToArray();
+                buffer = buf.ToArray();
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace SnmpSharpNet
             if (buf2 == null || buf2.Length == 0)
                 throw new ArgumentNullException(nameof(buf2));
 
-            _buffer = buf1.Concat(buf2).ToArray();
+            buffer = buf1.Concat(buf2).ToArray();
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace SnmpSharpNet
         /// <summary>Get byte[] buffer value. This property is internal because it exposes the internal byte array.</summary>
         internal byte[] Value
         {
-            get { return _buffer; }
+            get { return buffer; }
         }
 
         /// <summary>Byte buffer current length</summary>
@@ -100,10 +100,10 @@ namespace SnmpSharpNet
         {
             get
             {
-                if (_buffer == null)
+                if (buffer == null)
                     return 0;
 
-                return _buffer.Length;
+                return buffer.Length;
             }
         }
 
@@ -111,12 +111,12 @@ namespace SnmpSharpNet
         /// <param name="buf">Value to copy into internal buffer</param>
         public void Set(byte[] buf)
         {
-            _buffer = null;
+            buffer = null;
 
             if (buf == null || buf.Length == 0)
                 return;
 
-            _buffer = buf.ToArray();
+            buffer = buf.ToArray();
         }
 
         /// <summary>Copy source buffer array up to length into the class.</summary>
@@ -125,11 +125,11 @@ namespace SnmpSharpNet
         /// <exception cref="ArgumentNullException">Thrown if buf argument is null or length of zero</exception>
         public void Set(byte[] buf, int length)
         {
-            _buffer = null;
+            buffer = null;
             if (buf == null || buf.Length == 0)
                 throw new ArgumentNullException(nameof(buf), "Byte array is null.");
 
-            _buffer = buf.Take(length).ToArray();
+            buffer = buf.Take(length).ToArray();
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace SnmpSharpNet
         /// <param name="buf">Byte value to copy into internal byte array of size 1</param>
         public void Set(byte buf)
         {
-            _buffer = new byte[1] { buf };
+            buffer = new byte[1] { buf };
         }
 
         /// <summary>Set value at specified position to the supplied value</summary>
@@ -149,7 +149,7 @@ namespace SnmpSharpNet
             if (position < 0 || position >= Length)
                 return;
 
-            _buffer[position] = value;
+            buffer[position] = value;
         }
 
         /// <summary>Set class value to the contents of the supplied array starting from offset with specified length</summary>
@@ -161,11 +161,10 @@ namespace SnmpSharpNet
             if (
                 offset < 0 ||
                 length < 0 ||
-                (offset + length) > value.Length
-                )
+                (offset + length) > value.Length)
                 throw new ArgumentOutOfRangeException();
 
-            _buffer = value.Skip(offset).Take(length).ToArray();
+            buffer = value.Skip(offset).Take(length).ToArray();
         }
 
         /// <summary>Set class value with bytes from the string. UTF8 encoding is assumed.</summary>
@@ -173,7 +172,7 @@ namespace SnmpSharpNet
         public void Set(string value)
         {
             if (value == null || value.Length <= 0)
-                _buffer = null;
+                buffer = null;
             else
                 Set(Encoding.UTF8.GetBytes(value));
         }
@@ -186,22 +185,22 @@ namespace SnmpSharpNet
             if (buf == null || buf.Length == 0)
                 return; // null value received. nothing to append
 
-            if (_buffer == null)
+            if (buffer == null)
                 Set(buf);
             else
-                _buffer = _buffer.Concat(buf).ToArray();
+                buffer = buffer.Concat(buf).ToArray();
         }
 
         /// <summary>Append a single byte value to the internal buffer</summary>
         /// <param name="buf">Byte value to append to the internal buffer</param>
         public void Append(byte buf)
         {
-            if (_buffer == null)
+            if (buffer == null)
                 Set(buf);
             else
             {
-                Array.Resize(ref _buffer, _buffer.Length + 1);
-                _buffer[_buffer.Length - 1] = buf;
+                Array.Resize(ref buffer, buffer.Length + 1);
+                buffer[buffer.Length - 1] = buf;
             }
         }
 
@@ -222,7 +221,7 @@ namespace SnmpSharpNet
                 return;
             }
 
-            _buffer = _buffer.Take(position).Concat(buf).Concat(_buffer.Skip(position)).ToArray();
+            buffer = buffer.Take(position).Concat(buf).Concat(buffer.Skip(position)).ToArray();
         }
 
         /// <summary>Insert single byte at specified location</summary>
@@ -239,7 +238,7 @@ namespace SnmpSharpNet
                 return;
             }
 
-            _buffer = _buffer.Take(position).Concat(new byte[] { buf }).Concat(_buffer.Skip(position)).ToArray();
+            buffer = buffer.Take(position).Concat(new byte[] { buf }).Concat(buffer.Skip(position)).ToArray();
         }
 
         /// <summary>Prepend (insert at beginning) a byte array</summary>
@@ -249,7 +248,7 @@ namespace SnmpSharpNet
             if (Length <= 0)
                 Set(buf);
             else
-                _buffer = buf.Concat(_buffer).ToArray();
+                buffer = buf.Concat(buffer).ToArray();
         }
 
         /// <summary>Prepend (add at the beginning) a single byte value</summary>
@@ -259,7 +258,7 @@ namespace SnmpSharpNet
             if (Length <= 0)
                 Set(buf);
             else
-                _buffer = (new byte[] { buf }).Concat(_buffer).ToArray();
+                buffer = (new byte[] { buf }).Concat(buffer).ToArray();
         }
 
         /// <summary>Remove bytes from the beginning of the array</summary>
@@ -270,7 +269,7 @@ namespace SnmpSharpNet
             if (Length == 0)
                 throw new ArgumentOutOfRangeException(nameof(count), "Buffer is length 0. Unable to remove members.");
 
-            if (count > _buffer.Length)
+            if (count > buffer.Length)
                 throw new ArgumentOutOfRangeException(nameof(count), "Byte count is greater then the length of the array");
 
             if (count == Length)
@@ -280,7 +279,7 @@ namespace SnmpSharpNet
                 return;
             }
 
-            _buffer = _buffer.Skip(count).ToArray();
+            buffer = buffer.Skip(count).ToArray();
         }
 
         /// <summary>Remove number of byte values from the end of the internal buffer</summary>
@@ -291,7 +290,7 @@ namespace SnmpSharpNet
             if (Length == 0)
                 throw new ArgumentOutOfRangeException(nameof(count), "Buffer is length 0. Unable to remove members.");
 
-            if (count > _buffer.Length)
+            if (count > buffer.Length)
                 throw new ArgumentOutOfRangeException(nameof(count), "Byte count is greater then the length of the array");
 
             if (count == Length)
@@ -301,7 +300,7 @@ namespace SnmpSharpNet
                 return;
             }
 
-            Array.Resize(ref _buffer, _buffer.Length - count);
+            Array.Resize(ref buffer, buffer.Length - count);
         }
 
         /// <summary>Remove array byte members starting with position start for the length length bytes.</summary>
@@ -314,7 +313,7 @@ namespace SnmpSharpNet
         /// </exception>
         public void Remove(int start, int count)
         {
-            if (_buffer.Length == 0)
+            if (buffer.Length == 0)
                 throw new ArgumentOutOfRangeException(nameof(start), "Byte array is empty. Unable to remove members.");
 
             if (start < 0 || start >= Length)
@@ -328,21 +327,21 @@ namespace SnmpSharpNet
             else if (start + count == Length)
                 RemoveEnd(count);
             else
-                _buffer = _buffer.Take(start).Concat(_buffer.Skip(start + count)).ToArray();
+                buffer = buffer.Take(start).Concat(buffer.Skip(start + count)).ToArray();
         }
 
         /// <summary>Get sub-array</summary>
         /// <param name="position">Start of the sub-array. Zero based.</param>
         /// <param name="length">Count of bytes to copy</param>
         /// <returns>MutableByte array containing the sub-array.</returns>
-        /// <exception cref="OverflowException">Thrown when position starts before the beginning of the array (position is less then 0) or 
+        /// <exception cref="OverflowException">Thrown when position starts before the beginning of the array (position is less then 0) or
         /// position + length is greater then the length of the byte array contained in the object.</exception>
         public MutableByte Get(int position, int length)
         {
-            if (_buffer.Length <= position || _buffer.Length < (position + length))
-                throw new OverflowException("Buffer is too small to extract sub-array.\r\n" + string.Format("buffer length: {0} offset: {1} length: {2}", _buffer.Length, position, length));
+            if (buffer.Length <= position || buffer.Length < (position + length))
+                throw new OverflowException("Buffer is too small to extract sub-array.\r\n" + string.Format("buffer length: {0} offset: {1} length: {2}", buffer.Length, position, length));
 
-            return new MutableByte(_buffer.Skip(position).Take(length).ToArray());
+            return new MutableByte(buffer.Skip(position).Take(length).ToArray());
         }
 
         /// <summary>Add <see cref="MutableByte"/> and byte array values into a new MutableByte class.</summary>
@@ -380,10 +379,10 @@ namespace SnmpSharpNet
         /// <returns>true if the same, otherwise falseB</returns>
         public static bool operator ==(MutableByte buf1, MutableByte buf2)
         {
-            if (((Object)buf1) == null && ((Object)buf2) == null)
+            if (((object)buf1) == null && ((object)buf2) == null)
                 return true;
 
-            if (((Object)buf1) == null || ((Object)buf2) == null)
+            if (((object)buf1) == null || ((object)buf2) == null)
                 return false;
 
             return buf1.Equals(buf2);
@@ -395,19 +394,19 @@ namespace SnmpSharpNet
         /// <returns>true if class values are not equal, otherwise false.</returns>
         public static bool operator !=(MutableByte buf1, MutableByte buf2)
         {
-            if (((Object)buf1) == null && ((Object)buf2) == null)
+            if (((object)buf1) == null && ((object)buf2) == null)
                 return false;
 
-            if (((Object)buf1) == null || ((Object)buf2) == null)
+            if (((object)buf1) == null || ((object)buf2) == null)
                 return true;
 
-            return !(buf1.Equals(buf2));
+            return !buf1.Equals(buf2);
         }
 
         /// <summary>Allow implicit casting of this object as a byte array for any callers.</summary>
         /// <param name="obj">MutableByte object whose values should be cast as byte array</param>
         /// <returns>Byte array represented in the MutableObject class.</returns>
-        public static implicit operator byte[] (MutableByte obj)
+        public static implicit operator byte[](MutableByte obj)
         {
             return obj.Value;
         }
@@ -423,14 +422,15 @@ namespace SnmpSharpNet
                 if (index < 0 || index >= Length)
                     return 0x00; // don't throw an exception here
 
-                return _buffer[index];
+                return buffer[index];
             }
+
             set
             {
                 if (index < 0 || index >= Length)
                     return; // don't throw an exception here
 
-                _buffer[index] = value;
+                buffer[index] = value;
             }
         }
 
@@ -529,16 +529,16 @@ namespace SnmpSharpNet
         /// <returns>String representation of the object as a hex string</returns>
         public override string ToString()
         {
-            if (_buffer == null)
-                return "";
+            if (buffer == null)
+                return string.Empty;
 
             var str = new StringBuilder();
-            for (int i = 0; i < _buffer.Length; i++)
+            for (int i = 0; i < buffer.Length; i++)
             {
-                str.Append(string.Format("{0:x02} ", _buffer[i]));
-                if (i > 0 && i < (_buffer.Length - 1) && (i % 16) == 0)
+                str.Append(string.Format("{0:x02} ", buffer[i]));
+                if (i > 0 && i < (buffer.Length - 1) && (i % 16) == 0)
                     str.Append("\n");
-                else if (i < (_buffer.Length - 1))
+                else if (i < (buffer.Length - 1))
                     str.Append(" ");
             }
 
@@ -554,10 +554,10 @@ namespace SnmpSharpNet
         /// <exception cref="ArgumentOutOfRangeException">Thrown when start and length arguments point to internal byte array locations that are outside of the array bounds.</exception>
         public string ToString(int start, int length)
         {
-            if (_buffer == null)
-                return "";
+            if (buffer == null)
+                return string.Empty;
 
-            if (_buffer.Length <= start || _buffer.Length < (start + length))
+            if (buffer.Length <= start || buffer.Length < (start + length))
                 throw new ArgumentOutOfRangeException(nameof(start), "Range specification past boundaries of the buffer.");
 
             var output = new StringBuilder();
@@ -567,9 +567,9 @@ namespace SnmpSharpNet
 
             for (var i = start; i < (start + length); i++)
             {
-                output.AppendFormat("{0:x2}", _buffer[i]);
-                if (_buffer[i] > 31 && _buffer[i] < 128)
-                    dec.Append(Convert.ToChar(_buffer[i]));
+                output.AppendFormat("{0:x2}", buffer[i]);
+                if (buffer[i] > 31 && buffer[i] < 128)
+                    dec.Append(Convert.ToChar(buffer[i]));
 
                 pcnt++;
 
@@ -578,7 +578,7 @@ namespace SnmpSharpNet
                     output.Append("    ");
                     output.Append(dec.ToString());
                     output.Append("\n");
-                    output.AppendFormat("{0:d03}  ", (i + 1));
+                    output.AppendFormat("{0:d03}  ", i + 1);
                     dec.Remove(0, dec.Length);
                     pcnt = 0;
                 }
@@ -590,22 +590,22 @@ namespace SnmpSharpNet
         }
 
         /// <summary>Clone object</summary>
-        /// <returns>Cloned copy of the object cast as <see cref="Object"/></returns>
+        /// <returns>Cloned copy of the object cast as <see cref="object"/></returns>
         public object Clone()
         {
-            return new MutableByte(_buffer);
+            return new MutableByte(buffer);
         }
 
         /// <summary>Reset object data to null</summary>
         public void Reset()
         {
-            _buffer = null;
+            buffer = null;
         }
 
         /// <summary>Reset object data to null</summary>
         public void Clear()
         {
-            _buffer = null;
+            buffer = null;
         }
 
         /// <summary>Compare class to another MutableByte class.</summary>
@@ -627,6 +627,7 @@ namespace SnmpSharpNet
                 if (other.Value[i] < Value[i])
                     return 1;
             }
+
             return 0;
         }
 

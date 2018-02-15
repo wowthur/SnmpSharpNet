@@ -1,35 +1,35 @@
 ﻿// This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
+//
 // First introduced: 0.5.2
 //
-using SnmpSharpNet.Exception;
-using SnmpSharpNet.Security;
-using SnmpSharpNet.Types;
-using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-
 namespace SnmpSharpNet
 {
+    using System;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Text;
+    using SnmpSharpNet.Exception;
+    using SnmpSharpNet.Security;
+    using SnmpSharpNet.Types;
+
     /// <summary>Send SNMP Trap notifications</summary>
     /// <remarks>
     /// TrapAgent class is used to hide Socket operations from users and provide an easy method to send
     /// Trap notifications.
-    /// 
+    ///
     /// To use the class, you can use the TrapAgent class protocol specific members, recommended when you
     /// expect to send a lot of notifications, or a static helper TrapAgent.SendTrap method which will
     /// construct a new socket for each call.
@@ -37,7 +37,7 @@ namespace SnmpSharpNet
     public class TrapAgent
     {
         /// <summary>Internal Socket class</summary>
-        protected Socket _sock;
+        protected Socket socket;
 
         /// <summary>Constructor.</summary>
         /// <remarks>
@@ -46,15 +46,15 @@ namespace SnmpSharpNet
         /// </remarks>
         public TrapAgent()
         {
-            _sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            _sock.Bind(new IPEndPoint(IPAddress.Any, 0));
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket.Bind(new IPEndPoint(IPAddress.Any, 0));
         }
 
         /// <summary>Destructor.</summary>
         /// <remarks>Destructors only purpose is to close the Socket used by the class.</remarks>
         ~TrapAgent()
         {
-            _sock.Close();
+            socket.Close();
         }
 
         /// <summary>Send SNMP version 1 Trap notification</summary>
@@ -64,7 +64,7 @@ namespace SnmpSharpNet
         public void SendV1Trap(SnmpV1TrapPacket packet, IpAddress peer, int port)
         {
             byte[] outBuffer = packet.Encode();
-            _sock.SendTo(outBuffer, new IPEndPoint((IPAddress)peer, port));
+            socket.SendTo(outBuffer, new IPEndPoint((IPAddress)peer, port));
         }
 
         /// <summary>Construct and send SNMP v1 Trap</summary>
@@ -77,9 +77,17 @@ namespace SnmpSharpNet
         /// <param name="specificTrap">Specific trap code</param>
         /// <param name="senderUpTime">Senders sysUpTime</param>
         /// <param name="varList">Variable binding list</param>
-        public void SendV1Trap(IpAddress receiver, int receiverPort, string community, Oid senderSysObjectID,
-            IpAddress senderIpAdress, Int32 genericTrap, Int32 specificTrap, uint senderUpTime,
-            VbCollection varList)
+        public void SendV1Trap(
+            IpAddress receiver,
+            int receiverPort,
+            string community,
+            Oid senderSysObjectID,
+            IpAddress senderIpAdress,
+            int genericTrap,
+            int specificTrap,
+            uint senderUpTime,
+            VbCollection varList
+        )
         {
             SnmpV1TrapPacket packet = new SnmpV1TrapPacket(community);
             packet.Pdu.Generic = genericTrap;
@@ -101,7 +109,7 @@ namespace SnmpSharpNet
                 throw new SnmpInvalidPduTypeException("Invalid Pdu type.");
 
             byte[] outBuffer = packet.Encode();
-            _sock.SendTo(outBuffer, new IPEndPoint((IPAddress)peer, port));
+            socket.SendTo(outBuffer, new IPEndPoint((IPAddress)peer, port));
         }
 
         /// <summary>Construct and send SNMP v2 Trap</summary>
@@ -111,8 +119,14 @@ namespace SnmpSharpNet
         /// <param name="senderUpTime">Sender sysUpTime</param>
         /// <param name="trapObjectID">Trap ObjectID</param>
         /// <param name="varList">Variable binding list</param>
-        public void SendV2Trap(IpAddress receiver, int receiverPort, string community, uint senderUpTime,
-            Oid trapObjectID, VbCollection varList)
+        public void SendV2Trap(
+            IpAddress receiver,
+            int receiverPort,
+            string community,
+            uint senderUpTime,
+            Oid trapObjectID,
+            VbCollection varList
+        )
         {
             SnmpV2Packet packet = new SnmpV2Packet(community);
             packet.Pdu.Type = EPduType.V2Trap;
@@ -132,7 +146,7 @@ namespace SnmpSharpNet
                 throw new SnmpInvalidPduTypeException("Invalid Pdu type.");
 
             byte[] outBuffer = packet.Encode();
-            _sock.SendTo(outBuffer, new IPEndPoint((IPAddress)peer, port));
+            socket.SendTo(outBuffer, new IPEndPoint((IPAddress)peer, port));
         }
 
         /// <summary>Construct and send SNMP v3 noAuthNoPriv Trap</summary>
@@ -145,8 +159,17 @@ namespace SnmpSharpNet
         /// <param name="senderUpTime">Sender upTime</param>
         /// <param name="trapObjectID">Trap object ID</param>
         /// <param name="varList">Variable binding list</param>
-        public void SendV3Trap(IpAddress receiver, int receiverPort, byte[] engineId, Int32 senderEngineBoots,
-            Int32 senderEngineTime, string senderUserName, uint senderUpTime, Oid trapObjectID, VbCollection varList)
+        public void SendV3Trap(
+            IpAddress receiver,
+            int receiverPort,
+            byte[] engineId,
+            int senderEngineBoots,
+            int senderEngineTime,
+            string senderUserName,
+            uint senderUpTime,
+            Oid trapObjectID,
+            VbCollection varList
+        )
         {
             SnmpV3Packet packet = new SnmpV3Packet();
             packet.Pdu.Type = EPduType.V2Trap;
@@ -156,7 +179,7 @@ namespace SnmpSharpNet
             packet.ScopedPdu.TrapObjectID.Set(trapObjectID);
             packet.ScopedPdu.TrapSysUpTime.Value = senderUpTime;
             packet.ScopedPdu.VbList.Add(varList);
-            packet.MsgFlags.Reportable = false;
+            packet.MessageFlags.Reportable = false;
             SendV3Trap(packet, receiver, receiverPort);
         }
 
@@ -175,9 +198,19 @@ namespace SnmpSharpNet
         /// available digests
         /// </param>
         /// <param name="authSecret">Authentication secret</param>
-        public void SendV3Trap(IpAddress receiver, int receiverPort, byte[] engineId, Int32 senderEngineBoots,
-            Int32 senderEngineTime, string senderUserName, uint senderUpTime, Oid trapObjectID, VbCollection varList,
-            AuthenticationDigests authDigest, byte[] authSecret)
+        public void SendV3Trap(
+            IpAddress receiver,
+            int receiverPort,
+            byte[] engineId,
+            int senderEngineBoots,
+            int senderEngineTime,
+            string senderUserName,
+            uint senderUpTime,
+            Oid trapObjectID,
+            VbCollection varList,
+            AuthenticationDigests authDigest,
+            byte[] authSecret
+        )
         {
             SnmpV3Packet packet = new SnmpV3Packet();
             packet.Pdu.Type = EPduType.V2Trap;
@@ -187,7 +220,7 @@ namespace SnmpSharpNet
             packet.ScopedPdu.TrapObjectID.Set(trapObjectID);
             packet.ScopedPdu.TrapSysUpTime.Value = senderUpTime;
             packet.ScopedPdu.VbList.Add(varList);
-            packet.MsgFlags.Reportable = false;
+            packet.MessageFlags.Reportable = false;
             SendV3Trap(packet, receiver, receiverPort);
         }
 
@@ -207,13 +240,25 @@ namespace SnmpSharpNet
         /// </param>
         /// <param name="authSecret">Authentication secret</param>
         /// <param name="privProtocol">
-        /// Privacy protocol. See <see cref="PrivacyProtocols"/> enumeration for
+        /// Privacy protocol. See <see cref="EPrivacyProtocols"/> enumeration for
         /// available privacy protocols.
         /// </param>
         /// <param name="privSecret">Privacy secret</param>
-        public void SendV3Trap(IpAddress receiver, int receiverPort, byte[] engineId, Int32 senderEngineBoots,
-            Int32 senderEngineTime, string senderUserName, uint senderUpTime, Oid trapObjectID, VbCollection varList,
-            AuthenticationDigests authDigest, byte[] authSecret, PrivacyProtocols privProtocol, byte[] privSecret)
+        public void SendV3Trap(
+            IpAddress receiver,
+            int receiverPort,
+            byte[] engineId,
+            int senderEngineBoots,
+            int senderEngineTime,
+            string senderUserName,
+            uint senderUpTime,
+            Oid trapObjectID,
+            VbCollection varList,
+            AuthenticationDigests authDigest,
+            byte[] authSecret,
+            EPrivacyProtocols privProtocol,
+            byte[] privSecret
+        )
         {
             SnmpV3Packet packet = new SnmpV3Packet();
             packet.Pdu.Type = EPduType.V2Trap;
@@ -223,17 +268,17 @@ namespace SnmpSharpNet
             packet.ScopedPdu.TrapObjectID.Set(trapObjectID);
             packet.ScopedPdu.TrapSysUpTime.Value = senderUpTime;
             packet.ScopedPdu.VbList.Add(varList);
-            packet.MsgFlags.Reportable = false;
+            packet.MessageFlags.Reportable = false;
             SendV3Trap(packet, receiver, receiverPort);
         }
 
         /// <summary>Send SNMP Trap notification</summary>
         /// <remarks>
         /// Helper function to allow for seamless sending of SNMP notifications for all protocol versions.
-        /// 
+        ///
         /// packet parameter should be appropriately formatted SNMP notification in SnmpV1TrapPacket,
         /// SnmpV2Packet or SnmpV3Packet class cast as SnmpPacket class.
-        /// 
+        ///
         /// Function will determine which version of the notification is to be used by checking the type
         /// of the packet parameter and call appropriate TrapAgent member function to send it.
         /// </remarks>

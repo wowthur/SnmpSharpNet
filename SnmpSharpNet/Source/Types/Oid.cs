@@ -1,27 +1,27 @@
 // This file is part of SNMP#NET
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
 //
-using System;
-using System.Globalization;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using SnmpSharpNet.Exception;
-
 namespace SnmpSharpNet.Types
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Text;
+    using SnmpSharpNet.Exception;
+
     /// <summary>
     /// SMI Object Identifier type implementation.
     /// </summary>
@@ -33,15 +33,13 @@ namespace SnmpSharpNet.Types
         IEnumerable<uint>
     {
         /// <summary>Internal buffer</summary>
-        protected uint[] _data;
-
-        #region Constructors
+        protected uint[] data;
 
         /// <summary>Creates a default empty object identifier.</summary>
         public Oid()
         {
-            Type = SnmpConstants.SMI_OBJECTID;
-            _data = null;
+            Type = SnmpConstants.SmiObjectId;
+            data = null;
         }
 
         /// <summary>Constructor. Initialize ObjectId value to the unsigned integer array</summary>
@@ -76,10 +74,6 @@ namespace SnmpSharpNet.Types
             Set(value);
         }
 
-        #endregion Constructors
-
-        #region Set members
-
         /// <summary>Set Oid value from integer array. If integer array is null or length == 0, internal buffer is set to null.</summary>
         /// <param name="value">Integer array</param>
         /// <exception cref="ArgumentNullException">Parameter is null</exception>
@@ -88,13 +82,13 @@ namespace SnmpSharpNet.Types
         public virtual void Set(int[] value)
         {
             if (value == null)
-                _data = null;
+                data = null;
             else
             {
                 if (value.Where(x => x < 0).Count() > 0)
                     throw new OverflowException("OID instance value cannot be less then zero.");
 
-                _data = value.Select(x => (uint)x).ToArray();
+                data = value.Select(x => (uint)x).ToArray();
             }
         }
 
@@ -104,7 +98,7 @@ namespace SnmpSharpNet.Types
         /// <exception cref="ArgumentOutOfRangeException">Parameter contains less then 2 integer values</exception>
         public virtual void Set(uint[] value)
         {
-            _data = value?.ToArray();
+            data = value?.ToArray();
         }
 
         /// <summary>Set class value from another Oid class.</summary>
@@ -123,21 +117,19 @@ namespace SnmpSharpNet.Types
         /// </param>
         public void Set(string value)
         {
-            _data = value == null ? null : Parse(value);
+            data = value == null ? null : Parse(value);
         }
-
-        #endregion Set members
 
         /// <summary> Gets the number of object identifiers in the object.</summary>
         /// <returns> Returns the number of object identifiers</returns>
-        virtual public int Length
+        public virtual int Length
         {
             get
             {
-                if (_data == null)
+                if (data == null)
                     return 0;
 
-                return _data.Length;
+                return data.Length;
             }
         }
 
@@ -149,33 +141,33 @@ namespace SnmpSharpNet.Types
             if (ids == null || ids.Length == 0)
                 return;
 
-            if (_data != null)
+            if (data != null)
             {
                 if (ids != null && ids.Length != 0)
                 {
-                    uint[] tmp = new uint[_data.Length + ids.Length];
-                    Array.Copy(_data, 0, tmp, 0, _data.Length);
+                    uint[] tmp = new uint[data.Length + ids.Length];
+                    Array.Copy(data, 0, tmp, 0, data.Length);
+
                     for (int i = 0; i < ids.Length; i++)
                     {
                         if (ids[i] < 0)
-                        {
                             throw new OverflowException("Instance value cannot be less then zero.");
-                        }
-                        tmp[_data.Length + i] = (uint)ids[i];
+
+                        tmp[data.Length + i] = (uint)ids[i];
                     }
-                    _data = tmp;
+
+                    data = tmp;
                 }
             }
             else
             {
-                _data = new uint[ids.Length];
+                data = new uint[ids.Length];
                 for (int i = 0; i < ids.Length; i++)
                 {
                     if (ids[i] < 0)
-                    {
                         throw new OverflowException("Instance value cannot be less then zero.");
-                    }
-                    _data[i] = (uint)ids[i];
+
+                    data[i] = (uint)ids[i];
                 }
             }
         }
@@ -188,23 +180,23 @@ namespace SnmpSharpNet.Types
             if (ids == null || ids.Length == 0)
                 return;
 
-            if (_data != null)
+            if (data != null)
             {
                 if (ids != null && ids.Length != 0)
-                    _data = _data.Concat(ids).ToArray();
+                    data = data.Concat(ids).ToArray();
             }
             else
-                _data = ids.ToArray();
+                data = ids.ToArray();
         }
 
         /// <summary>Add a single uint id to the end of the object</summary>
         /// <param name="id">Id to add to the oid</param>
         public virtual void Add(uint id)
         {
-            if (_data != null)
-                _data = _data.Concat(new uint[] { id }).ToArray();
+            if (data != null)
+                data = data.Concat(new uint[] { id }).ToArray();
             else
-                _data = new uint[] { id };
+                data = new uint[] { id };
         }
 
         /// <summary>Add a single Int32 id to the end of the object</summary>
@@ -235,23 +227,21 @@ namespace SnmpSharpNet.Types
             Add(second.GetData());
         }
 
-        #region Comparison methods
-
         /// <summary>Compare Oid value with array of uint integers</summary>
         /// <param name="ids">Array of integers</param>
         /// <returns>-1 if class is less then, 0 if the same or 1 if greater then the integer array value</returns>
         public virtual int Compare(uint[] ids)
         {
-            if (ids == null && _data == null)
+            if (ids == null && data == null)
                 return 0;
 
-            if (ids != null && _data == null)
+            if (ids != null && data == null)
                 return 1;
 
-            if (ids == null && _data != null)
+            if (ids == null && data != null)
                 return -1;
 
-            return Compare(ids, _data.Length > ids.Length ? ids.Length : _data.Length);
+            return Compare(ids, data.Length > ids.Length ? ids.Length : data.Length);
         }
 
         /// <summary>Compare class value with the contents of the array. Compare up to dist number of Oid values
@@ -261,21 +251,20 @@ namespace SnmpSharpNet.Types
         /// <returns>0 if equal, -1 if less then and 1 if greater then.</returns>
         public virtual int Compare(uint[] ids, int dist)
         {
-            if (_data == null)
+            if (data == null)
             {
                 if (ids == null)
                     return 0;
 
                 return -1;
             }
-            if (ids == null)
-            {
-                return 1;
-            }
 
-            if (ids.Length < dist || _data.Length < dist)
+            if (ids == null)
+                return 1;
+
+            if (ids.Length < dist || data.Length < dist)
             {
-                if (_data.Length < ids.Length || _data.Length == ids.Length)
+                if (data.Length < ids.Length || data.Length == ids.Length)
                     return -1;
 
                 return 1;
@@ -283,9 +272,10 @@ namespace SnmpSharpNet.Types
 
             for (int cnt = 0; cnt < dist; cnt++)
             {
-                if (_data[cnt] < ids[cnt])
+                if (data[cnt] < ids[cnt])
                     return -1;
-                else if (_data[cnt] > ids[cnt])
+
+                if (data[cnt] > ids[cnt])
                     return 1;
             }
 
@@ -304,7 +294,7 @@ namespace SnmpSharpNet.Types
         /// <summary>Exact comparison of two Oid values</summary>
         /// <remarks>
         /// This method is required for cases when exact comparison is required and not lexographical comparison.
-        /// 
+        ///
         /// This method will compare the lengths first and, if not the same, make a comparison determination based
         /// on it before looking into the data.
         /// </remarks>
@@ -318,24 +308,25 @@ namespace SnmpSharpNet.Types
             {
                 if (ids == null)
                 {
-                    if (_data == null)
+                    if (data == null)
                         return 0;
 
                     return 1;
                 }
 
-                if (_data == null)
+                if (data == null)
                     return -1;
 
-                if (_data.Length != ids.Length)
+                if (data.Length != ids.Length)
                 {
-                    if (_data.Length > ids.Length)
+                    if (data.Length > ids.Length)
                         return 1;
 
-                    if (_data.Length < ids.Length)
+                    if (data.Length < ids.Length)
                         return -1;
                 }
             }
+
             return cmpVal;
         }
 
@@ -344,16 +335,16 @@ namespace SnmpSharpNet.Types
         /// <returns>0 if equal, -1 if less then and 1 if greater then.</returns>
         public virtual int Compare(Oid cmp)
         {
-            if (((Object)cmp) == null)
+            if (((object)cmp) == null)
                 return 1;
 
-            if (cmp.GetData() == null && _data == null)
+            if (cmp.GetData() == null && data == null)
                 return 0;
 
-            if (cmp.GetData() != null && _data == null)
+            if (cmp.GetData() != null && data == null)
                 return 1;
 
-            if (cmp.GetData() == null && _data != null)
+            if (cmp.GetData() == null && data != null)
                 return -1;
 
             return Compare(cmp.GetData());
@@ -362,19 +353,19 @@ namespace SnmpSharpNet.Types
         /// <summary> Test for equality. Returns true if 'o' is an instance of an Oid and is equal to self.</summary>
         /// <param name="obj">The object to be tested for equality.</param>
         /// <returns> True if the object is an Oid and is equal to self. False otherwise.</returns>
-        public override bool Equals(System.Object obj)
+        public override bool Equals(object obj)
         {
             if (obj == null)
                 return false;
 
             if (obj is Oid)
-                return (CompareExact(((Oid)obj)._data) == 0);
+                return CompareExact(((Oid)obj).data) == 0;
 
             if (obj is string)
-                return (CompareExact(Parse((string)obj)) == 0);
+                return CompareExact(Parse((string)obj)) == 0;
 
             if (obj is uint[])
-                return (CompareExact((uint[])obj) == 0);
+                return CompareExact((uint[])obj) == 0;
 
             return false;
         }
@@ -392,12 +383,10 @@ namespace SnmpSharpNet.Types
         /// </returns>
         public virtual bool IsRootOf(Oid leaf)
         {
-            return (Compare(leaf._data, _data == null ? 0 : _data.Length) == 0);
+            return Compare(leaf.data, data == null ? 0 : data.Length) == 0;
         }
 
-        /// <summary>
-        /// IComparable interface implementation. Internally uses <see cref="Oid.CompareExact(Oid)"/> method to perform comparisons.
-        /// </summary>
+        /// <summary>IComparable interface implementation. Internally uses <see cref="Oid.CompareExact(Oid)"/> method to perform comparisons.</summary>
         /// <param name="obj"></param>
         /// <returns>1 if class is greater then argument, -1 if class value is less then argument, 0 if the same</returns>
         public int CompareTo(object obj)
@@ -410,7 +399,6 @@ namespace SnmpSharpNet.Types
 
             return 1;
         }
-        #endregion Comparison methods
 
         /// <summary>
         /// Return internal integer array. This is required by static members of the class and other methods in
@@ -419,7 +407,7 @@ namespace SnmpSharpNet.Types
         /// <returns>Internal unsigned integer array buffer.</returns>
         protected uint[] GetData()
         {
-            return _data;
+            return data;
         }
 
         /// <summary>
@@ -427,7 +415,7 @@ namespace SnmpSharpNet.Types
         /// </summary>
         public void Reset()
         {
-            _data = null;
+            data = null;
         }
 
         /// <summary>
@@ -440,23 +428,21 @@ namespace SnmpSharpNet.Types
                 if (Length == 0)
                     return true;
 
-                if (Length == 2 && _data[0] == 0 && _data[1] == 0)
+                if (Length == 2 && data[0] == 0 && data[1] == 0)
                     return true;
 
                 return false;
             }
         }
 
-        /// <summary>
-        /// Convert the Oid class to a integer array. Internal class data buffer is *copied* and not passed to the caller.
-        /// </summary>
+        /// <summary>Convert the Oid class to a integer array. Internal class data buffer is *copied* and not passed to the caller.</summary>
         /// <returns>Unsigned integer array representing the Oid class IDs</returns>
         public uint[] ToArray()
         {
-            if (_data == null || _data.Length == 0)
+            if (data == null || data.Length == 0)
                 return null;
 
-            return _data.ToArray();
+            return data.ToArray();
         }
 
         /// <summary>Access individual Oid values.</summary>
@@ -467,10 +453,10 @@ namespace SnmpSharpNet.Types
         {
             get
             {
-                if (_data == null || index < 0 || index >= _data.Length)
+                if (data == null || index < 0 || index >= data.Length)
                     throw new OverflowException("Requested instance is outside the bounds of the Oid array");
 
-                return _data[index];
+                return data[index];
             }
         }
 
@@ -480,10 +466,10 @@ namespace SnmpSharpNet.Types
         /// <returns>Returns int array of child OIDs, if there was an error or no child IDs are present, returns null.</returns>
         public static uint[] GetChildIdentifiers(Oid root, Oid leaf)
         {
-            if (((Object)leaf) == null || leaf.IsNull)
+            if (((object)leaf) == null || leaf.IsNull)
                 return null;
 
-            if ((((Object)root) == null || root.IsNull) && ((Object)leaf) != null)
+            if ((((object)root) == null || root.IsNull) && ((object)leaf) != null)
                 return leaf.GetData().ToArray();
 
             if (!root.IsRootOf(leaf))
@@ -522,15 +508,13 @@ namespace SnmpSharpNet.Types
             return string.Join(".", vals.Skip(startpos).Select(x => x.ToString(CultureInfo.CurrentCulture)));
         }
 
-        #region Operators
-
         /// <summary>Add Oid class value and oid values in the integer array into a new class instance.</summary>
         /// <param name="oid">Oid class</param>
         /// <param name="ids">Unsigned integer array to add to the Oid</param>
         /// <returns>New Oid class with the two values added together</returns>
         public static Oid operator +(Oid oid, uint[] ids)
         {
-            if (((Object)oid) == null && ids == null)
+            if (((object)oid) == null && ids == null)
                 return null;
 
             if (ids == null)
@@ -538,7 +522,7 @@ namespace SnmpSharpNet.Types
 
             Oid newoid = new Oid(oid)
             {
-                ids
+                ids,
             };
 
             return newoid;
@@ -550,7 +534,7 @@ namespace SnmpSharpNet.Types
         /// <returns>New Oid class with the new oid value.</returns>
         public static Oid operator +(Oid oid, string strOids)
         {
-            if (((Object)oid) == null && (strOids == null || strOids.Length == 0))
+            if (((object)oid) == null && (strOids == null || strOids.Length == 0))
                 return null;
 
             if (strOids == null || strOids.Length == 0)
@@ -558,7 +542,7 @@ namespace SnmpSharpNet.Types
 
             Oid newoid = new Oid(oid)
             {
-                strOids
+                strOids,
             };
             return newoid;
         }
@@ -569,18 +553,18 @@ namespace SnmpSharpNet.Types
         /// <returns>New class with two Oid values added.</returns>
         public static Oid operator +(Oid oid1, Oid oid2)
         {
-            if (((Object)oid1) == null && ((Object)oid2) == null)
+            if (((object)oid1) == null && ((object)oid2) == null)
                 return null;
 
-            if ((Object)oid2 == null || oid2.IsNull)
+            if ((object)oid2 == null || oid2.IsNull)
                 return (Oid)oid1.Clone();
 
-            if ((Object)oid1 == null)
+            if ((object)oid1 == null)
                 return (Oid)oid2.Clone();
 
             Oid newoid = new Oid(oid1)
             {
-                oid2
+                oid2,
             };
             return newoid;
         }
@@ -591,12 +575,12 @@ namespace SnmpSharpNet.Types
         /// <returns>New Oid class with id added to the Oid class.</returns>
         public static Oid operator +(Oid oid1, uint id)
         {
-            if (((Object)oid1) == null)
+            if (((object)oid1) == null)
                 return null;
 
             Oid newoid = new Oid(oid1)
             {
-                id
+                id,
             };
             return newoid;
         }
@@ -604,7 +588,7 @@ namespace SnmpSharpNet.Types
         /// <summary>Operator allowing explicit conversion from Oid class to integer array int[]</summary>
         /// <param name="oid">Oid to present as integer array int[]</param>
         /// <returns>Integer array representing the Oid class value</returns>
-        public static explicit operator uint[] (Oid oid)
+        public static explicit operator uint[](Oid oid)
         {
             return oid.ToArray();
         }
@@ -616,10 +600,10 @@ namespace SnmpSharpNet.Types
         public static bool operator ==(Oid oid1, Oid oid2)
         {
             // I'm casting the oid values to Object to avoid recursive calls to this operator override.
-            if (((Object)oid1) == null && ((Object)oid2) == null)
+            if (((object)oid1) == null && ((object)oid2) == null)
                 return true;
 
-            if (((Object)oid1) == null || ((Object)oid2) == null)
+            if (((object)oid1) == null || ((object)oid2) == null)
                 return false;
 
             return oid1.Equals(oid2);
@@ -631,10 +615,10 @@ namespace SnmpSharpNet.Types
         /// <returns>true if class values are not the same, otherwise false</returns>
         public static bool operator !=(Oid oid1, Oid oid2)
         {
-            if (((Object)oid1) == null && ((Object)oid2) == null)
+            if (((object)oid1) == null && ((object)oid2) == null)
                 return false;
 
-            if (((Object)oid1) == null || ((Object)oid2) == null)
+            if (((object)oid1) == null || ((object)oid2) == null)
                 return true;
 
             return !oid1.Equals(oid2);
@@ -647,16 +631,16 @@ namespace SnmpSharpNet.Types
         /// <returns>True if first oid is greater then second, otherwise false</returns>
         public static bool operator >(Oid oid1, Oid oid2)
         {
-            if (((Object)oid1) == null && ((Object)oid2) == null)
+            if (((object)oid1) == null && ((object)oid2) == null)
                 return false;
 
-            if (((Object)oid1) == null)
+            if (((object)oid1) == null)
                 return false;
 
-            if (((Object)oid2) == null)
+            if (((object)oid2) == null)
                 return true;
 
-            return (oid1.Compare(oid2) > 0);
+            return oid1.Compare(oid2) > 0;
         }
 
         /// <summary>Less then operator.</summary>
@@ -666,19 +650,17 @@ namespace SnmpSharpNet.Types
         /// <returns>True if first oid is less then second, otherwise false</returns>
         public static bool operator <(Oid oid1, Oid oid2)
         {
-            if (((Object)oid1) == null && ((Object)oid2) == null)
+            if (((object)oid1) == null && ((object)oid2) == null)
                 return false;
 
-            if (((Object)oid1) == null)
+            if (((object)oid1) == null)
                 return true;
 
-            if (((Object)oid2) == null)
+            if (((object)oid2) == null)
                 return false;
 
-            return (oid1.Compare(oid2) < 0);
+            return oid1.Compare(oid2) < 0;
         }
-
-        #endregion Operators
 
         /// <summary>Converts the object identifier to a dotted decimal string representation.</summary>
         /// <returns> Returns the dotted decimal object id string.
@@ -686,16 +668,16 @@ namespace SnmpSharpNet.Types
         public override string ToString()
         {
             StringBuilder buf = new StringBuilder();
-            if (_data == null)
+            if (data == null)
                 buf.Append("0.0");
             else
             {
-                for (int x = 0; x < _data.Length; x++)
+                for (int x = 0; x < data.Length; x++)
                 {
                     if (x > 0)
                         buf.Append('.');
 
-                    buf.Append(_data[x].ToString());
+                    buf.Append(data[x].ToString());
                 }
             }
 
@@ -709,32 +691,29 @@ namespace SnmpSharpNet.Types
         {
             int hash = 0;
 
-            if (_data == null)
+            if (data == null)
                 return 0;
 
-            for (int i = 0; i < _data.Length; i++)
-                hash = hash ^ (_data[i] > Int32.MaxValue ? Int32.MaxValue : (int)_data[i]);
+            for (int i = 0; i < data.Length; i++)
+                hash = hash ^ (data[i] > int.MaxValue ? int.MaxValue : (int)data[i]);
 
             return hash;
         }
 
         /// <summary>Duplicate current object.</summary>
         /// <returns> Returns a new Oid copy of self cast as Object.</returns>
-        public override Object Clone()
+        public override object Clone()
         {
             return new Oid(this);
         }
-
-        #region Encode & Decode
 
         /// <summary>Encodes ASN.1 object identifier and append it to the end of the passed buffer.</summary>
         /// <param name="buffer">Buffer to append the encoded information to.</param>
         public override void Encode(MutableByte buffer)
         {
-
             MutableByte tmpBuffer = new MutableByte();
 
-            uint[] values = _data;
+            uint[] values = data;
             if (values == null || values.Length < 2)
             {
                 values = new uint[2];
@@ -749,7 +728,7 @@ namespace SnmpSharpNet.Types
                 throw new SnmpException("Invalid Object Identifier");
 
             // add the first oid!
-            tmpBuffer.Append((byte)(values[0] * 40 + values[1]));
+            tmpBuffer.Append((byte)((values[0] * 40) + values[1]));
 
             // encode remaining instance values
             for (int i = 2; i < values.Length; i++)
@@ -769,7 +748,7 @@ namespace SnmpSharpNet.Types
         {
             MutableByte result = new MutableByte();
             if (number <= 127)
-                result.Set((byte)(number));
+                result.Set((byte)number);
             else
             {
                 uint val = number;
@@ -780,7 +759,7 @@ namespace SnmpSharpNet.Types
 
                     byte bval = b[0];
                     if ((bval & 0x80) != 0)
-                        bval = (byte)(bval & ~HIGH_BIT); // clear high bit
+                        bval = (byte)(bval & ~HighBit); // clear high bit
 
                     val >>= 7; // shift original value by 7 bits
 
@@ -791,7 +770,7 @@ namespace SnmpSharpNet.Types
                 for (int i = tmp.Length - 1; i >= 0; i--)
                 {
                     if (i > 0)
-                        result.Append((byte)(tmp[i] | HIGH_BIT));
+                        result.Append((byte)(tmp[i] | HighBit));
                     else
                         result.Append(tmp[i]);
                 }
@@ -817,7 +796,7 @@ namespace SnmpSharpNet.Types
 
             if (headerLength == 0)
             {
-                _data = null;
+                data = null;
                 return offset;
             }
 
@@ -837,7 +816,7 @@ namespace SnmpSharpNet.Types
 
                 // this is where we decode individual values
                 {
-                    if ((buffer[offset] & HIGH_BIT) == 0)
+                    if ((buffer[offset] & HighBit) == 0)
                     {
                         // short encoding
                         result = buffer[offset];
@@ -851,9 +830,9 @@ namespace SnmpSharpNet.Types
                         bool completed = false;
                         do
                         {
-                            tmp.Append((byte)(buffer[offset] & ~HIGH_BIT));
+                            tmp.Append((byte)(buffer[offset] & ~HighBit));
 
-                            if ((buffer[offset] & HIGH_BIT) == 0)
+                            if ((buffer[offset] & HighBit) == 0)
                                 completed = true;
 
                             offset += 1; // advance offset
@@ -868,16 +847,17 @@ namespace SnmpSharpNet.Types
                         }
                     }
                 }
+
                 list.Add(result);
             }
-            _data = list.ToArray();
 
-            if (_data.Length == 2 && _data[0] == 0 && _data[1] == 0)
-                _data = null;
+            data = list.ToArray();
+
+            if (data.Length == 2 && data[0] == 0 && data[1] == 0)
+                data = null;
 
             return offset;
         }
-        #endregion Encode & Decode
 
         /// <summary>Parse string formatted oid value into an array of integers</summary>
         /// <param name="oidStr">string formatted oid</param>
@@ -886,7 +866,7 @@ namespace SnmpSharpNet.Types
         {
             if (oidStr == null || oidStr.Length <= 0)
                 return null;
-            
+
             // verify correct values are the only ones present in the string
             foreach (char c in oidStr.ToCharArray())
             {
@@ -897,7 +877,7 @@ namespace SnmpSharpNet.Types
             // check if oid starts with a '.' and remove it if it does
             if (oidStr[0] == '.')
                 oidStr = oidStr.Remove(0, 1);
-            
+
             // split string into an array
             string[] splitString = oidStr.Split(new char[] { '.' }, StringSplitOptions.None);
 
@@ -916,8 +896,8 @@ namespace SnmpSharpNet.Types
         /// <returns>An IEnumerator  object that can be used to iterate through the collection.</returns>
         public IEnumerator<uint> GetEnumerator()
         {
-            if (_data != null)
-                return ((IEnumerable<uint>)_data).GetEnumerator();
+            if (data != null)
+                return ((IEnumerable<uint>)data).GetEnumerator();
 
             return null;
         }
@@ -926,8 +906,8 @@ namespace SnmpSharpNet.Types
         /// <returns>An IEnumerator  object that can be used to iterate through the collection.</returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            if (_data != null)
-                return _data.GetEnumerator();
+            if (data != null)
+                return data.GetEnumerator();
 
             return null;
         }

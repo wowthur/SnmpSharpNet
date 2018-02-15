@@ -1,26 +1,26 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using System;
-using System.Text;
-using System.Collections.Generic;
-using SnmpSharpNet.Types;
-using SnmpSharpNet.Exception;
-
+//
 namespace SnmpSharpNet
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using SnmpSharpNet.Exception;
+    using SnmpSharpNet.Types;
+
     /// <summary>SNMP Protocol Data Unit</summary>
     /// <remarks>
     /// SNMP PDU class that is the bases for all SNMP requests and replies. It is capable of processing
@@ -31,54 +31,49 @@ namespace SnmpSharpNet
     /// pdu.VbList.AddVb("1.3.6.1.2.1.1.1.0");
     /// pdu.VbList.AddVb("1.3.6.1.2.1.1.2.0");
     /// </code>
-    /// 
+    ///
     /// By default, Pdu class initializes the RequestId (unique identifier of each SNMP request made by the manager)
     /// with a random value. User can force a new, random request id generation at the time packet is encoding by
     /// changing RequestId to 0. If you wish to set a specific RequestId, you can do it this way:
-    /// 
+    ///
     /// <code>
     /// Pdu pdu = new Pdu();
     /// pdu.Type = PduType.GetNext;
     /// pdu.RequestId = 11; // Set a custom request id
     /// pdu.VbList.AddVb("1.3.6.1.2.1.1");
     /// </code>
-    /// 
+    ///
     /// Pdu types with special options are notification PDUs, V2TRAP and INFORM, and Get-Bulk requests.
-    /// 
+    ///
     /// Get-Bulk request is available in version 2c and 3 of the SNMP. Two special options can be set for these
-    /// requests, NonRepeaters and MaxRepetitions. 
-    /// 
-    /// NonRepeaters is a value telling the agent how many OIDs in the VbList are to be treated as a single 
+    /// requests, NonRepeaters and MaxRepetitions.
+    ///
+    /// NonRepeaters is a value telling the agent how many OIDs in the VbList are to be treated as a single
     /// GetNext request.
-    /// 
+    ///
     /// MaxRepeaters tells the agent how many variable bindings to return in a single Pdu for each requested Oid.
     /// </remarks>
     public class Pdu : AsnType, ICloneable, IEnumerable<Vb>
     {
-
-        #region Internal variables
-
         /// <summary>SNMPv2 trap second Vb is the trap object ID.</summary>
         /// <remarks>
         /// This variable should be set to the trap OID and will be inserted
         /// into the encoded packet.
         /// </remarks>
-        protected Oid _trapObjectID;
-
-        #endregion Internal variables
+        protected Oid trapObjectID;
 
         /// <summary>Constructor.</summary>
         /// <remarks>Initializes all values to NULL and PDU type to GET</remarks>
         public Pdu()
         {
-            _errorIndex = new Integer32();
-            _errorStatus = new Integer32();
-            _requestId = new Integer32();
-            _requestId.SetRandom();
+            errorIndex = new Integer32();
+            errorStatus = new Integer32();
+            requestId = new Integer32();
+            requestId.SetRandom();
             base.Type = (byte)EPduType.Get;
             VbList = new VbCollection();
             TrapSysUpTime = new TimeTicks();
-            _trapObjectID = new Oid();
+            trapObjectID = new Oid();
         }
 
         /// <summary>Constructor.</summary>
@@ -91,8 +86,8 @@ namespace SnmpSharpNet
 
             if (base.Type == (byte)EPduType.GetBulk)
             {
-                _errorStatus.Value = 0;
-                _errorIndex.Value = 100;
+                errorStatus.Value = 0;
+                errorIndex.Value = 100;
             }
         }
 
@@ -113,7 +108,7 @@ namespace SnmpSharpNet
         public Pdu(VbCollection vbs, EPduType type, int requestId)
             : this(vbs)
         {
-            _requestId.Value = requestId;
+            this.requestId.Value = requestId;
             base.Type = (byte)type;
         }
 
@@ -146,7 +141,7 @@ namespace SnmpSharpNet
             if (value is Pdu pdu)
             {
                 Type = pdu.Type;
-                _requestId.Value = pdu.RequestId;
+                requestId.Value = pdu.RequestId;
 
                 if (Type == EPduType.GetBulk)
                 {
@@ -170,13 +165,14 @@ namespace SnmpSharpNet
 
         /// <summary>Set VbList</summary>
         /// <remarks>
-        /// Copy variable bindings from argument <see cref="VbCollection"/> into this classes variable 
+        /// Copy variable bindings from argument <see cref="VbCollection"/> into this classes variable
         /// binding collection
         /// </remarks>
         /// <param name="value"><see cref="VbCollection"/> to copy variable bindings from</param>
         public void SetVbList(VbCollection value)
         {
             VbList.Clear();
+
             foreach (Vb v in value)
                 VbList.Add(v);
         }
@@ -186,15 +182,15 @@ namespace SnmpSharpNet
         public void Reset()
         {
             VbList.Clear();
-            _errorStatus.Value = 0;
-            _errorIndex.Value = 0;
+            errorStatus.Value = 0;
+            errorIndex.Value = 0;
 
-            if (_requestId.Value == Int32.MaxValue)
-                _requestId.Value = 1;
+            if (requestId.Value == int.MaxValue)
+                requestId.Value = 1;
             else
-                _requestId.Value = _requestId.Value + 1;
+                requestId.Value = requestId.Value + 1;
 
-            _trapObjectID.Reset();
+            trapObjectID.Reset();
             TrapSysUpTime.Value = 0;
         }
 
@@ -211,7 +207,7 @@ namespace SnmpSharpNet
             {
                 Type = EPduType.Get,
                 ErrorIndex = 0,
-                ErrorStatus = 0
+                ErrorStatus = 0,
             };
 
             return p;
@@ -237,7 +233,7 @@ namespace SnmpSharpNet
             {
                 Type = EPduType.Set,
                 ErrorIndex = 0,
-                ErrorStatus = 0
+                ErrorStatus = 0,
             };
 
             return p;
@@ -263,7 +259,7 @@ namespace SnmpSharpNet
             {
                 Type = EPduType.GetNext,
                 ErrorIndex = 0,
-                ErrorStatus = 0
+                ErrorStatus = 0,
             };
 
             return p;
@@ -289,7 +285,7 @@ namespace SnmpSharpNet
             {
                 Type = EPduType.GetBulk,
                 MaxRepetitions = 100,
-                NonRepeaters = 0
+                NonRepeaters = 0,
             };
 
             return p;
@@ -301,6 +297,8 @@ namespace SnmpSharpNet
         {
             return new Pdu(EPduType.GetBulk);
         }
+
+        protected Integer32 errorStatus;
 
         /// <summary>ErrorStatus Pdu value</summary>
         /// <remarks>
@@ -314,14 +312,17 @@ namespace SnmpSharpNet
             {
                 if (Type == EPduType.GetBulk)
                     throw new SnmpInvalidPduTypeException("ErrorStatus property is not valid for GetBulk packets.");
-                return (EPduErrorStatus) _errorStatus.Value;
+
+                return (EPduErrorStatus)errorStatus.Value;
             }
+
             set
             {
-                _errorStatus.Value = (int) value;
+                errorStatus.Value = (int)value;
             }
         }
-        protected Integer32 _errorStatus;
+
+        private Integer32 errorIndex;
 
         /// <summary>ErrorIndex Pdu value</summary>
         /// <remarks>
@@ -337,22 +338,23 @@ namespace SnmpSharpNet
                 if (Type == EPduType.GetBulk)
                     throw new SnmpInvalidPduTypeException("ErrorStatus property is not valid for GetBulk packets.");
 
-                return _errorIndex.Value;
+                return errorIndex.Value;
             }
+
             set
             {
-                _errorIndex.Value = value;
+                errorIndex.Value = value;
             }
         }
-        protected Integer32 _errorIndex;
+
+        private Integer32 requestId;
 
         /// <summary>SNMP packet request id that is sent to the SNMP agent. SET this value before making SNMP requests.</summary>
         public int RequestId
         {
-            set { _requestId.Value = value; }
-            get { return _requestId.Value; }
+            get { return requestId.Value; }
+            set { requestId.Value = value; }
         }
-        protected Integer32 _requestId;
 
         /// <summary>Get or SET the PDU type. Available types are GET, GETNEXT, SET, GETBULK. PDU types are defined in Pdu class.</summary>
         /// <seealso cref="EPduType.Get"/>
@@ -363,29 +365,31 @@ namespace SnmpSharpNet
         /// <seealso cref="EPduType.GetBulk"/>
         public new EPduType Type
         {
-            set
-            {
-                if (base.Type == (byte)value)
-                    return; // nothing has changed
-                            // If type changes from GETBULK make sure errorIndex and errorStatus are set to 0
-                            // otherwise you'll send error messages to the receiver
-
-                if (value != EPduType.GetBulk)
-                {
-                    _errorIndex.Value = 0;
-                    _errorStatus.Value = 0;
-                }
-                else
-                {
-                    _errorStatus.Value = 0;
-                    _errorIndex.Value = 100;
-                }
-
-                base.Type = (byte)value;
-            }
             get
             {
                 return (EPduType)base.Type;
+            }
+
+            set
+            {
+                // If nothing has changed
+                // If type changes from GETBULK make sure errorIndex and errorStatus are set to 0
+                // otherwise you'll send error messages to the receiver
+                if (base.Type == (byte)value)
+                    return;
+
+                if (value != EPduType.GetBulk)
+                {
+                    errorIndex.Value = 0;
+                    errorStatus.Value = 0;
+                }
+                else
+                {
+                    errorStatus.Value = 0;
+                    errorIndex.Value = 100;
+                }
+
+                base.Type = (byte)value;
             }
         }
 
@@ -393,19 +397,20 @@ namespace SnmpSharpNet
         /// <exception cref="SnmpInvalidPduTypeException">Thrown when PDU type is not GET-BULK</exception>
         public int MaxRepetitions
         {
-            set
-            {
-                if (Type == EPduType.GetBulk)
-                    _errorIndex.Value = value;
-                else
-                    throw new SnmpInvalidPduTypeException("NonRepeaters property is only available in GET-BULK PDU type.");
-            }
             get
             {
                 if (Type == EPduType.GetBulk)
-                    return _errorIndex.Value;
+                    return errorIndex.Value;
 
                 throw new SnmpInvalidPduTypeException("NonRepeaters property is only available in GET-BULK PDU type.");
+            }
+
+            set
+            {
+                if (Type == EPduType.GetBulk)
+                    errorIndex.Value = value;
+                else
+                    throw new SnmpInvalidPduTypeException("NonRepeaters property is only available in GET-BULK PDU type.");
             }
         }
 
@@ -418,18 +423,19 @@ namespace SnmpSharpNet
         /// <exception cref="SnmpInvalidPduTypeException">Thrown when PDU type is not GET-BULK</exception>
         public int NonRepeaters
         {
-            set
-            {
-                if (base.Type == (byte)EPduType.GetBulk)
-                    _errorStatus.Value = value;
-                else
-                    throw new SnmpInvalidPduTypeException("NonRepeaters property is only available in GET-BULK PDU type.");
-            }
             get
             {
                 if (Type == EPduType.GetBulk)
-                    return _errorStatus.Value;
+                    return errorStatus.Value;
                 throw new SnmpInvalidPduTypeException("NonRepeaters property is only available in GET-BULK PDU type.");
+            }
+
+            set
+            {
+                if (base.Type == (byte)EPduType.GetBulk)
+                    errorStatus.Value = value;
+                else
+                    throw new SnmpInvalidPduTypeException("NonRepeaters property is only available in GET-BULK PDU type.");
             }
         }
 
@@ -448,12 +454,10 @@ namespace SnmpSharpNet
                 if (Type != EPduType.V2Trap && Type != EPduType.Inform && Type != EPduType.Response)
                     throw new SnmpInvalidPduTypeException("TrapObjectID value can only be accessed in V2TRAP, INFORM and RESPONSE PDUs");
 
-                return _trapObjectID;
+                return trapObjectID;
             }
-            set
-            {
-                _trapObjectID.Set(value);
-            }
+
+            set { trapObjectID.Set(value); }
         }
 
         /// <summary>Get VB from VarBind list at the specified index</summary>
@@ -478,13 +482,11 @@ namespace SnmpSharpNet
                 VbList.RemoveAt(pos);
         }
 
-        #region Encode & Decode methods
-
         /// <summary>Encode Pdu class to BER byte buffer</summary>
         /// <remarks>
         /// Encodes the protocol data unit using the passed encoder and stores
-        /// the results in the passed buffer. An exception is thrown if an 
-        /// error occurs with the encoding of the information. 
+        /// the results in the passed buffer. An exception is thrown if an
+        /// error occurs with the encoding of the information.
         /// </remarks>
         /// <param name="buffer">The buffer to write the encoded information.</param>
         public override void Encode(MutableByte buffer)
@@ -492,22 +494,21 @@ namespace SnmpSharpNet
             MutableByte tmpBuffer = new MutableByte();
 
             // if request id is 0, get a random value
-            if (_requestId.Value == 0)
-                _requestId.SetRandom();
+            if (requestId.Value == 0)
+                requestId.SetRandom();
 
-            _requestId.Encode(tmpBuffer);
-            _errorStatus.Encode(tmpBuffer);
-            _errorIndex.Encode(tmpBuffer);
+            requestId.Encode(tmpBuffer);
+            errorStatus.Encode(tmpBuffer);
+            errorIndex.Encode(tmpBuffer);
 
             // if V2TRAP PDU type, add sysUpTime and trapObjectID OIDs before encoding VarBind
-
             if (Type == EPduType.V2Trap || Type == EPduType.Inform)
             {
                 if (VbList.Count == 0)
                 {
                     // add sysUpTime and trapObjectID to the VbList
                     VbList.Add(SnmpConstants.SysUpTime, TrapSysUpTime);
-                    VbList.Add(SnmpConstants.TrapObjectId, _trapObjectID);
+                    VbList.Add(SnmpConstants.TrapObjectId, trapObjectID);
                 }
                 else
                 {
@@ -532,7 +533,7 @@ namespace SnmpSharpNet
                         // if second Vb in the VarBinds array is not trapObjectId encode the value
                         if (!VbList[1].Oid.Equals(SnmpConstants.TrapObjectId))
                         {
-                            Vb trapObjectIdVb = new Vb(SnmpConstants.TrapObjectId, _trapObjectID);
+                            Vb trapObjectIdVb = new Vb(SnmpConstants.TrapObjectId, trapObjectID);
                             VbList.Insert(1, trapObjectIdVb);
                         }
                     }
@@ -567,13 +568,13 @@ namespace SnmpSharpNet
             base.Type = asnType;
 
             // request id
-            offset = _requestId.Decode(buffer, offset);
+            offset = requestId.Decode(buffer, offset);
 
             // error status
-            offset = _errorStatus.Decode(buffer, offset);
+            offset = errorStatus.Decode(buffer, offset);
 
             // error index
-            offset = _errorIndex.Decode(buffer, offset);
+            offset = errorIndex.Decode(buffer, offset);
 
             // clean out the current variables
             VbList.Clear();
@@ -592,11 +593,12 @@ namespace SnmpSharpNet
                         VbList.RemoveAt(0); // remove sysUpTime
                     }
                 }
+
                 if (VbList.Count > 0)
                 {
                     if (VbList[0].Oid.Equals(SnmpConstants.TrapObjectId))
                     {
-                        _trapObjectID.Set((Oid)VbList[0].Value);
+                        trapObjectID.Set((Oid)VbList[0].Value);
                         VbList.RemoveAt(0); // remove sysUpTime
                     }
                 }
@@ -604,9 +606,6 @@ namespace SnmpSharpNet
 
             return offset;
         }
-        #endregion
-
-        #region Overrides
 
         /// <summary>Return string dump of the Pdu class.</summary>
         /// <returns>String content of the Pdu class.</returns>
@@ -669,13 +668,13 @@ namespace SnmpSharpNet
 
         /// <summary>Clone this object</summary>
         /// <returns>Copy of this object cast as type System.Object</returns>
-        public override Object Clone()
+        public override object Clone()
         {
-            Pdu p = new Pdu(VbList, Type, _requestId);
+            Pdu p = new Pdu(VbList, Type, requestId);
             if (Type == EPduType.GetBulk)
             {
-                p.NonRepeaters = _errorStatus;
-                p.MaxRepetitions = _errorIndex;
+                p.NonRepeaters = errorStatus;
+                p.MaxRepetitions = errorIndex;
             }
             else
             {
@@ -694,7 +693,7 @@ namespace SnmpSharpNet
 
         /// <summary>
         /// Check class equality with argument.
-        /// 
+        ///
         /// Accepted argument types are:
         /// * Integer32 - compared against the request id
         /// * Pdu - compared against PduType, request id and contents of VarBind list
@@ -707,7 +706,7 @@ namespace SnmpSharpNet
                 return false;
 
             if (obj is Integer32)
-                return (((Integer32)obj) == _requestId);
+                return ((Integer32)obj) == requestId;
 
             if (obj is Pdu p)
             {
@@ -744,10 +743,6 @@ namespace SnmpSharpNet
         {
             return (byte)Type | RequestId;
         }
-
-        #endregion // Overrides
-
-        #region Quick access methods
 
         /// <summary>Indexed access to VarBind collection of the Pdu.</summary>
         /// <param name="index">Index position of the VarBind entry</param>
@@ -808,7 +803,5 @@ namespace SnmpSharpNet
         {
             return ((System.Collections.IEnumerable)VbList).GetEnumerator();
         }
-
-        #endregion
     }
 }

@@ -1,7 +1,7 @@
-﻿using SnmpSharpNet.Types;
-
-namespace SnmpSharpNet
+﻿namespace SnmpSharpNet
 {
+    using SnmpSharpNet.Types;
+
     /// <summary>SNMP target interface</summary>
     public interface ITarget
     {

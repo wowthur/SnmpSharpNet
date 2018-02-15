@@ -1,24 +1,24 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Exception;
-using System;
-using System.Globalization;
-
+//
 namespace SnmpSharpNet.Types
 {
+    using System;
+    using System.Globalization;
+    using SnmpSharpNet.Exception;
+
     /// <summary>ASN.1 Counter64 value implementation.</summary>
     /// <remarks>
     /// Counter64 value is unsigned 64-bit integer value that is incremented by the agent
@@ -26,44 +26,45 @@ namespace SnmpSharpNet.Types
     /// roll over to 0.
     /// </remarks>
     [Serializable]
-    public class Counter64 : AsnType, IComparable<UInt64>, IComparable<Counter64>, ICloneable
+    public class Counter64 :
+        AsnType,
+        IComparable<ulong>,
+        IComparable<Counter64>,
+        ICloneable
     {
-        /// <summary>
-        /// Internal 64-bit unsigned integer value.
-        /// </summary>
-        protected UInt64 _value;
+        /// <summary>Internal 64-bit unsigned integer value.</summary>
+        private ulong value;
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
+        /// <summary>Constructor.</summary>
         public Counter64()
         {
-            Type = SnmpConstants.SMI_COUNTER64;
+            Type = SnmpConstants.SmiCounter64;
         }
 
         /// <summary>Constructor.</summary>
         /// <param name="value">Value to set class value.
         /// </param>
-        public Counter64(long value) : this()
+        public Counter64(long value)
+            : this()
         {
-            _value = Convert.ToUInt64(value);
+            this.value = Convert.ToUInt64(value);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
+        /// <summary>Constructor</summary>
         /// <param name="value">Copy value</param>
-        public Counter64(Counter64 value) : this()
+        public Counter64(Counter64 value)
+            : this()
         {
-            _value = value.Value;
+            this.value = value.Value;
         }
 
         /// <summary>Constructor.</summary>
         /// <param name="value">Value to initialize the class with.
         /// </param>
-        public Counter64(UInt64 value) : this()
+        public Counter64(ulong value)
+            : this()
         {
-            _value = value;
+            this.value = value;
         }
 
         /// <summary>Constructor.</summary>
@@ -73,36 +74,33 @@ namespace SnmpSharpNet.Types
         /// </remarks>
         /// <param name="value">64-bit unsigned integer value encoded as a string.
         /// </param>
-        public Counter64(string value) : this()
+        public Counter64(string value)
+            : this()
         {
             Set(value);
         }
 
-        /// <summary>Get/Set class 64-bit unsigned value
-        /// </summary>
-        virtual public UInt64 Value
+        /// <summary>Get/Set class 64-bit unsigned value</summary>
+        public virtual ulong Value
         {
-            get { return _value; }
-            set { _value = value; }
+            get { return value; }
+            set { this.value = value; }
         }
 
-        /// <summary>
-        /// SET class value from another Counter64 class cast as <seealso cref="AsnType"/>.
-        /// </summary>
+        /// <summary>SET class value from another Counter64 class cast as <seealso cref="AsnType"/>.</summary>
         /// <param name="value">Counter64 class cast as <seealso cref="AsnType"/></param>
         /// <exception cref="ArgumentException">Argument is not Counter64 type.</exception>
         public void Set(AsnType value)
         {
             Counter64 val = value as Counter64;
+
             if (val != null)
-                _value = val.Value;
+                this.value = val.Value;
             else
                 throw new ArgumentException("Invalid argument type.");
         }
 
-        /// <summary>
-        /// Parse an Counter64 value from a string.
-        /// </summary>
+        /// <summary>Parse an Counter64 value from a string.</summary>
         /// <param name="value">String containing an Counter64 value</param>
         /// <exception cref="ArgumentOutOfRangeException">Argument length is 0 (zero)</exception>
         /// <exception cref="ArgumentException">Unable to parse Counter64 value from the argument.</exception>
@@ -113,7 +111,7 @@ namespace SnmpSharpNet.Types
 
             try
             {
-                _value = Convert.ToUInt64(value, CultureInfo.CurrentCulture);
+                this.value = Convert.ToUInt64(value, CultureInfo.CurrentCulture);
             }
             catch
             {
@@ -121,25 +119,22 @@ namespace SnmpSharpNet.Types
             }
         }
 
-
         /// <summary>Duplicate current object.</summary>
         /// <returns>Duplicate of the current object.</returns>
-        public override Object Clone()
+        public override object Clone()
         {
             return new Counter64(this);
         }
 
-        /// <summary>
-        /// Return class value hash code
-        /// </summary>
+        /// <summary>Return class value hash code</summary>
         /// <returns>Int32 hash of the class stored value</returns>
         public override int GetHashCode()
         {
-            return _value.GetHashCode();
+            return value.GetHashCode();
         }
 
         /// <summary>
-        /// Compare class value against the object argument. Supported argument types are 
+        /// Compare class value against the object argument. Supported argument types are
         /// <see cref="Counter64"/> and UInt64.
         /// </summary>
         /// <param name="obj">Object to compare values with</param>
@@ -148,41 +143,37 @@ namespace SnmpSharpNet.Types
         {
             if (obj == null)
                 return false;
+
             if (obj is Counter64)
-                return _value.Equals(((Counter64)obj).Value);
-            if (obj is UInt64)
-                return _value.Equals((UInt64)obj);
+                return value.Equals(((Counter64)obj).Value);
+
+            if (obj is ulong)
+                return value.Equals((ulong)obj);
 
             return false;
         }
 
-        /// <summary>
-        /// Returns the string representation of the object.
-        /// </summary>
+        /// <summary>Returns the string representation of the object.</summary>
         /// <returns>String representation of the object value</returns>
         public override string ToString()
         {
             return Value.ToString(CultureInfo.CurrentCulture);
         }
 
-        /// <summary>
-        /// Implicit casting of Counter64 value as UInt64 value
-        /// </summary>
+        /// <summary>Implicit casting of Counter64 value as UInt64 value</summary>
         /// <param name="value">Counter64 class whose value is cast as UInt64 value</param>
         /// <returns>UInt64 value of the Counter64 class.</returns>
-        public static implicit operator UInt64(Counter64 value)
+        public static implicit operator ulong(Counter64 value)
         {
             return value.Value;
         }
-
-        #region Encode & Decode methods
 
         /// <summary>BER encode class value</summary>
         /// <param name="buffer">MutableByte to append BER encoded value to.
         /// </param>
         public override void Encode(MutableByte buffer)
         {
-            byte[] b = BitConverter.GetBytes(_value);
+            byte[] b = BitConverter.GetBytes(value);
             MutableByte tmp = new MutableByte();
 
             for (int i = b.Length - 1; i >= 0; i--)
@@ -198,16 +189,13 @@ namespace SnmpSharpNet.Types
             buffer.Append(tmp);
         }
 
-        /// <summary>Decode BER encoded Counter64 value
-        /// </summary>
+        /// <summary>Decode BER encoded Counter64 value</summary>
         /// <param name="buffer">The encoded ASN.1 data</param>
         /// <param name="offset">Offset to start value decoding from.</param>
         /// <returns>Offset after the parsed value.</returns>
         public override int Decode(byte[] buffer, int offset)
         {
-            //
             // parse the header first
-            //
             byte asnType = ParseHeader(buffer, ref offset, out int headerLength);
 
             if (asnType != Type)
@@ -237,27 +225,20 @@ namespace SnmpSharpNet.Types
                 headerLength -= 1;
             }
 
-            _value = BitConverter.ToUInt64(tmpBuf, 0);
+            value = BitConverter.ToUInt64(tmpBuf, 0);
 
             return offset;
         }
 
-        #endregion
-
-
-        /// <summary>
-        /// Compare class value with the UInt64 variable
-        /// </summary>
+        /// <summary>Compare class value with the UInt64 variable</summary>
         /// <param name="other">Variable to compare with</param>
         /// <returns>less then 0 if if parameter is less then, 0 if paramater is equal and greater then 0 if parameter is greater then the class value</returns>
-        public int CompareTo(UInt64 other)
+        public int CompareTo(ulong other)
         {
-            return _value.CompareTo(other);
+            return value.CompareTo(other);
         }
 
-        /// <summary>
-        /// Compare class value with the value of the second class
-        /// </summary>
+        /// <summary>Compare class value with the value of the second class</summary>
         /// <param name="other">Class whose value we are comparing with</param>
         /// <returns>less then 0 if if parameter is less then, 0 if paramater is equal and greater then 0 if parameter is greater then the class value</returns>
         public int CompareTo(Counter64 other)
@@ -265,12 +246,10 @@ namespace SnmpSharpNet.Types
             if (other == null)
                 return -1;
 
-            return _value.CompareTo(other.Value);
+            return value.CompareTo(other.Value);
         }
 
-        /// <summary>
-        /// Check for equality of class values
-        /// </summary>
+        /// <summary>Check for equality of class values</summary>
         /// <param name="first">First class value to compare</param>
         /// <param name="second">Second class value to compare</param>
         /// <returns>True if values are the same, otherwise false</returns>
@@ -278,15 +257,14 @@ namespace SnmpSharpNet.Types
         {
             if ((object)first == null && (object)second == null)
                 return true;
+
             if ((object)first == null || (object)second == null)
                 return false;
 
             return first.Equals(second);
         }
 
-        /// <summary>
-        /// Negative comparison
-        /// </summary>
+        /// <summary>Negative comparison</summary>
         /// <param name="first">First class value to compare</param>
         /// <param name="second">Second class value to compare</param>
         /// <returns>False if values are the same, otherwise true</returns>
@@ -298,12 +276,10 @@ namespace SnmpSharpNet.Types
             if ((object)first == null || (object)second == null)
                 return true;
 
-            return (!first.Equals(second));
+            return !first.Equals(second);
         }
 
-        /// <summary>
-        /// Greater then operator
-        /// </summary>
+        /// <summary>Greater then operator</summary>
         /// <remarks>Compare two Counter64 class values and return true if first class value is greater then second.</remarks>
         /// <param name="first">First class</param>
         /// <param name="second">Second class</param>
@@ -325,9 +301,7 @@ namespace SnmpSharpNet.Types
             return false;
         }
 
-        /// <summary>
-        /// Less then operator
-        /// </summary>
+        /// <summary>Less then operator</summary>
         /// <remarks>Compare two Counter64 class values and return true if first class value is less then second.</remarks>
         /// <param name="first">First class</param>
         /// <param name="second">Second class</param>
@@ -336,18 +310,20 @@ namespace SnmpSharpNet.Types
         {
             if ((object)first == null && (object)second == null)
                 return false;
+
             if ((object)first == null)
                 return true;
+
             if ((object)second == null)
                 return false;
+
             if (first.Value < second.Value)
                 return true;
+
             return false;
         }
 
-        /// <summary>
-        /// Addition operator.
-        /// </summary>
+        /// <summary>Addition operator.</summary>
         /// <remarks>
         /// Add two Counter64 object values. Values of the two objects are added and
         /// a new class is instantiated with the result. Original values of the two parameter classes
@@ -362,18 +338,20 @@ namespace SnmpSharpNet.Types
         {
             if (first == null && second == null)
                 return null;
+
             if (first == null)
                 return new Counter64(second);
+
             if (second == null)
                 return new Counter64(first);
+
             return new Counter64(first.Value + second.Value);
         }
-        /// <summary>
-        /// Subtraction operator
-        /// </summary>
+
+        /// <summary>Subtraction operator</summary>
         /// <remarks>
-        /// Subtract the value of the second Counter64 class value from the first Counter64 class value. 
-        /// Values of the two objects are subtracted and a new class is instantiated with the result. 
+        /// Subtract the value of the second Counter64 class value from the first Counter64 class value.
+        /// Values of the two objects are subtracted and a new class is instantiated with the result.
         /// Original values of the two parameter classes are preserved.
         /// </remarks>
         /// <param name="first">First Counter64 object</param>
@@ -385,32 +363,34 @@ namespace SnmpSharpNet.Types
         {
             if (first == null && second == null)
                 return null;
+
             if (first == null)
                 return new Counter64(second);
+
             if (second == null)
                 return new Counter64(first);
+
             return new Counter64(first.Value - second.Value);
         }
-        /// <summary>
-        /// Return difference between two Counter64 values taking counter roll-over into account.
-        /// </summary>
+
+        /// <summary>Return difference between two Counter64 values taking counter roll-over into account.</summary>
         /// <param name="first">First or older value</param>
         /// <param name="second">Second or newer value</param>
         /// <returns>Difference between the two values</returns>
-        public static UInt64 Diff(Counter64 first, Counter64 second)
+        public static ulong Diff(Counter64 first, Counter64 second)
         {
-            UInt64 f = first.Value;
-            UInt64 s = second.Value;
-            UInt64 res = 0;
+            ulong f = first.Value;
+            ulong s = second.Value;
+            ulong res = 0;
+
             if (s > f)
             {
                 // in case of a roll-over event
-                res = (UInt64.MaxValue - f) + s;
+                res = (ulong.MaxValue - f) + s;
             }
             else
-            {
                 res = s - f;
-            }
+
             return res;
         }
     }

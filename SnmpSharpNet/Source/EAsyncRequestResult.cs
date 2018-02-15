@@ -34,6 +34,6 @@
         EncodeError,
 
         /// <summary>Error decoding SNMP packet</summary>
-        DecodeError
+        DecodeError,
     }
 }

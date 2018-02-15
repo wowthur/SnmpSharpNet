@@ -1,72 +1,73 @@
 ﻿// This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Exception;
-using SnmpSharpNet.Types;
-
+//
 namespace SnmpSharpNet
 {
+    using SnmpSharpNet.Exception;
+    using SnmpSharpNet.Types;
+
     /// <summary>SNMP Agent specific values.</summary>
     /// <remarks>
     /// This class stores values to access SNMP version 1 and version 2
     /// agents.
-    /// 
+    ///
     /// Pass this class with your request data (Pdu) to the request method of the target class to make
     /// a request.
     /// </remarks>
     public class AgentParameters : IAgentParameters
     {
         /// <summary>Agent protocol version</summary>
-        protected Integer32 _version;
+        protected Integer32 version;
 
         /// <summary>SNMP community name for SNMP v1 and v2 protocol versions</summary>
-        protected OctetString _community;
+        protected OctetString community;
 
         /// <summary>
         /// Flag that disables checking of host IP address and port number from which reply is received. If not disabled, only
         /// replies from the host IP/port to which request was sent will be considered valid and all others will be ignored.
-        /// 
+        ///
         /// Default value is: false (reply source check is enabled)
-        /// 
+        ///
         /// Set to true if you wish to disable this check.
         /// </summary>
-        protected bool _disableReplySourceCheck;
+        protected bool disableReplySourceCheck;
 
         /// <summary>Standard constructor</summary>
         public AgentParameters()
         {
-            _version = new Integer32((int)ESnmpVersion.Ver1);
-            _community = new OctetString("public");
-            _disableReplySourceCheck = false;
+            version = new Integer32((int)ESnmpVersion.Ver1);
+            community = new OctetString("public");
+            disableReplySourceCheck = false;
         }
 
         /// <summary>Copy constructor. Initialize the class with the values of the parameter class values.</summary>
         /// <param name="second">Parameter class.</param>
         public AgentParameters(AgentParameters second)
         {
-            _version.Value = (int)second.Version;
-            _community.Set(second.Community);
-            _disableReplySourceCheck = second.DisableReplySourceCheck;
+            version.Value = (int)second.Version;
+            community.Set(second.Community);
+            disableReplySourceCheck = second.DisableReplySourceCheck;
         }
 
         /// <summary>Constructor</summary>
         /// <param name="version">SNMP protocol version. Acceptable values are SnmpConstants.SNMPV1 and
         /// SnmpConstants.SNMPV2</param>
-        public AgentParameters(ESnmpVersion version) : this()
+        public AgentParameters(ESnmpVersion version)
+            : this()
         {
-            _version.Value = (int)version;
+            this.version.Value = (int)version;
         }
 
         /// <summary>Constructor</summary>
@@ -74,7 +75,7 @@ namespace SnmpSharpNet
         public AgentParameters(OctetString community)
             : this()
         {
-            _community.Set(community);
+            this.community.Set(community);
         }
 
         /// <summary>Constructor</summary>
@@ -83,7 +84,7 @@ namespace SnmpSharpNet
         public AgentParameters(ESnmpVersion version, OctetString community)
             : this(version)
         {
-            _community.Set(community);
+            this.community.Set(community);
         }
 
         /// <summary>Constructor</summary>
@@ -93,7 +94,7 @@ namespace SnmpSharpNet
         public AgentParameters(ESnmpVersion version, OctetString community, bool disableReplySourceCheck)
             : this(version, community)
         {
-            _disableReplySourceCheck = disableReplySourceCheck;
+            this.disableReplySourceCheck = disableReplySourceCheck;
         }
 
         /// <summary>Get/Set SNMP protocol version.</summary>
@@ -101,12 +102,14 @@ namespace SnmpSharpNet
         /// other then version 1 or 2c</exception>
         public virtual ESnmpVersion Version
         {
-            get { return (ESnmpVersion)_version.Value; }
+            get { return (ESnmpVersion)version.Value; }
+
             set
             {
                 if (value != ESnmpVersion.Ver1 && value != ESnmpVersion.Ver2)
                     throw new SnmpInvalidVersionException("Valid SNMP versions are 1 or 2");
-                _version.Value = (int)value;
+
+                version.Value = (int)value;
             }
         }
 
@@ -114,13 +117,13 @@ namespace SnmpSharpNet
         /// <returns>Integer32 object</returns>
         public Integer32 GetVersion()
         {
-            return _version;
+            return version;
         }
 
         /// <summary>Get SNMP version 1 or 2 community name object</summary>
-        virtual public OctetString Community
+        public virtual OctetString Community
         {
-            get { return _community; }
+            get { return community; }
         }
 
         /// <summary>
@@ -129,19 +132,20 @@ namespace SnmpSharpNet
         /// </summary>
         public bool DisableReplySourceCheck
         {
-            get { return _disableReplySourceCheck; }
-            set { _disableReplySourceCheck = value; }
+            get { return disableReplySourceCheck; }
+            set { disableReplySourceCheck = value; }
         }
 
         /// <summary>Validate object.</summary>
         /// <returns>true if object is valid, otherwise false</returns>
         public bool Valid()
         {
-            if (_community != null && _community.Length > 0 && _version != null)
+            if (community != null && community.Length > 0 && version != null)
             {
-                if (_version.Value == (int)ESnmpVersion.Ver1 || _version.Value == (int)ESnmpVersion.Ver2)
+                if (version.Value == (int)ESnmpVersion.Ver1 || version.Value == (int)ESnmpVersion.Ver2)
                     return true;
             }
+
             return false;
         }
 
@@ -153,13 +157,9 @@ namespace SnmpSharpNet
         public void InitializePacket(SnmpPacket packet)
         {
             if (packet is SnmpV1Packet pkt)
-            {
-                pkt.Community.Set(_community);
-            }
+                pkt.Community.Set(community);
             else if (packet is SnmpV2Packet pktV2)
-            {
-                pktV2.Community.Set(_community);
-            }
+                pktV2.Community.Set(community);
             else
                 throw new SnmpInvalidVersionException("Invalid SNMP version.");
         }

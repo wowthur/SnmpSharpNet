@@ -1,9 +1,9 @@
-using SnmpSharpNet.Exception;
-using System;
-using System.Linq;
-
 namespace SnmpSharpNet.Types
 {
+    using System;
+    using System.Linq;
+    using SnmpSharpNet.Exception;
+
     /// <summary>Represents SNMP sequence</summary>
     [Serializable]
     public class Sequence :
@@ -11,14 +11,14 @@ namespace SnmpSharpNet.Types
         ICloneable
     {
         /// <summary>data buffer</summary>
-        protected byte[] _data;
+        protected byte[] data;
 
         /// <summary>Constructor</summary>
-        public Sequence() :
-            base()
+        public Sequence()
+            : base()
         {
-            Type = SnmpConstants.SMI_SEQUENCE;
-            _data = null;
+            Type = SnmpConstants.SmiSequence;
+            data = null;
         }
 
         /// <summary>Constructor.</summary>
@@ -27,7 +27,7 @@ namespace SnmpSharpNet.Types
             : this()
         {
             if (value != null && value.Length > 0)
-                _data = value.ToArray();
+                data = value.ToArray();
         }
 
         /// <summary>Set sequence data</summary>
@@ -35,9 +35,9 @@ namespace SnmpSharpNet.Types
         public void Set(byte[] value)
         {
             if (value == null || value.Length <= 0)
-                _data = null;
+                data = null;
             else
-                _data = value.ToArray();
+                data = value.ToArray();
         }
 
         /// <summary>BER encode sequence</summary>
@@ -45,13 +45,13 @@ namespace SnmpSharpNet.Types
         public override void Encode(MutableByte buffer)
         {
             int dataLen = 0;
-            if (_data != null && _data.Length > 0)
-                dataLen = _data.Length;
+            if (data != null && data.Length > 0)
+                dataLen = data.Length;
 
             BuildHeader(buffer, Type, dataLen);
 
             if (dataLen > 0)
-                buffer.Append(_data);
+                buffer.Append(data);
         }
 
         /// <summary>Decode sequence from the byte array. Returned offset value is advanced by the size of the sequence header.</summary>
@@ -60,7 +60,7 @@ namespace SnmpSharpNet.Types
         /// <returns>Returns offset position after the sequence header</returns>
         public override int Decode(byte[] buffer, int offset)
         {
-            _data = null;
+            data = null;
 
             int asnType = ParseHeader(buffer, ref offset, out int dataLen);
 
@@ -71,7 +71,7 @@ namespace SnmpSharpNet.Types
                 throw new OverflowException("Sequence longer then packet.");
 
             if (dataLen > 0)
-                _data = buffer.Skip(offset).Take(dataLen).ToArray();
+                data = buffer.Skip(offset).Take(dataLen).ToArray();
 
             return offset;
         }
@@ -79,14 +79,14 @@ namespace SnmpSharpNet.Types
         /// <summary>Get sequence data</summary>
         public byte[] Value
         {
-            get { return _data; }
+            get { return data; }
         }
 
         /// <summary>Clone sequence</summary>
         /// <returns>Cloned sequence cast as object</returns>
         public override object Clone()
         {
-            return new Sequence(_data);
+            return new Sequence(data);
         }
     }
 }

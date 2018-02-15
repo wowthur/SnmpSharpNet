@@ -1,22 +1,22 @@
 ﻿// This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using System;
-
+//
 namespace SnmpSharpNet.Exception
 {
+    using System;
+
     /// <summary>SNMP generic exception. Thrown every time SNMP specific error is encountered.</summary>
     [Serializable]
     public class SnmpException : System.Exception
@@ -25,19 +25,19 @@ namespace SnmpSharpNet.Exception
         {
             /// <summary>No error</summary>
             None = 0,
-            
+
             /// <summary>Security model specified in the packet is not supported</summary>
             UnsupportedSecurityModel,
-            
+
             /// <summary>Privacy enabled without authentication combination in a packet is not supported.
             UnsupportedNoAuthPriv,
-            
+
             /// <summary>
             /// Invalid length of the authentication parameter field. Expected length is 12 bytes when authentication is
             /// enabled. Same length is used for both MD5 and SHA-1 authentication protocols.
             /// </summary>
             InvalidAuthenticationParameterLength,
-            
+
             /// <summary>Authentication of the received packet failed.</summary>
             AuthenticationFailed,
 
@@ -91,7 +91,7 @@ namespace SnmpSharpNet.Exception
             OidValueTypeChanged,
 
             /// <summary>Specified Oid is invalid</summary>
-            InvalidOid
+            InvalidOid,
         }
 
         /// <summary>
@@ -99,14 +99,7 @@ namespace SnmpSharpNet.Exception
         /// the process handling the error to determine how critical the error that occured is and what followup actions
         /// to take.
         /// </summary>
-        protected EErrorCode _errorCode;
-
-        /// <summary>Get/Set error code associated with the exception</summary>
-        public EErrorCode ErrorCode
-        {
-            get { return _errorCode; }
-            set { _errorCode = value; }
-        }
+        public EErrorCode ErrorCode { get; set; }
 
         /// <summary>Constructor.</summary>
         public SnmpException()
@@ -127,7 +120,6 @@ namespace SnmpSharpNet.Exception
         public SnmpException(string message, System.Exception innerException)
             : base(message, innerException)
         {
-
         }
 
         /// <summary>Constructor</summary>
@@ -136,7 +128,7 @@ namespace SnmpSharpNet.Exception
         public SnmpException(EErrorCode errorCode, string message)
             : base(message)
         {
-            _errorCode = errorCode;
+            ErrorCode = errorCode;
         }
 
         /// <summary>Constructor</summary>
@@ -146,7 +138,7 @@ namespace SnmpSharpNet.Exception
         public SnmpException(EErrorCode errorCode, string message, System.Exception innerException)
             : base(message, innerException)
         {
-            _errorCode = errorCode;
+            ErrorCode = errorCode;
         }
     }
 }

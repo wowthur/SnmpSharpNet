@@ -1,39 +1,39 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Exception;
-using SnmpSharpNet.Types;
-using System;
-using System.Collections.Generic;
-
+//
 namespace SnmpSharpNet
 {
+    using System;
+    using System.Collections.Generic;
+    using SnmpSharpNet.Exception;
+    using SnmpSharpNet.Types;
+
     /// <summary>Variable Binding collection</summary>
     public class VbCollection : AsnType, IEnumerable<Vb>
     {
-        List<Vb> _vbs;
+        private List<Vb> vbs;
 
         /// <summary>Standard constructor</summary>
         public VbCollection()
             : base()
         {
             // this is the SMI type for the VarBind sequence
-            Type = SnmpConstants.SMI_SEQUENCE;
+            Type = SnmpConstants.SmiSequence;
 
             // list to store VarBind
-            _vbs = new List<Vb>();
+            vbs = new List<Vb>();
         }
 
         /// <summary>Copy constructor</summary>
@@ -41,24 +41,24 @@ namespace SnmpSharpNet
             : base()
         {
             // this is the SMI type for the VarBind sequence
-            Type = SnmpConstants.SMI_SEQUENCE;
-            
+            Type = SnmpConstants.SmiSequence;
+
             // list to store VarBind
-            _vbs = new List<Vb>();
+            vbs = new List<Vb>();
             foreach (Vb v in second)
-                _vbs.Add(v);
+                vbs.Add(v);
         }
 
         /// <summary>Get number of VarBind entries in the collection</summary>
         public int Count
         {
-            get { return _vbs.Count; }
+            get { return vbs.Count; }
         }
 
         /// <summary>Reset the VarBind collection.</summary>
         public void Clear()
         {
-            _vbs.Clear();
+            vbs.Clear();
         }
 
         /// <summary>Indexed access to VarBind collection.</summary>
@@ -69,10 +69,10 @@ namespace SnmpSharpNet
         {
             get
             {
-                if (index < 0 && index >= _vbs.Count)
+                if (index < 0 && index >= vbs.Count)
                     throw new IndexOutOfRangeException("Requested VarBind entry is outside the collection range.");
 
-                return _vbs[index];
+                return vbs[index];
             }
         }
 
@@ -86,7 +86,7 @@ namespace SnmpSharpNet
                 if (!ContainsOid(oid))
                     return null;
 
-                foreach (Vb v in _vbs)
+                foreach (Vb v in vbs)
                 {
                     if (v.Oid.Equals(oid))
                         return v;
@@ -103,7 +103,7 @@ namespace SnmpSharpNet
         {
             get
             {
-                foreach (Vb v in _vbs)
+                foreach (Vb v in vbs)
                 {
                     if (v.Oid.Equals(oid))
                         return v;
@@ -118,10 +118,10 @@ namespace SnmpSharpNet
         /// <exception cref="IndexOutOfRangeException">Thrown when position is outside the bounds of the collection</exception>
         public void RemoveAt(int pos)
         {
-            if (pos < 0 && pos >= _vbs.Count)
+            if (pos < 0 && pos >= vbs.Count)
                 throw new IndexOutOfRangeException("Requested VarBind entry is outside the collection range.");
 
-            _vbs.RemoveAt(pos);
+            vbs.RemoveAt(pos);
         }
 
         /// <summary>Insert VarBind item at specific location</summary>
@@ -130,17 +130,17 @@ namespace SnmpSharpNet
         /// <exception cref="IndexOutOfRangeException">Thrown when position is outside the bounds of the collection</exception>
         public void Insert(int pos, Vb item)
         {
-            if (pos < 0 && pos >= _vbs.Count)
+            if (pos < 0 && pos >= vbs.Count)
                 throw new IndexOutOfRangeException("Requested VarBind position is outside the collection range.");
 
-            _vbs.Insert(pos, item);
+            vbs.Insert(pos, item);
         }
 
         /// <summary>Add variable binding to the collection</summary>
         /// <param name="vb">VarBind item to add to the collection</param>
         public void Add(Vb vb)
         {
-            _vbs.Add(vb);
+            vbs.Add(vb);
         }
 
         /// <summary>Create a new Variable Binding with the supplied Oid and SnmpNull value and add it to the end of Vb collection</summary>
@@ -205,7 +205,7 @@ namespace SnmpSharpNet
             if (oid == null)
                 return false;
 
-            foreach (Vb v in _vbs)
+            foreach (Vb v in vbs)
             {
                 if (v.Oid.Equals(oid))
                     return true;
@@ -220,7 +220,7 @@ namespace SnmpSharpNet
         {
             List<Oid> o = new List<Oid>();
 
-            foreach (Vb v in _vbs)
+            foreach (Vb v in vbs)
                 o.Add((Oid)v.Oid.Clone());
 
             return o.ToArray();
@@ -230,24 +230,22 @@ namespace SnmpSharpNet
         /// <returns>Enumerator</returns>
         public IEnumerator<Vb> GetEnumerator()
         {
-            return _vbs.GetEnumerator();
+            return vbs.GetEnumerator();
         }
 
         /// <summary>Get enumerator.</summary>
         /// <returns>Enumerator</returns>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return _vbs.GetEnumerator();
+            return vbs.GetEnumerator();
         }
 
         /// <summary>Duplicate Vbs object</summary>
         /// <returns>Duplicate of the Vbs object</returns>
-        public override Object Clone()
+        public override object Clone()
         {
             return new VbCollection(this);
         }
-
-        #region Encode and decode methods
 
         /// <summary>Encode VarBind collection sequence</summary>
         /// <param name="buffer">Target buffer. Encoded VarBind collection is appended.</param>
@@ -255,7 +253,7 @@ namespace SnmpSharpNet
         {
             MutableByte tmp = new MutableByte();
 
-            foreach (Vb v in _vbs)
+            foreach (Vb v in vbs)
                 v.Encode(tmp);
 
             BuildHeader(buffer, Type, tmp.Length);
@@ -274,7 +272,7 @@ namespace SnmpSharpNet
             if (b != Type)
                 throw new SnmpException("Invalid ASN.1 encoding for variable binding list.");
 
-            _vbs.Clear();
+            vbs.Clear();
 
             int oldOffset = offset;
             while (headerLen > 0)
@@ -282,14 +280,12 @@ namespace SnmpSharpNet
                 Vb vb = new Vb();
                 offset = vb.Decode(buffer, offset);
 
-                headerLen -= (offset - oldOffset);
+                headerLen -= offset - oldOffset;
                 oldOffset = offset;
-                _vbs.Add(vb);
+                vbs.Add(vb);
             }
 
             return offset;
         }
-
-        #endregion
     }
 }

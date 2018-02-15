@@ -1,24 +1,24 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Exception;
-using SnmpSharpNet.Types;
-using System;
-
+//
 namespace SnmpSharpNet
 {
+    using System;
+    using SnmpSharpNet.Exception;
+    using SnmpSharpNet.Types;
+
     /// <summary>Base SNMP packet class.</summary>
     /// <remarks>
     /// All SNMP packets begin with the SMI_SEQUENCE header and SNMP protocol version number.
@@ -27,12 +27,12 @@ namespace SnmpSharpNet
     public abstract class SnmpPacket
     {
         /// <summary>SNMP protocol version</summary>
-        protected Integer32 _protocolVersion;
+        protected Integer32 protocolVersion;
 
         /// <summary>SNMP Protocol version</summary>
         public ESnmpVersion Version
         {
-            get { return (ESnmpVersion)_protocolVersion.Value; }
+            get { return (ESnmpVersion)protocolVersion.Value; }
         }
 
         /// <summary>Get Pdu</summary>
@@ -44,17 +44,17 @@ namespace SnmpSharpNet
         /// <summary>Constructor. Sets SNMP version to SNMPV1.</summary>
         public SnmpPacket()
         {
-            _protocolVersion = new Integer32((int)ESnmpVersion.Ver1);
+            protocolVersion = new Integer32((int)ESnmpVersion.Ver1);
         }
 
         /// <summary>Constructor. Initialize SNMP version as supplied. </summary>
         /// <param name="protocolVersion">
-        /// Protocol version. Acceptable values are SnmpConstants.SNMPV1, 
+        /// Protocol version. Acceptable values are SnmpConstants.SNMPV1,
         /// SnmpConstants.SNMPV2 and SnmpConstants.SNMPV3
         /// </param>
         public SnmpPacket(ESnmpVersion protocolVersion)
         {
-            _protocolVersion = new Integer32((int)protocolVersion);
+            this.protocolVersion = new Integer32((int)protocolVersion);
         }
 
         /// <summary>
@@ -80,10 +80,10 @@ namespace SnmpSharpNet
             Sequence seq = new Sequence();
             offset = seq.Decode(buf, offset);
 
-            if (seq.Type != SnmpConstants.SMI_SEQUENCE)
+            if (seq.Type != SnmpConstants.SmiSequence)
                 throw new SnmpDecodingException("Invalid sequence type at the start of the SNMP packet.");
 
-            offset = _protocolVersion.Decode(buf, offset);
+            offset = protocolVersion.Decode(buf, offset);
 
             return offset;
         }
@@ -94,9 +94,9 @@ namespace SnmpSharpNet
 
         /// <summary>
         /// Wrap BER encoded SNMP information contained in the parameter <see cref="MutableByte"/> class.
-        /// 
+        ///
         /// Information in the parameter is prepended by the SNMP version field and wrapped in a sequence header.
-        /// 
+        ///
         /// Derived classes call this method to finalize SNMP packet encoding.
         /// </summary>
         /// <param name="buffer">Buffer containing BER encoded SNMP information</param>
@@ -105,19 +105,19 @@ namespace SnmpSharpNet
             // Encode SNMP protocol version
             MutableByte temp = new MutableByte();
 
-            _protocolVersion.Encode(temp);
+            protocolVersion.Encode(temp);
             buffer.Prepend(temp);
             temp.Reset();
 
-            AsnType.BuildHeader(temp, SnmpConstants.SMI_SEQUENCE, buffer.Length);
+            AsnType.BuildHeader(temp, SnmpConstants.SmiSequence, buffer.Length);
 
             buffer.Prepend(temp);
         }
-        
+
         /// <summary>
         /// Get SNMP protocol version from the packet. This routine does not verify if version number is valid. Caller
         /// should verify that returned value represents a valid SNMP protocol version number.
-        /// 
+        ///
         /// <code>
         /// int protocolVersion = Packet.GetProtocolVersion(inPacket, inLength);
         /// if( protocolVersion != -1 )
@@ -144,21 +144,19 @@ namespace SnmpSharpNet
             if ((offset + length) > bufferLength)
                 throw new SnmpDecodingException("Cannot parse SNMP version from packet, input past end");
 
-            if (asnType != SnmpConstants.SMI_SEQUENCE)
+            if (asnType != SnmpConstants.SmiSequence)
                 throw new SnmpDecodingException("Invalid sequence type at the start of the SNMP packet.");
 
             Integer32 version = new Integer32();
             offset = version.Decode(buffer, offset);
 
-            return (ESnmpVersion) version.Value;
+            return (ESnmpVersion)version.Value;
         }
-
-        #region Packet type check properties
 
         /// <summary>Packet is a report</summary>
         public bool IsReport
         {
-            get { return (Pdu.Type == EPduType.Response); }
+            get { return Pdu.Type == EPduType.Response; }
         }
 
         /// <summary>Packet is a request</summary>
@@ -167,19 +165,18 @@ namespace SnmpSharpNet
         {
             get
             {
-                return (
+                return
                     Pdu.Type == EPduType.Get ||
                     Pdu.Type == EPduType.GetNext ||
                     Pdu.Type == EPduType.GetBulk ||
-                    Pdu.Type == EPduType.Set
-                    );
+                    Pdu.Type == EPduType.Set;
             }
         }
 
         /// <summary>Packet is a response</summary>
         public bool IsResponse
         {
-            get { return (Pdu.Type == EPduType.Response); }
+            get { return Pdu.Type == EPduType.Response; }
         }
 
         /// <summary>Packet is a notification</summary>
@@ -187,13 +184,11 @@ namespace SnmpSharpNet
         {
             get
             {
-                return (
+                return
                     Pdu.Type == EPduType.Trap ||
                     Pdu.Type == EPduType.V2Trap ||
-                    Pdu.Type == EPduType.Inform
-                    );
+                    Pdu.Type == EPduType.Inform;
             }
         }
-        #endregion
     }
 }

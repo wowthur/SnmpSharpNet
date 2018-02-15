@@ -1,27 +1,26 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Types;
-using System;
-
+//
 namespace SnmpSharpNet
 {
+    using System;
+    using SnmpSharpNet.Types;
+
     /// <summary>Collection of static helper methods making operations with SMI data types simpler and easier.</summary>
     public sealed class SMIDataType
     {
-
         private SMIDataType()
         {
         }
@@ -81,7 +80,7 @@ namespace SnmpSharpNet
         /// <see cref="Integer32"/>, <see cref="Counter32"/>, <see cref="Gauge32"/>, <see cref="Counter64"/>,
         /// <see cref="TimeTicks"/>, <see cref="OctetString"/>, <see cref="IpAddress"/>, <see cref="Oid"/>, and
         /// <see cref="Null"/>.
-        /// 
+        ///
         /// Type names are the same as support class names compared without case sensitivity (e.g. Integer == INTEGER).
         /// </summary>
         /// <param name="name">Name of the object type (not case sensitive)</param>

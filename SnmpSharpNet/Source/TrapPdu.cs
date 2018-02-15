@@ -1,23 +1,23 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Exception;
-using SnmpSharpNet.Types;
-using System;
+//
 namespace SnmpSharpNet
 {
+    using System;
+    using SnmpSharpNet.Exception;
+    using SnmpSharpNet.Types;
 
     /// <summary>SNMP version 1 TRAP Protocol Data Unit</summary>
     /// <remarks>
@@ -28,76 +28,68 @@ namespace SnmpSharpNet
         AsnType,
         ICloneable
     {
-        #region Internal variables
-
         /// <summary>Trap enterprise Oid</summary>
-        protected Oid _enterprise;
+        protected Oid enterprise;
 
         /// <summary>The IP Address of the remote agent sending the trap.</summary>
-        protected IpAddress _agentAddr;
+        protected IpAddress agentAddr;
 
         /// <summary>Generic trap code</summary>
-        protected Integer32 _generic;
+        protected Integer32 generic;
 
         /// <summary>Specific trap code.</summary>
-        protected Integer32 _specific;
+        protected Integer32 specific;
 
         /// <summary>sysUpTime timestamp of the trap event</summary>
-        protected TimeTicks _timeStamp;
+        protected TimeTicks timeStamp;
 
         /// <summary>Variable binding list</summary>
-        private VbCollection _variables;
-
-        #endregion Internal variables
-
-        #region Properties
+        private VbCollection variables;
 
         /// <summary>Get remote agent's IP address.</summary>
-        virtual public IpAddress AgentAddress
+        public virtual IpAddress AgentAddress
         {
-            get { return _agentAddr; }
+            get { return agentAddr; }
         }
-        
+
         /// <summary>Get/Set generic code trap value object</summary>
-        virtual public Int32 Generic
+        public virtual int Generic
         {
-            get { return _generic.Value; }
-            set { _generic.Value = value; }
+            get { return generic.Value; }
+            set { generic.Value = value; }
         }
 
         /// <summary>Get/Set specific code trap value object</summary>
-        virtual public Int32 Specific
+        public virtual int Specific
         {
-            get { return _specific.Value; }
-            set { _specific.Value = value; }
+            get { return specific.Value; }
+            set { specific.Value = value; }
         }
 
         /// <summary>Get timeticks trap value object</summary>
-        virtual public uint TimeStamp
+        public virtual uint TimeStamp
         {
-            get { return _timeStamp.Value; }
-            set { _timeStamp.Value = value; }
+            get { return timeStamp.Value; }
+            set { timeStamp.Value = value; }
         }
 
         /// <summary> Returns the number oid/value pairs in the variable binding contained in the PDU</summary>
-        virtual public int Count
+        public virtual int Count
         {
-            get { return _variables.Count; }
+            get { return variables.Count; }
         }
-
-        #endregion Properties
 
         /// <summary>Constructor</summary>
         public TrapPdu()
         {
             base.Type = (byte)EPduType.Trap;
 
-            _enterprise = new Oid();
-            _agentAddr = new IpAddress();
-            _generic = new Integer32();
-            _specific = new Integer32();
-            _timeStamp = new TimeTicks();
-            _variables = new VbCollection();
+            enterprise = new Oid();
+            agentAddr = new IpAddress();
+            generic = new Integer32();
+            specific = new Integer32();
+            timeStamp = new TimeTicks();
+            variables = new VbCollection();
         }
 
         /// <summary>Constructs a new trap pdu that is identical to the passed pdu.</summary>
@@ -106,14 +98,14 @@ namespace SnmpSharpNet
         public TrapPdu(TrapPdu second)
             : this()
         {
-            _enterprise.Set(second._enterprise);
-            _agentAddr.Set(second._agentAddr);
-            _generic.Value = second.Generic;
-            _specific.Value = second.Specific;
-            _timeStamp.Value = second.TimeStamp;
+            enterprise.Set(second.enterprise);
+            agentAddr.Set(second.agentAddr);
+            generic.Value = second.Generic;
+            specific.Value = second.Specific;
+            timeStamp.Value = second.TimeStamp;
 
-            for (int x = 0; x < second._variables.Count; x++)
-                _variables = (VbCollection)second.VbList.Clone();
+            for (int x = 0; x < second.variables.Count; x++)
+                variables = (VbCollection)second.VbList.Clone();
         }
 
         /// <summary>Not implemented. Throws NotImplementedException.</summary>
@@ -127,7 +119,10 @@ namespace SnmpSharpNet
 
         /// <summary>Get PDU type.</summary>
         /// <remarks>Always returns PduType.Trap</remarks>
-        public new EPduType Type { get { return (EPduType)base.Type; } }
+        public new EPduType Type
+        {
+            get { return (EPduType)base.Type; }
+        }
 
         /// <summary>Initialize the class with values from another <see cref="TrapPdu"/> class.</summary>
         /// <param name="second">TrapPdu class whose values are used to initialize this class.</param>
@@ -135,16 +130,16 @@ namespace SnmpSharpNet
         {
             if (second != null)
             {
-                _enterprise.Set(second._enterprise);
-                _agentAddr.Set(second._agentAddr);
-                _generic.Value = second.Generic;
-                _specific.Value = second.Specific;
-                _timeStamp.Value = second.TimeStamp;
+                enterprise.Set(second.enterprise);
+                agentAddr.Set(second.agentAddr);
+                generic.Value = second.Generic;
+                specific.Value = second.Specific;
+                timeStamp.Value = second.TimeStamp;
 
-                _variables.Clear();
+                variables.Clear();
 
-                for (int x = 0; x < second._variables.Count; x++)
-                    _variables = (VbCollection)second.VbList.Clone();
+                for (int x = 0; x < second.variables.Count; x++)
+                    variables = (VbCollection)second.VbList.Clone();
             }
             else
                 throw new ArgumentException("Invalid argument type.", nameof(second));
@@ -153,7 +148,7 @@ namespace SnmpSharpNet
         /// <summary>Get trap enterprise identifier</summary>
         public Oid Enterprise
         {
-            get { return _enterprise; }
+            get { return enterprise; }
         }
 
         /// <summary>
@@ -161,7 +156,7 @@ namespace SnmpSharpNet
         /// </summary>
         public VbCollection VbList
         {
-            get { return _variables; }
+            get { return variables; }
         }
 
         /// <summary>
@@ -169,7 +164,7 @@ namespace SnmpSharpNet
         /// </summary>
         public int VbCount
         {
-            get { return _variables.Count; }
+            get { return variables.Count; }
         }
 
         /// <summary>ASN.1 encode SNMP version 1 trap</summary>
@@ -177,19 +172,19 @@ namespace SnmpSharpNet
         public override void Encode(MutableByte buffer)
         {
             MutableByte trapBuffer = new MutableByte();
-            
+
             // encode the enterprise id & address
-            _enterprise.Encode(trapBuffer);
+            enterprise.Encode(trapBuffer);
 
-            _agentAddr.Encode(trapBuffer);
+            agentAddr.Encode(trapBuffer);
 
-            _generic.Encode(trapBuffer);
+            generic.Encode(trapBuffer);
 
-            _specific.Encode(trapBuffer);
+            specific.Encode(trapBuffer);
 
-            _timeStamp.Encode(trapBuffer);
+            timeStamp.Encode(trapBuffer);
 
-            _variables.Encode(trapBuffer);
+            variables.Encode(trapBuffer);
 
             MutableByte tmpBuffer = new MutableByte();
 
@@ -214,27 +209,27 @@ namespace SnmpSharpNet
             if (headerLength > buffer.Length - offset)
                 throw new OverflowException("Packet is too short.");
 
-            offset = _enterprise.Decode(buffer, offset);
+            offset = enterprise.Decode(buffer, offset);
 
-            offset = _agentAddr.Decode(buffer, offset);
+            offset = agentAddr.Decode(buffer, offset);
 
-            offset = _generic.Decode(buffer, offset);
+            offset = generic.Decode(buffer, offset);
 
-            offset = _specific.Decode(buffer, offset);
+            offset = specific.Decode(buffer, offset);
 
-            offset = _timeStamp.Decode(buffer, offset);
+            offset = timeStamp.Decode(buffer, offset);
 
             // clean out the current variables
-            _variables.Clear();
+            variables.Clear();
 
-            offset = _variables.Decode(buffer, offset);
+            offset = variables.Decode(buffer, offset);
 
             return offset;
         }
 
         /// <summary>Clone object</summary>
         /// <returns>Cloned copy of this object.</returns>
-        public override Object Clone()
+        public override object Clone()
         {
             return new TrapPdu(this);
         }

@@ -1,29 +1,26 @@
 // This file is part of SNMP#NET.
-// 
+//
 // SNMP#NET is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // SNMP#NET is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-// 
-using SnmpSharpNet.Types;
-using System;
-
+//
 namespace SnmpSharpNet
 {
+    using System;
+    using SnmpSharpNet.Types;
 
     /// <summary>SNMP SMI version 1, version 2c and version 3 constants.</summary>
     public static class SnmpConstants
     {
-        #region Snmp V1 errors
-
         /// <summary>No error</summary>
         public const int ErrNoError = 0;
 
@@ -43,11 +40,7 @@ namespace SnmpSharpNet
         public const int ErrGenError = 5;
 
         /// <summary>Enterprise specific error</summary>
-        public const int enterpriseSpecific = 6;
-
-        #endregion SnmpV1errors
-
-        #region SnmpV2errors
+        public const int EnterpriseSpecific = 6;
 
         /// <summary>Access denied</summary>
         public const int ErrNoAccess = 6;
@@ -88,10 +81,6 @@ namespace SnmpSharpNet
         /// <summary>Inconsistent object identifier</summary>
         public const int ErrInconsistentName = 18;
 
-        #endregion SnmpV2errors
-
-        #region SNMP version 1 trap generic error codes
-
         /// <summary>Cold start trap</summary>
         public const int ColdStart = 0;
 
@@ -110,36 +99,29 @@ namespace SnmpSharpNet
         /// <summary>EGP Neighbor Loss trap</summary>
         public const int EgpNeighborLoss = 5;
 
-        /// <summary>Enterprise Specific trap</summary>
-        public const int EnterpriseSpecific = 6;
-
-        #endregion SNMP version 1 trap generic error codes
-
-        #region SMI Type codes and type names
-
         /// <summary>Signed 32-bit integer ASN.1 data type. For implementation, see <see cref="Integer32"/></summary>
-        public const byte SMI_INTEGER = (byte)(AsnType.UNIVERSAL | AsnType.INTEGER);
+        public const byte SmiInteger = (byte)(EAsnType.Universal | EAsnType.Integer);
 
         /// <summary>String representation of the AsnType.INTEGER type.</summary>
-        public const string SMI_INTEGER_STR = "Integer32";
+        public const string SmiIntegerString = "Integer32";
 
         /// <summary>Data type representing a sequence of zero or more 8-bit byte values. For implementation, see <see cref="OctetString"/></summary>
-        public const byte SMI_STRING = (byte)(AsnType.UNIVERSAL | AsnType.OCTETSTRING);
+        public const byte SmiString = (byte)(EAsnType.Universal | EAsnType.OctetString);
 
         /// <summary>String representation of the AsnType.OCTETSTRING type.</summary>
-        public const string SMI_STRING_STR = "OctetString";
+        public const string SmiStringString = "OctetString";
 
         /// <summary>Object id ASN.1 type. For implementation, see <see cref="Oid"/></summary>
-        public const byte SMI_OBJECTID = (byte)(AsnType.UNIVERSAL | AsnType.OBJECTID);
+        public const byte SmiObjectId = (byte)(EAsnType.Universal | EAsnType.ObjectId);
 
         /// <summary>String representation of the SMI_OBJECTID type.</summary>
-        public const string SMI_OBJECTID_STR = "ObjectId";
+        public const string SmiObjectIdString = "ObjectId";
 
         /// <summary>Null ASN.1 value type. For implementation, see <see cref="Null"/>.</summary>
-        public const byte SMI_NULL = (byte)(AsnType.UNIVERSAL | AsnType.NULL);
+        public const byte SmiNull = (byte)(EAsnType.Universal | EAsnType.Null);
 
         /// <summary>String representation of the SMI_NULL type.</summary>
-        public const string SMI_NULL_STR = "NULL";
+        public const string SmiNullString = "NULL";
 
         /// <summary>
         /// An application string is a sequence of octets
@@ -148,20 +130,20 @@ namespace SnmpSharpNet
         /// an IP Address which is an Application String of length
         /// four.
         /// </summary>
-        public const byte SMI_APPSTRING = AsnType.APPLICATION;
+        public const byte SmiApplicationString = (byte)EAsnType.Application;
 
         /// <summary>String representation of the SMI_APPSTRING type.</summary>
-        public const string SMI_APPSTRING_STR = "AppString";
+        public const string SmiApplicationStringString = "AppString";
 
         /// <summary>
         /// An IP Address is an application string of length four
         /// and is indistinguishable from the SMI_APPSTRING value.
         /// The address is a 32-bit quantity stored in network byte order.
         /// </summary>
-        public const byte SMI_IPADDRESS = AsnType.APPLICATION;
+        public const byte SmiIpAddress = (byte)EAsnType.Application;
 
         /// <summary>String representation of the SMI_IPADDRESS type.</summary>
-        public const string SMI_IPADDRESS_STR = "IPAddress";
+        public const string SmiIpAddressString = "IPAddress";
 
         /// <summary>
         /// A non-negative integer that may be incremented, but not
@@ -169,49 +151,49 @@ namespace SnmpSharpNet
         /// the range of zero to 2^32-1 (4,294,967,295). When the counter
         /// reaches its maximum value it wraps back to zero and starts again.
         /// </summary>
-        public const byte SMI_COUNTER32 = AsnType.APPLICATION | 0x01;
+        public const byte SmiCounter32 = (byte)EAsnType.Application | 0x01;
 
         /// <summary>String representation of the SMI_COUNTER32 type.</summary>
-        public const string SMI_COUNTER32_STR = "Counter32";
+        public const string SmiCounter32String = "Counter32";
 
         /// <summary>
         /// Represents a non-negative integer that may increase or
         /// decrease with a maximum value of 2^32-1. If the maximum
         /// value is reached the gauge stays latched until reset.
         /// </summary>
-        public const byte SMI_GAUGE32 = AsnType.APPLICATION | 0x02;
+        public const byte SmiGauge32 = (byte)EAsnType.Application | 0x02;
 
         /// <summary>String representation of the SMI_GAUGE32 type.</summary>
-        public const string SMI_GAUGE32_STR = "Gauge32";
+        public const string SmiGauge32String = "Gauge32";
 
         /// <summary>
         /// Used to represent the integers in the range of 0 to 2^32-1.
         /// This type is identical to the SMI_COUNTER32 and are
         /// indistinguishable in ASN.1
         /// </summary>
-        public const byte SMI_UNSIGNED32 = AsnType.APPLICATION | 0x02; // same as gauge
+        public const byte SmiUnsigned32 = (byte)EAsnType.Application | 0x02; // same as gauge
 
         /// <summary>String representation of the SMI_UNSIGNED32 type.</summary>
-        public const string SMI_UNSIGNED32_STR = "Unsigned32";
+        public const string SmiUnsigned32String = "Unsigned32";
 
         /// <summary>
         /// This represents a non-negative integer that counts time, modulo 2^32.
         /// The time is represented in hundredths (1/100th) of a second.
         /// </summary>
-        public const byte SMI_TIMETICKS = AsnType.APPLICATION | 0x03;
-        
+        public const byte SmiTimeTicks = (byte)EAsnType.Application | 0x03;
+
         /// <summary>String representation of the SMI_TIMETICKS type.</summary>
-        public const string SMI_TIMETICKS_STR = "TimeTicks";
+        public const string SmiTimeTicksString = "TimeTicks";
 
         /// <summary>
         /// Used to support the transport of arbitrary data. The
         /// data itself is encoded as an octet string, but may be in
         /// any format defined by ASN.1 or another standard.
         /// </summary>
-        public const byte SMI_OPAQUE = AsnType.APPLICATION | 0x04;
-        
+        public const byte SmiOpaque = (byte)EAsnType.Application | 0x04;
+
         /// <summary>String representation of the SMI_OPAQUE type.</summary>
-        public const string SMI_OPAQUE_STR = "Opaque";
+        public const string SmiOpaqueString = "Opaque";
 
         /// <summary>
         /// Defines a 64-bit unsigned counter. A counter is an integer that
@@ -220,14 +202,14 @@ namespace SnmpSharpNet
         /// When the counter reaches it's maximum it wraps back to zero and
         /// starts again.
         /// </summary>
-        public const byte SMI_COUNTER64 = AsnType.APPLICATION | 0x06; 
-        
+        public const byte SmiCounter64 = (byte)EAsnType.Application | 0x06;
+
         // SMIv2 only
         /// <summary>String representation of the SMI_COUNTER64 type.</summary>
-        public const string SMI_COUNTER64_STR = "Counter64";
+        public const string SmiCounter64String = "Counter64";
 
         /// <summary>String representation of the unknown SMI data type.</summary>
-        public const string SMI_UNKNOWN_STR = "Unknown";
+        public const string SmiUnknownString = "Unknown";
 
         /// <summary>
         /// The SNMPv2 error representing that there is No-Such-Object
@@ -235,37 +217,33 @@ namespace SnmpSharpNet
         /// of a requested object identifier that does not exist in the
         /// agent's tables
         /// </summary>
-        public const byte SMI_NOSUCHOBJECT = AsnType.CONTEXT | AsnType.PRIMITIVE;
+        public const byte SmiNoSuchObject = (byte)EAsnType.Context | (byte)EAsnType.Primitive;
 
         /// <summary>
         /// The SNMPv2 error representing that there is No-Such-Instance
         /// for a particular object identifier. This error is the result
         /// of a requested object identifier instance does not exist in the
-        /// agent's tables. 
+        /// agent's tables.
         /// </summary>
-        public const byte SMI_NOSUCHINSTANCE = AsnType.CONTEXT | AsnType.PRIMITIVE | 0x01;
+        public const byte SmiNoSuchInstance = (byte)EAsnType.Context | (byte)EAsnType.Primitive | 0x01;
 
         /// <summary>
         /// The SNMPv2 error representing the End-Of-Mib-View.
         /// This error variable will be returned by a SNMPv2 agent
-        /// if the requested object identifier has reached the 
-        /// end of the agent's mib table and there is no lexicographic 
+        /// if the requested object identifier has reached the
+        /// end of the agent's mib table and there is no lexicographic
         /// successor.
         /// </summary>
-        public const byte SMI_ENDOFMIBVIEW = AsnType.CONTEXT | AsnType.PRIMITIVE | 0x02;
+        public const byte SmiEndOfMIBView = (byte)EAsnType.Context | (byte)EAsnType.Primitive | 0x02;
 
         /// <summary>SEQUENCE Variable Binding code. Hex value: 0x30</summary>
-        public const byte SMI_SEQUENCE = (byte)(AsnType.SEQUENCE | AsnType.CONSTRUCTOR);
+        public const byte SmiSequence = (byte)(EAsnType.Sequence | EAsnType.Cosntructor);
 
         /// <summary>
         /// Defines an SNMPv2 Party Clock. The Party Clock is currently
         /// Obsolete, but included for backwards compatibility. Obsoleted in RFC 1902.
         /// </summary>
-        public const byte SMI_PARTY_CLOCK = AsnType.APPLICATION | 0x07;
-
-        #endregion
-
-        #region SNMP version 2 TRAP OIDs
+        public const byte SmiPartyClock = (byte)EAsnType.Application | 0x07;
 
         /// <summary>sysUpTime.0 OID is the first value in the VarBind array of SNMP version 2 TRAP packets</summary>
         public static Oid SysUpTime = new Oid(new uint[] { 1, 3, 6, 1, 2, 1, 1, 3, 0 });
@@ -273,51 +251,44 @@ namespace SnmpSharpNet
         /// <summary>trapObjectID.0 OID is the second value in the VarBind array of SNMP version 2 TRAP packets</summary>
         public static Oid TrapObjectId = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 });
 
-        #endregion
-
-        #region SNMP version 3 error OID values
         /// <summary>SNMP version 3, USM error</summary>
-        public static Oid usmStatsUnsupportedSecLevels = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 1, 0 });
+        public static Oid UsmStatsUnsupportedSecLevels = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 1, 0 });
 
         /// <summary>SNMP version 3, USM error</summary>
-        public static Oid usmStatsNotInTimeWindows = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 2, 0 });
+        public static Oid UsmStatsNotInTimeWindows = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 2, 0 });
 
         /// <summary>SNMP version 3, USM error</summary>
-        public static Oid usmStatsUnknownSecurityNames = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 3, 0 });
+        public static Oid UsmStatsUnknownSecurityNames = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 3, 0 });
 
         /// <summary>SNMP version 3, USM error</summary>
-        public static Oid usmStatsUnknownEngineIDs = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 4, 0 });
+        public static Oid UsmStatsUnknownEngineIDs = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 4, 0 });
 
         /// <summary>SNMP version 3, USM error</summary>
-        public static Oid usmStatsWrongDigests = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 5, 0 });
+        public static Oid UsmStatsWrongDigests = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 5, 0 });
 
         /// <summary>SNMP version 3, USM error</summary>
-        public static Oid usmStatsDecryptionErrors = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 6, 0 });
+        public static Oid UsmStatsDecryptionErrors = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 15, 1, 1, 6, 0 });
 
         /// <summary>SNMP version 3, USM error</summary>
-        public static Oid snmpUnknownSecurityModels = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 11, 2, 1, 1, 0 });
+        public static Oid SnmpUnknownSecurityModels = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 11, 2, 1, 1, 0 });
 
         /// <summary>SNMP version 3, USM error</summary>
-        public static Oid snmpInvalidMsgs = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 11, 2, 1, 2, 0 });
+        public static Oid SnmpInvalidMsgs = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 11, 2, 1, 2, 0 });
 
         /// <summary>SNMP version 3, USM error</summary>
-        public static Oid snmpUnknownPDUHandlers = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 11, 2, 1, 3, 0 });
+        public static Oid SnmpUnknownPDUHandlers = new Oid(new uint[] { 1, 3, 6, 1, 6, 3, 11, 2, 1, 3, 0 });
 
         /// <summary>Array of all SNMP version 3 REPORT packet error OIDs</summary>
-        public static Oid[] v3ErrorOids = {
-            usmStatsUnsupportedSecLevels,
-            usmStatsNotInTimeWindows,
-            usmStatsUnknownSecurityNames,
-            usmStatsUnknownEngineIDs,
-            usmStatsWrongDigests,
-            usmStatsDecryptionErrors,
-            snmpUnknownSecurityModels,
-            snmpUnknownPDUHandlers
+        public static Oid[] Version3ErrorOids = {
+            UsmStatsUnsupportedSecLevels,
+            UsmStatsNotInTimeWindows,
+            UsmStatsUnknownSecurityNames,
+            UsmStatsUnknownEngineIDs,
+            UsmStatsWrongDigests,
+            UsmStatsDecryptionErrors,
+            SnmpUnknownSecurityModels,
+            SnmpUnknownPDUHandlers,
         };
-
-        #endregion SNMP version 3 error OID values
-
-        #region Helper methods
 
         /// <summary>Used to create correct variable type object for the specified encoded type</summary>
         /// <param name="asnType">ASN.1 type code</param>
@@ -326,33 +297,33 @@ namespace SnmpSharpNet
         {
             switch (asnType)
             {
-                case SMI_INTEGER:
+                case SmiInteger:
                     return new Integer32();
-                case SMI_COUNTER32:
+                case SmiCounter32:
                     return new Counter32();
-                case SMI_GAUGE32:
+                case SmiGauge32:
                     return new Gauge32();
-                case SMI_COUNTER64:
+                case SmiCounter64:
                     return new Counter64();
-                case SMI_TIMETICKS:
+                case SmiTimeTicks:
                     return new TimeTicks();
-                case SMI_STRING:
+                case SmiString:
                     return new OctetString();
-                case SMI_OPAQUE:
+                case SmiOpaque:
                     return new Opaque();
-                case SMI_IPADDRESS:
+                case SmiIpAddress:
                     return new IpAddress();
-                case SMI_OBJECTID:
+                case SmiObjectId:
                     return new Oid();
-                case SMI_PARTY_CLOCK:
+                case SmiPartyClock:
                     return new V2PartyClock();
-                case SMI_NOSUCHINSTANCE:
+                case SmiNoSuchInstance:
                     return new NoSuchInstance();
-                case SMI_NOSUCHOBJECT:
+                case SmiNoSuchObject:
                     return new NoSuchObject();
-                case SMI_ENDOFMIBVIEW:
+                case SmiEndOfMIBView:
                     return new EndOfMibView();
-                case SMI_NULL:
+                case SmiNull:
                     return new Null();
             }
 
@@ -407,33 +378,45 @@ namespace SnmpSharpNet
         {
             switch (type)
             {
-                case SMI_IPADDRESS:
-                    return SMI_IPADDRESS_STR;
+                case SmiIpAddress:
+                    return SmiIpAddressString;
+
+#pragma warning disable SA1005
+#pragma warning disable SA1515
                 //case SMI_APPSTRING:
                 //    return SMI_APPSTRING_STR;
-                case SMI_COUNTER32:
-                    return SMI_COUNTER32_STR;
-                case SMI_COUNTER64:
-                    return SMI_COUNTER64_STR;
+#pragma warning restore SA1515
+#pragma warning restore SA1005
+
+                case SmiCounter32:
+                    return SmiCounter32String;
+                case SmiCounter64:
+                    return SmiCounter64String;
+
+#pragma warning disable SA1005
+#pragma warning disable SA1515
                 //case SMI_GAUGE32:
                 //    return SMI_GAUGE32_STR;
-                case SMI_INTEGER:
-                    return SMI_INTEGER_STR;
-                case SMI_NULL:
-                    return SMI_NULL_STR;
-                case SMI_OBJECTID:
-                    return SMI_OBJECTID_STR;
-                case SMI_OPAQUE:
-                    return SMI_OPAQUE_STR;
-                case SMI_STRING:
-                    return SMI_STRING_STR;
-                case SMI_TIMETICKS:
-                    return SMI_TIMETICKS_STR;
-                case SMI_UNSIGNED32:
-                    return SMI_UNSIGNED32_STR;
+#pragma warning restore SA1515
+#pragma warning restore SA1005
+
+                case SmiInteger:
+                    return SmiIntegerString;
+                case SmiNull:
+                    return SmiNullString;
+                case SmiObjectId:
+                    return SmiObjectIdString;
+                case SmiOpaque:
+                    return SmiOpaqueString;
+                case SmiString:
+                    return SmiStringString;
+                case SmiTimeTicks:
+                    return SmiTimeTicksString;
+                case SmiUnsigned32:
+                    return SmiUnsigned32String;
             }
 
-            return SMI_UNKNOWN_STR;
+            return SmiUnknownString;
         }
 
         /// <summary>Debugging function used to dump on the console supplied byte array in a format suitable for console output.</summary>
@@ -472,7 +455,5 @@ namespace SnmpSharpNet
 
             return false;
         }
-
-        #endregion
     }
 }
