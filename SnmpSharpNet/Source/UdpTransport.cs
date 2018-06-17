@@ -15,11 +15,11 @@
 //
 namespace SnmpSharpNet
 {
+    using SnmpSharpNet.Exception;
     using System;
     using System.Net;
     using System.Net.Sockets;
-    using System.Threading;
-    using SnmpSharpNet.Exception;
+    using System.Threading.Tasks;
 
     /// <summary>Async delegate called on completion of Async SNMP request</summary>
     /// <param name="status">SNMP request status. If status is NoError then pdu will contain valid information</param>
@@ -175,358 +175,111 @@ namespace SnmpSharpNet
             }
         }
 
-        /// <summary>SNMP request internal callback</summary>
-        internal event SnmpAsyncCallback OnAsyncCallback;
-
-        /// <summary>
-        /// Is class busy. This property is true when class is servicing another request, false if
-        /// ready to process a new request.
-        /// </summary>
-        public bool IsBusy { get; internal set; }
-
-        /// <summary>Async request state information.</summary>
-        internal AsyncRequestState requestState;
-
-        /// <summary>Incoming data buffer</summary>
-        internal byte[] internalBuffer;
-
-        /// <summary>Receiver IP end point</summary>
-        internal IPEndPoint receivePeer;
-
-        /// <summary>Begin an async SNMP request</summary>
-        /// <param name="peer">Pdu to send to the agent</param>
-        /// <param name="port">Callback to receive response from the agent</param>
-        /// <param name="buffer">Buffer containing data to send to the peer</param>
-        /// <param name="bufferLength">Length of data in the buffer</param>
-        /// <param name="timeout">Request timeout in milliseconds</param>
-        /// <param name="retries">Maximum retry count. 0 = single request no further retries.</param>
-        /// <param name="asyncCallback">Callback that will receive the status and result of the operation</param>
-        /// <returns>
-        /// Returns false if another request is already in progress or if socket used by the class
-        /// has been closed using Dispose() member, otherwise true
-        /// </returns>
+        /// <summary>Make sync request using IP/UDP with request timeouts and retries.</summary>
+        /// <param name="peer">SNMP agent IP address</param>
+        /// <param name="port">SNMP agent port number</param>
+        /// <param name="buffer">Data to send to the agent</param>
+        /// <param name="bufferLength">Data length in the buffer</param>
+        /// <param name="timeout">Timeout in milliseconds</param>
+        /// <param name="retries">Maximum number of retries. 0 = make a single request with no retry attempts</param>
+        /// <returns>Byte array returned by the agent. Null on error</returns>
+        /// <exception cref="SnmpException">Thrown on request timed out. SnmpException.ErrorCode is set to
+        /// SnmpException.RequestTimedOut constant.</exception>
         /// <exception cref="SnmpException">Thrown when IPv4 address is passed to the v6 socket or vice versa</exception>
-        internal bool RequestAsync(IPAddress peer, int port, byte[] buffer, int bufferLength, int timeout, int retries, SnmpAsyncCallback asyncCallback)
+        public async Task<byte[]> RequestAsync(IPAddress peer, int port, byte[] buffer, int bufferLength, int timeout, int retries)
         {
-            if (IsBusy)
-                return false;
-
             if (socket == null)
-                return false; // socket has been closed. no new operations are possible.
+                return null; // socket has been closed. no new operations are possible.
 
             if (socket.AddressFamily != peer.AddressFamily)
                 throw new SnmpException("Invalid address protocol version.");
 
-            IsBusy = true;
-            OnAsyncCallback = null;
-            OnAsyncCallback += asyncCallback;
-            requestState = new AsyncRequestState(peer, port, retries, timeout)
+            IPEndPoint netPeer = new IPEndPoint(peer, port);
+
+            socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, timeout);
+
+            int recv = 0;
+            int retry = 0;
+            byte[] inbuffer = new byte[64 * 1024];
+
+            EndPoint remote = new IPEndPoint(peer.AddressFamily == AddressFamily.InterNetwork ? IPAddress.Any : IPAddress.IPv6Any, 0);
+            while (true)
             {
-                Packet = buffer,
-                PacketLength = bufferLength,
-            };
-
-            internalBuffer = new byte[64 * 1024]; // create incoming data buffer
-
-            SendToBegin(); // Send the request
-
-            return true;
-        }
-
-        /// <summary>Calls async version of the SendTo socket function.</summary>
-        internal void SendToBegin()
-        {
-            if (requestState == null)
-            {
-                IsBusy = false;
-                return;
-            }
-
-            // kill the timeout timer - there shouldn't be one active when we are sending a new request
-            if (requestState.Timer != null)
-            {
-                requestState.Timer.Dispose();
-                requestState.Timer = null;
-            }
-
-            if (socket == null)
-            {
-                IsBusy = false;
-                requestState = null;
-                OnAsyncCallback(EAsyncRequestResult.Terminated, new IPEndPoint(IPAddress.Any, 0), null, 0);
-
-                return; // socket has been closed. no new operations are possible.
-            }
-
-            try
-            {
-                socket.BeginSendTo(requestState.Packet, 0, requestState.PacketLength, SocketFlags.None, requestState.EndPoint, new AsyncCallback(SendToCallback), null);
-            }
-            catch
-            {
-                IsBusy = false;
-                requestState = null;
-                OnAsyncCallback(EAsyncRequestResult.SocketSendError, new IPEndPoint(socket.AddressFamily == AddressFamily.InterNetwork ? IPAddress.Any : IPAddress.IPv6Any, 0), null, 0);
-            }
-        }
-
-        /// <summary>Callback member called on completion of BeginSendTo send data operation.</summary>
-        /// <param name="ar">Async result</param>
-        internal void SendToCallback(IAsyncResult ar)
-        {
-            if (socket == null || !IsBusy || requestState == null)
-            {
-                IsBusy = false;
-                requestState = null;
-                OnAsyncCallback(EAsyncRequestResult.Terminated, new IPEndPoint(IPAddress.Any, 0), null, 0);
-
-                return; // socket has been closed. no new operations are possible.
-            }
-
-            int sentLength = 0;
-            try
-            {
-                sentLength = socket.EndSendTo(ar);
-            }
-            catch (NullReferenceException ex)
-            {
-                ex.GetType();
-                IsBusy = false;
-                requestState = null;
-                OnAsyncCallback(EAsyncRequestResult.Terminated, new IPEndPoint(socket.AddressFamily == AddressFamily.InterNetwork ? IPAddress.Any : IPAddress.IPv6Any, 0), null, 0);
-
-                return;
-            }
-            catch
-            {
-                sentLength = 0;
-            }
-
-            if (sentLength != requestState.PacketLength)
-            {
-                IsBusy = false;
-                requestState = null;
-                OnAsyncCallback(EAsyncRequestResult.SocketSendError, new IPEndPoint(socket.AddressFamily == AddressFamily.InterNetwork ? IPAddress.Any : IPAddress.IPv6Any, 0), null, 0);
-
-                return;
-            }
-
-            // Start receive timer
-            ReceiveBegin(); // Initialize a receive call
-        }
-
-        /// <summary>Begin async version of ReceiveFrom member of the socket class.</summary>
-        internal void ReceiveBegin()
-        {
-            // kill the timeout timer
-            if (requestState.Timer != null)
-            {
-                requestState.Timer.Dispose();
-                requestState.Timer = null;
-            }
-
-            if (socket == null || !IsBusy || requestState == null)
-            {
-                IsBusy = false;
-                requestState = null;
-
-                if (socket != null)
-                    OnAsyncCallback(EAsyncRequestResult.Terminated, new IPEndPoint(socket.AddressFamily == AddressFamily.InterNetwork ? IPAddress.Any : IPAddress.IPv6Any, 0), null, 0);
-                else
-                    OnAsyncCallback(EAsyncRequestResult.Terminated, new IPEndPoint(IPAddress.Any, 0), null, 0);
-
-                // socket has been closed. no new operations are possible.
-                return;
-            }
-
-            receivePeer = new IPEndPoint(socket.AddressFamily == AddressFamily.InterNetwork ? IPAddress.Any : IPAddress.IPv6Any, 0);
-            EndPoint ep = receivePeer;
-            try
-            {
-                socket.BeginReceiveFrom(internalBuffer, 0, internalBuffer.Length, SocketFlags.None, ref ep, new AsyncCallback(ReceiveFromCallback), null);
-            }
-            catch
-            {
-                // retry on every error. this can be done better by evaluating the returned
-                // error value but it's a lot of work and for a non-acked protocol, just send it again
-                // until you reach max retries.
-                RetryAsyncRequest();
-                return;
-            }
-
-            requestState.Timer = new Timer(new TimerCallback(AsyncRequestTimerCallback), null, requestState.Timeout, System.Threading.Timeout.Infinite);
-        }
-
-        /// <summary>
-        /// Internal retry function. Checks if request has reached maximum number of retries and either resends the request if not reached,
-        /// or sends request timed-out notification to the caller if maximum retry count has been reached and request has failed.
-        /// </summary>
-        internal void RetryAsyncRequest()
-        {
-            // kill the timer if one is active
-            if (requestState.Timer != null)
-            {
-                requestState.Timer.Dispose();
-                requestState.Timer = null;
-            }
-
-            if (socket == null || !IsBusy || requestState == null)
-            {
-                IsBusy = false;
-                requestState = null;
-
-                if (socket != null)
-                    OnAsyncCallback(EAsyncRequestResult.Terminated, new IPEndPoint(socket.AddressFamily == AddressFamily.InterNetwork ? IPAddress.Any : IPAddress.IPv6Any, 0), null, 0);
-                else
-                    OnAsyncCallback(EAsyncRequestResult.Terminated, new IPEndPoint(IPAddress.Any, 0), null, 0);
-
-                // socket has been closed. no new operations are possible.
-                return;
-            }
-
-            // We increment the retry counter before retry count. Initial CurrentRetry value is set to -1 so that
-            // MaxRetries value can be 0 (first request is not counted as a retry).
-            requestState.CurrentRetry += 1;
-            if (requestState.CurrentRetry >= requestState.MaxRetries)
-            {
-                IsBusy = false;
-                requestState = null;
-                OnAsyncCallback(EAsyncRequestResult.Timeout, new IPEndPoint(socket.AddressFamily == AddressFamily.InterNetwork ? IPAddress.Any : IPAddress.IPv6Any, 0), null, 0);
-
-                return;
-            }
-            else
-                SendToBegin();
-        }
-
-        /// <summary>
-        /// Internal callback called as part of Socket.BeginReceiveFrom. Process incoming packets and notify caller
-        /// of results.
-        /// </summary>
-        /// <param name="ar">Async call result used by <seealso cref="Socket.EndReceiveFrom"/></param>
-        internal void ReceiveFromCallback(IAsyncResult ar)
-        {
-            // kill the timer if one is active
-            if (requestState.Timer != null)
-            {
-                requestState.Timer.Dispose();
-                requestState.Timer = null;
-            }
-
-            if (socket == null || !IsBusy || requestState == null)
-            {
-                IsBusy = false;
-                requestState = null;
-
-                if (socket == null)
-                    OnAsyncCallback(EAsyncRequestResult.Terminated, new IPEndPoint(socket.AddressFamily == AddressFamily.InterNetwork ? IPAddress.Any : IPAddress.IPv6Any, 0), null, 0);
-                else
-                    OnAsyncCallback(EAsyncRequestResult.Terminated, new IPEndPoint(IPAddress.Any, 0), null, 0);
-
-                return; // socket has been closed. no new operations are possible.
-            }
-
-            int inlen = 0;
-            EndPoint ep = receivePeer;
-            try
-            {
-                inlen = socket.EndReceiveFrom(ar, ref ep);
-            }
-            catch (SocketException ex)
-            {
-                switch ((SocketError)ex.ErrorCode)
+                try
                 {
-                    case SocketError.MessageSize:
-                        inlen = 0; // Packet too large
-                        break;
+                    await Task.Factory.FromAsync(
+                        socket.BeginSendTo(buffer, 0, bufferLength, SocketFlags.None, netPeer, null, null),
+                        end =>
+                        {
+                            socket.EndSendTo(end);
+                        }
+                    )
+                    .ConfigureAwait(false);
 
-                    case SocketError.NetworkDown:
-                        IsBusy = false;
-                        requestState = null;
-                        OnAsyncCallback(EAsyncRequestResult.SocketReceiveError, null, null, -1);
-                        return;
-
-                    case SocketError.NetworkUnreachable:
-                        IsBusy = false;
-                        requestState = null;
-                        OnAsyncCallback(EAsyncRequestResult.SocketReceiveError, null, null, -1);
-                        return;
-
-                    case SocketError.ConnectionReset:
-                        IsBusy = false;
-                        requestState = null;
-                        OnAsyncCallback(EAsyncRequestResult.SocketReceiveError, null, null, -1);
-                        return;
-
-                    case SocketError.HostDown:
-                        IsBusy = false;
-                        requestState = null;
-                        OnAsyncCallback(EAsyncRequestResult.SocketReceiveError, null, null, -1);
-                        return;
-
-                    case SocketError.HostUnreachable:
-                        IsBusy = false;
-                        requestState = null;
-                        OnAsyncCallback(EAsyncRequestResult.SocketReceiveError, null, null, -1);
-                        return;
-
-                    case SocketError.ConnectionRefused:
-                        IsBusy = false;
-                        requestState = null;
-                        OnAsyncCallback(EAsyncRequestResult.SocketReceiveError, null, null, -1);
-                        return;
-
-                    case SocketError.TimedOut:
-                        inlen = 0; // Connection attempt timed out. Fall through to retry
-                        break;
-
-                    default:
-                        // Assume it is a timeout
-                        break;
+                    await Task.Factory.FromAsync(
+                        socket.BeginReceiveFrom(inbuffer, 0, inbuffer.Length, SocketFlags.None, ref remote, null, null),
+                        end =>
+                        {
+                            recv = socket.EndReceiveFrom(end, ref remote);
+                        }
+                    );
                 }
-            }
-            catch (ObjectDisposedException ex)
-            {
-                ex.GetType(); // this is to avoid the compilation warning
-                OnAsyncCallback(EAsyncRequestResult.Terminated, null, null, -1);
-                return;
-            }
-            catch (NullReferenceException ex)
-            {
-                ex.GetType(); // this is to avoid the compilation warning
-                OnAsyncCallback(EAsyncRequestResult.Terminated, null, null, -1);
-                return;
-            }
-            catch (System.Exception ex)
-            {
-                ex.GetType();
+                catch (SocketException ex)
+                {
+                    switch ((SocketError)ex.ErrorCode)
+                    {
+                        case SocketError.MessageSize:
+                            recv = 0; // Packet too large
+                            break;
+                        case SocketError.NetworkDown:
+                            throw new SnmpNetworkException(ex, "Network error: Destination network is down.");
+                        case SocketError.NetworkUnreachable:
+                            throw new SnmpNetworkException(ex, "Network error: destination network is unreachable.");
+                        case SocketError.ConnectionReset:
+                            throw new SnmpNetworkException(ex, "Network error: connection reset by peer.");
+                        case SocketError.HostDown:
+                            throw new SnmpNetworkException(ex, "Network error: remote host is down.");
+                        case SocketError.HostUnreachable:
+                            throw new SnmpNetworkException(ex, "Network error: remote host is unreachable.");
+                        case SocketError.ConnectionRefused:
+                            throw new SnmpNetworkException(ex, "Network error: connection refused.");
+                        case SocketError.TimedOut:
+                            recv = 0; // Connection attempt timed out. Fall through to retry
+                            break;
+                        default:
+                            // Assume it is a timeout
+                            break;
+                    }
+                }
 
-                // we don't care what exception happened. We only want to know if we should retry the request
-                inlen = 0;
-            }
+                if (recv > 0)
+                {
+                    IPEndPoint remEP = remote as IPEndPoint;
+                    if (!noSourceCheck && !remEP.Equals(netPeer))
+                    {
+                        if (remEP.Address != netPeer.Address)
+                            Console.WriteLine("Address miss-match {0} != {1}", remEP.Address, netPeer.Address);
 
-            if (inlen == 0)
-                RetryAsyncRequest();
-            else
-            {
-                // make a copy of the data from the internal buffer
-                byte[] buf = new byte[inlen];
-                Buffer.BlockCopy(internalBuffer, 0, buf, 0, inlen);
+                        if (remEP.Port != netPeer.Port)
+                            Console.WriteLine("Port # miss-match {0} != {1}", remEP.Port, netPeer.Port);
 
-                IsBusy = false;
-                requestState = null;
-                OnAsyncCallback(EAsyncRequestResult.NoError, receivePeer, buf, buf.Length);
-            }
-        }
-
-        /// <summary>Internal timer callback. Called by _asyncTimer when SNMP request timeout has expired</summary>
-        /// <param name="stateInfo">State info. Always null</param>
-        internal void AsyncRequestTimerCallback(object stateInfo)
-        {
-            if (socket != null || (requestState != null && IsBusy))
-            {
-                // Call retry function
-                RetryAsyncRequest();
+                        /* Not good, we got a response from somebody other then who we requested a response from */
+                        retry++;
+                        if (retry > retries)
+                            throw new SnmpException(SnmpException.EErrorCode.RequestTimedOut, "Request has reached maximum retries.");
+                    }
+                    else
+                    {
+                        MutableByte buf = new MutableByte(inbuffer, recv);
+                        return buf;
+                    }
+                }
+                else
+                {
+                    retry++;
+                    if (retry > retries)
+                        throw new SnmpException(SnmpException.EErrorCode.RequestTimedOut, "Request has reached maximum retries.");
+                }
             }
         }
 
