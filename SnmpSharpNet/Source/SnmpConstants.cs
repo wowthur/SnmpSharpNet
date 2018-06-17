@@ -237,7 +237,7 @@ namespace SnmpSharpNet
         public const byte SmiEndOfMIBView = (byte)EAsnType.Context | (byte)EAsnType.Primitive | 0x02;
 
         /// <summary>SEQUENCE Variable Binding code. Hex value: 0x30</summary>
-        public const byte SmiSequence = (byte)(EAsnType.Sequence | EAsnType.Cosntructor);
+        public const byte SmiSequence = (byte)(EAsnType.Sequence | EAsnType.Constructor);
 
         /// <summary>
         /// Defines an SNMPv2 Party Clock. The Party Clock is currently

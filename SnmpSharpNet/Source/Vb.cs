@@ -33,7 +33,7 @@ namespace SnmpSharpNet
         /// <summary>Standard constructor. Initializes values to null.</summary>
         public Vb()
         {
-            Type = (byte)(EAsnType.Sequence | EAsnType.Cosntructor);
+            Type = (byte)(EAsnType.Sequence | EAsnType.Constructor);
         }
 
         /// <summary>Construct Vb with the supplied OID and Null value</summary>

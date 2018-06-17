@@ -12,17 +12,17 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-//
+
 namespace SnmpSharpNet.Types
 {
     using System;
     using SnmpSharpNet.Exception;
 
-    /// <summary>
-    /// Returned when end of MIB has been reached when performing GET-NEXT or GET-BULK operations.
-    /// </summary>
+    /// <summary>Returned when end of MIB has been reached when performing GET-NEXT or GET-BULK operations.</summary>
     [Serializable]
-    public class EndOfMibView : V2Error, System.ICloneable
+    public class EndOfMibView :
+        V2Error,
+        ICloneable
     {
         /// <summary> The default class construtor.</summary>
         public EndOfMibView()

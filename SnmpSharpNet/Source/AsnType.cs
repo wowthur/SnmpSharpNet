@@ -18,61 +18,6 @@ namespace SnmpSharpNet
     using System;
     using SnmpSharpNet.Exception;
 
-    public enum EAsnType
-    {
-        /// <summary>Bool true/false value type</summary>
-        Boolean = 0x01,
-
-        /// <summary>Signed 32-bit integer type</summary>
-        Integer = 0x02,
-
-        /// <summary>Bit sequence type</summary>
-        BitString = 0x03,
-
-        /// <summary>Octet (byte) value type</summary>
-        OctetString = 0x04,
-
-        /// <summary>Null (no value) type</summary>
-        Null = 0x05,
-
-        /// <summary>Object id type</summary>
-        ObjectId = 0x06,
-
-        /// <summary>Arbitrary data type</summary>
-        Sequence = 0x10,
-
-        /// <summary>
-        /// Defined by referencing a fixed, unordered list of types,
-        /// some of which may be declared optional. Each value is an
-        /// unordered list of values, one from each component type.
-        /// </summary>
-        Set = 0x11,
-
-        /// <summary>
-        /// Generally useful, application-independent types and
-        /// construction mechanisms.
-        /// </summary>
-        Universal = 0x00,
-
-        /// <summary>
-        /// Relevant to a particular application. These are defined
-        /// in standards other than ASN.1.
-        /// </summary>
-        Application = 0x40,
-
-        /// <summary>Also relevant to a particular application, but limited by context</summary>
-        Context = 0x80,
-
-        /// <summary>These are types not covered by any standard but instead defined by users.</summary>
-        Private = 0xC0,
-
-        /// <summary>A primitive data object.</summary>
-        Primitive = 0x00,
-
-        /// <summary> A constructed data object such as a set or sequence.</summary>
-        Cosntructor = 0x20,
-    }
-
     /// <summary>Base class for all ASN.1 value classes</summary>
     public abstract class AsnType : ICloneable
     {

@@ -75,9 +75,7 @@ namespace SnmpSharpNet.Types
             return new Counter32(this);
         }
 
-        /// <summary>
-        /// Return difference between two Counter32 values taking counter roll-over into account.
-        /// </summary>
+        /// <summary>Return difference between two Counter32 values taking counter roll-over into account.</summary>
         /// <param name="first">First or older value</param>
         /// <param name="second">Second or newer value</param>
         /// <returns>Difference between the two values</returns>
@@ -85,19 +83,12 @@ namespace SnmpSharpNet.Types
         {
             uint f = first.Value;
             uint s = second.Value;
-            uint res = 0;
 
+            // in case of a roll-over event
             if (s > f)
-            {
-                // in case of a roll-over event
-                res = (uint.MaxValue - f) + s;
-            }
+                return (uint.MaxValue - f) + s;
             else
-            {
-                res = s - f;
-            }
-
-            return res;
+                return s - f;
         }
     }
 }

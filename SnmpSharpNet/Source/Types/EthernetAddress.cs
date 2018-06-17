@@ -12,7 +12,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with SNMP#NET.  If not, see <http://www.gnu.org/licenses/>.
-//
+
 namespace SnmpSharpNet.Types
 {
     using System;
@@ -24,7 +24,9 @@ namespace SnmpSharpNet.Types
     /// <remarks>THis class doesn't not represent a distinct ASN.1 data type. It is a helper
     /// class to allow users to perform MAC address specific operations on OctetString values.</remarks>
     [Serializable]
-    public class EthernetAddress : OctetString, ICloneable
+    public class EthernetAddress :
+        OctetString,
+        ICloneable
     {
         /// <summary>Constructor. Initialize the class to 0000.0000.0000</summary>
         public EthernetAddress()
@@ -93,7 +95,7 @@ namespace SnmpSharpNet.Types
         public override void Set(string value)
         {
             if (value == null || value.Length <= 0)
-                throw new ArgumentException("Invalid argument. String is empty.");
+                throw new ArgumentException("Invalid argument. String is empty.", "value");
 
             string workString = (string)value.Clone();
             for (int cnt = 0; cnt < value.Length; cnt++)
@@ -109,7 +111,7 @@ namespace SnmpSharpNet.Types
             }
 
             if (workString.Length != 12)
-                throw new ArgumentException("Invalid Ethernet address format.");
+                throw new ArgumentException("Invalid Ethernet address format.", "value");
 
             int pos = 0;
             int bufpos = 0;

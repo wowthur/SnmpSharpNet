@@ -78,7 +78,7 @@
             Assert.NotNull(vb);
 
             Assert.Equal(new Oid("1.3.6.1.2.1.1.2.0"), vb.Oid);
-            Assert.Equal((byte)(EAsnType.Cosntructor | EAsnType.Sequence), vb.Type);
+            Assert.Equal((byte)(EAsnType.Constructor | EAsnType.Sequence), vb.Type);
             Assert.Equal((byte)EAsnType.ObjectId, vb.Value.Type);
             Assert.Equal(new Oid("1.3.6.1.4.1.2001.1.1.1.297.93.1.27.2.2.1"), vb.Value);
         }
@@ -192,6 +192,44 @@
             Assert.Equal(new Oid("1.3.6.1.4.1.253.8.64.4.2.1.5.10.14130400"), vb.Oid);
             Assert.Equal((byte)EAsnType.Integer, vb.Value.Type);
             Assert.Equal(1, vb.Value as Integer32);
+        }
+
+        private static readonly byte[] V2cPacket1 =
+        {
+            0x30, 0x2d, 0x02, 0x01, 0x01, 0x04, 0x05, 0x43,
+            0x49, 0x53, 0x43, 0x4f, 0xa2, 0x21, 0x02, 0x04,
+            0x78, 0xf2, 0x85, 0x22, 0x02, 0x01, 0x00, 0x02,
+            0x01, 0x00, 0x30, 0x13, 0x30, 0x11, 0x06, 0x0c,
+            0x28, 0xc4, 0x62, 0x01, 0x01, 0x01, 0x01, 0x02,
+            0x01, 0x01, 0x06, 0x03, 0x02, 0x01, 0x03,
+        };
+
+        [Fact]
+        public void ParseSnmpV2cGet1()
+        {
+            var packetVersion = SnmpPacket.GetProtocolVersion(V2cPacket1, V2cPacket1.Length);
+
+            Assert.Equal(ESnmpVersion.Ver2, packetVersion);
+
+            var packet = new SnmpV2Packet();
+            packet.Decode(V2cPacket1, V2cPacket1.Length);
+
+            Assert.Equal("CISCO", packet.Community.ToString());
+
+            Assert.False(packet.IsRequest);
+            Assert.True(packet.IsResponse);
+
+            Assert.Equal(2029159714, packet.Pdu.RequestId);
+            Assert.Equal(EPduErrorStatus.NoError, packet.Pdu.ErrorStatus);
+            Assert.Equal(0, packet.Pdu.ErrorIndex);
+
+            Assert.Equal(1, packet.Pdu.VbCount);
+
+            var vb = packet.Pdu.GetVb(0);
+            Assert.NotNull(vb);
+
+            Assert.Equal(new Oid("1.0.8802.1.1.1.1.2.1.1.6.3"), vb.Oid);
+            Assert.Equal(3, (vb.Value as Integer32).Value);
         }
     }
 }
